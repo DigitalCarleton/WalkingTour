@@ -113,6 +113,8 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
           }
         }
 
+        var_dump($_tourTypes);
+
         $this->view->tour_types = $_tourTypes;
         // $this->view->item_types = $this->_itemTypes;
         /* REMOVING ADDITIONAL SIMPLE VOCAB FILTERS -AM */
