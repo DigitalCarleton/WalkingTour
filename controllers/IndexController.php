@@ -113,8 +113,6 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
           }
         }
 
-        var_dump($_tourTypes);
-
         $this->view->tour_types = $_tourTypes;
         // $this->view->item_types = $this->_itemTypes;
         /* REMOVING ADDITIONAL SIMPLE VOCAB FILTERS -AM */
@@ -160,7 +158,6 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         $wheres = array("items.public = 1");
 
         $request_tour_id = $this->_request->getParam('tourType');
-        echo "request_tour_id: " . $request_tour_id; 
         $tourItemTable = $db->getTable( 'TourItem' );
         if($request_tour_id != 0){
       		$tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
