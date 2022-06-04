@@ -122,7 +122,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         // $placeTypes = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_PLACE_TYPE);
         // $eventTypes = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_EVENT_TYPE);
 
-        $_tourTypes = publicTours();
+        $_tourTypes = $this->publicTours();
 
         $this->view->tour_types = $_tourTypes;
         // $this->view->item_types = $this->_itemTypes;
