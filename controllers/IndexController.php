@@ -87,6 +87,30 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
     );
 
     /**
+     * Return a list of public tours
+     */
+    public function publicTours()
+    {
+        // Get the database.
+        $db = get_db();
+        // Get the Tour table.
+        $tour_table = $db->getTable('Tour');
+        // Build the select query.
+        $select = $tour_table->getSelect();
+        // Fetch some items with our select.
+        $results = $tour_table->fetchObjects($select);
+        // Build an array with 
+        $_tourTypes = array();
+        foreach ($results as $tour){
+          if($tour['public']==1){
+            $_tourTypes[$tour['id']] = $tour['title'];
+          }
+        }
+
+        return $_tourTypes;
+    }
+
+    /**
      * Display the map.
      */
     public function indexAction()
@@ -98,20 +122,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         // $placeTypes = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_PLACE_TYPE);
         // $eventTypes = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_EVENT_TYPE);
 
-        // Get the database.
-    		$db = get_db();
-    		// Get the Tour table.
-    		$tour_table = $db->getTable('Tour');
-    		// Build the select query.
-    		$select = $tour_table->getSelect();
-    		// Fetch some items with our select.
-    		$results = $tour_table->fetchObjects($select);
-        $_tourTypes = array();
-        foreach ($results as $tour){
-          if($tour['public']==1){
-            $_tourTypes[$tour['id']] = $tour['title'];
-          }
-        }
+        $_tourTypes = publicTours();
 
         $this->view->tour_types = $_tourTypes;
         // $this->view->item_types = $this->_itemTypes;
