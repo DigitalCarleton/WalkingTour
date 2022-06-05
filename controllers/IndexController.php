@@ -267,10 +267,10 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             );
         }
         // commented code below serves as debugging tool to write output to a file
-        $text = "Anything";
+        /*$text = "Anything";
         $var_str = var_export($request_tour_id, true);
         $var = "<?php\n\n\$text = $var_str;\n\n?>";
-        file_put_contents('filename.php', $var);
+        file_put_contents('filename.php', $var);*/
         $this->_helper->json($data);
     }
 
