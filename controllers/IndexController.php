@@ -171,6 +171,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         // Filter public tours' items
         $request_tour_id = $this->publicTours();
 	    $tourItemTable = $db->getTable( 'TourItem' );
+        $id = array();
         foreach($request_tour_id as $tour_id => $tour_title){
             if($tour_id != 0){
                 $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
@@ -183,14 +184,16 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             foreach ($tourItemsDat as $dat){
               $tourItemsIDs[] = (int) $dat["item_id"];
             }
-            $ids = $tourItemsIDs;
+            for ($i = 0; $i < count($tourItemsIDs); $i++){
+                array_push($id, $tourItemsIDs[$i])
+            }
             $tourItemsIDs = implode(", ", $tourItemsIDs);
             
     
             if($tour_id != 0){
               $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);
             }
-        
+        }
 
 
         // Filter item type
@@ -269,7 +272,6 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         $var = "<?php\n\n\$text = $var_str;\n\n?>";
         file_put_contents('filename.php', $var);*/
         $this->_helper->json($data);
-        }
     }
 
     /**
