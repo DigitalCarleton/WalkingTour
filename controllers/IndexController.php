@@ -87,7 +87,8 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
     );
 
     /**
-     * Return an dictionary of public tours
+     * Return an associative array of public tours
+     * 
      */
     public function publicTours()
     {
@@ -165,7 +166,6 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
 
         $db = $this->_helper->db->getDb();
         $joins = array("$db->Item AS items ON items.id = locations.item_id");
-        // $joins = array("$db->Item AS items ON items.id = tour_items.item_id");
         $wheres = array("items.public = 1");
 
         // Filter public tours' items
@@ -190,18 +190,10 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             }
 
             $tourItemsIDs = implode(", ", $tourItemsIDs);
-            
-    
-            if($tour_id != 0){
-              $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);
-            }
         }
 
-
-        // Filter item type
-        // if ($this->_request->getParam('tourType')) {
-        //     $wheres[] = $db->quoteInto("items.item_type_id = ?", $this->_request->getParam('tourType'), Zend_Db::INT_TYPE);
-        // }
+        $wheres[] = $db->quoteInto("items.id IN ($ids)", Zend_Db::INT_TYPE);
+        
 
         // Filter map coverage.
         if ($this->_request->getParam('mapCoverage')) {
@@ -210,28 +202,6 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
                      . $db->quoteInto("AND $alias.element_id = ?", self::ELEMENT_ID_MAP_COVERAGE);
             $wheres[] = $db->quoteInto("$alias.text = ?", $this->_request->getParam('mapCoverage'));
         }
-        /* REMOVING ADDITIONAL SIMPLE VOCAB FILTERS -AM */
-        // // Filter place types (inclusive).
-        // if ($this->_request->getParam('placeTypes')) {
-        //     $alias = "place_types";
-        //     $joins[] = "$db->ElementText AS $alias ON $alias.record_id = items.id AND $alias.record_type = 'Item' "
-        //              . $db->quoteInto("AND $alias.element_id = ?", self::ELEMENT_ID_PLACE_TYPE);
-        //     $placeTypes = array();
-        //     foreach ($this->_request->getParam('placeTypes') as $text) {
-        //         $placeTypes[] = $db->quoteInto("$alias.text = ?", $text);
-        //     }
-        //     $wheres[] = implode(" OR ", $placeTypes);
-        // // Filter event types (inclusive).
-        // } else if ($this->_request->getParam('eventTypes')) {
-        //     $alias = "event_types";
-        //     $joins[] = "$db->ElementText AS $alias ON $alias.record_id = items.id AND $alias.record_type = 'Item' "
-        //              . $db->quoteInto("AND $alias.element_id = ?", self::ELEMENT_ID_EVENT_TYPE);
-        //     $eventTypes = array();
-        //     foreach ($this->_request->getParam('eventTypes') as $text) {
-        //         $eventTypes[] = $db->quoteInto("$alias.text = ?", $text);
-        //     }
-        //     $wheres[] = implode(" OR ", $eventTypes);
-        // }
 
         // Build the SQL.
         $sql = "SELECT items.id, locations.latitude, locations.longitude\nFROM $db->Location AS locations";
