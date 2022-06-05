@@ -168,13 +168,13 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         // $joins = array("$db->Item AS items ON items.id = tour_items.item_id");
         $wheres = array("items.public = 1");
 
-        // Filter public tours items
+        // Filter public tours' items
         $request_tour_id = $this->publicTours();
 	    $tourItemTable = $db->getTable( 'TourItem' );
         foreach($request_tour_id as $tour_id => $tour_title){
             if($tour_id != 0){
                 $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
-                                                            WHERE tour_id = $request_tour_id");
+                                                            WHERE tour_id = $tour_id");
             } else {
                 $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items");
             }
