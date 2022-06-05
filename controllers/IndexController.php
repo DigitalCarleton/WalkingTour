@@ -179,7 +179,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
                 $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items");
             }
 
-            $toufrItemsIDs = array();
+            $tourItemsIDs = array();
             foreach ($tourItemsDat as $dat){
               $tourItemsIDs[] = (int) $dat["item_id"];
             }
