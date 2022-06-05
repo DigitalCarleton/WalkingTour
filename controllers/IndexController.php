@@ -171,7 +171,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         // Filter public tours' items
         $request_tour_id = $this->publicTours();
 	    $tourItemTable = $db->getTable( 'TourItem' );
-        $id = array();
+        $ids = array();
         foreach($request_tour_id as $tour_id => $tour_title){
             if($tour_id != 0){
                 $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
@@ -186,7 +186,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             }
 
             for ($i = 0; $i < count($tourItemsIDs); $i++){
-                $id[] = $tourItemsIDs[$i];
+                array_push($ids, $tourItemsIDs);
             }
 
             $tourItemsIDs = implode(", ", $tourItemsIDs);
