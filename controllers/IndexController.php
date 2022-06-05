@@ -87,7 +87,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
     );
 
     /**
-     * Return a list of public tours
+     * Return an dictionary of public tours
      */
     public function publicTours()
     {
@@ -190,7 +190,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             if($tour_id != 0){
               $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);
             }
-        }
+        
 
 
         // Filter item type
@@ -269,6 +269,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         $var = "<?php\n\n\$text = $var_str;\n\n?>";
         file_put_contents('filename.php', $var);*/
         $this->_helper->json($data);
+        }
     }
 
     /**
