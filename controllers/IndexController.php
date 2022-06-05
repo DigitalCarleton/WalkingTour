@@ -187,7 +187,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             $tourItemsIDs = implode(", ", $tourItemsIDs);
             
     
-            if($request_tour_id != 0){
+            if($tour_id != 0){
               $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);
             }
         }
