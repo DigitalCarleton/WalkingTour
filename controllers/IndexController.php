@@ -186,7 +186,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             }
 
             for ($i = 0; $i < count($tourItemsIDs); $i++){
-                array_push($ids, $tourItemsIDs);
+                array_push($ids, $tourItemsIDs[$i]);
             }
 
             $tourItemsIDs = implode(", ", $tourItemsIDs);
