@@ -168,25 +168,31 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         // $joins = array("$db->Item AS items ON items.id = tour_items.item_id");
         $wheres = array("items.public = 1");
 
-        $request_tour_id = $this->_request->getParam('tourType');
+        // Filter public tours items
+        $request_tour_id = $this->publicTours();
 	    $tourItemTable = $db->getTable( 'TourItem' );
-        if($request_tour_id != 0){
-      		$tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
-                                                           WHERE tour_id = $request_tour_id");
-        } else {
-          $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items");
-        }
-        $tourItemsIDs = array();
-        foreach ($tourItemsDat as $dat){
-          $tourItemsIDs[] = (int) $dat["item_id"];
-        }
-        $ids = $tourItemsIDs;
-        $tourItemsIDs = implode(", ", $tourItemsIDs);
-        // // Filter tours
+        foreach($request_tour_id as $tour_id => $tour_title){
+            if($tour_id != 0){
+                $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
+                                                            WHERE tour_id = $request_tour_id");
+            } else {
+                $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items");
+            }
 
-        if($request_tour_id != 0){
-          $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);
+            $toufrItemsIDs = array();
+            foreach ($tourItemsDat as $dat){
+              $tourItemsIDs[] = (int) $dat["item_id"];
+            }
+            $ids = $tourItemsIDs;
+            $tourItemsIDs = implode(", ", $tourItemsIDs);
+            
+    
+            if($request_tour_id != 0){
+              $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);
+            }
         }
+
+
         // Filter item type
         // if ($this->_request->getParam('tourType')) {
         //     $wheres[] = $db->quoteInto("items.item_type_id = ?", $this->_request->getParam('tourType'), Zend_Db::INT_TYPE);
