@@ -172,6 +172,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         $request_tour_id = $this->publicTours();
 	    $tourItemTable = $db->getTable( 'TourItem' );
         $ids = array();
+        $tourItemsIDs = array();
         foreach($request_tour_id as $tour_id => $tour_title){
             if($tour_id != 0){
                 $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
@@ -180,7 +181,6 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
                 $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items");
             }
 
-            $tourItemsIDs = array();
             foreach ($tourItemsDat as $dat){
               $tourItemsIDs[] = (int) $dat["item_id"];
             }
@@ -189,10 +189,10 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
                 array_push($ids, $tourItemsIDs[$i]);
             }
 
-            $tourItemsIDs = implode(", ", $tourItemsIDs);
         }
-
-        $wheres[] = $db->quoteInto("items.id IN ($ids)", Zend_Db::INT_TYPE);
+        
+        $tourItemsIDs = implode(", ", $tourItemsIDs);
+        $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);
         
 
         // Filter map coverage.
