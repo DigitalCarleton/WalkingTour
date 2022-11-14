@@ -23,7 +23,7 @@ function mallMapJs(){
     //  MAP_ZOOM controls the default zoom of the map
     var MAP_ZOOM = 15;
     var MAP_MIN_ZOOM = 14;
-    var MAP_MAX_ZOOM = 18;
+    var MAP_MAX_ZOOM = 17;
     // MAP_MAX_BOUNDS controls the boundaries of the map
     var MAP_MAX_BOUNDS = [[41.908628, 12.451941], [41.88927, 12.490607]];
     var LOCATE_BOUNDS = [[41.908628, 12.451941], [41.88927, 12.490607]];
