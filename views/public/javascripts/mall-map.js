@@ -349,9 +349,14 @@ function mallMapJs(){
                             for (var i = 0; i < response.date.length; i++) {
                                 content.append('<p>' + response.date[i] + '</p>');
                             }
-                            content.append('<p>' + response.description + '</p>');
+
+                            if (response.description) {
+                                content.append('<p>' + response.description + '</p>');
+                            } else {
+                                content.append('<p>No descriptions available.</p>');
+                            }
                             content.append(response.fullsize);
-                            content.append('<p><a href="' + response.url + '" class="button">view more info</a></p>');
+                            content.append('<p><a href="' + response.url + '" class="button">View More</a></p>');
                         });
                     });
                 }
