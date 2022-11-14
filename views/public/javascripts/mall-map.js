@@ -16,7 +16,7 @@ function mallMapJs(){
     imported.src = "/cgmrdev/plugins/MallMap/views/public/javascripts/new_markercluster_src.js";
     document.head.appendChild(imported);
 
-    var MAP_URL_TEMPLATE = 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png';
+    var MAP_URL_TEMPLATE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
     // MAP_CENTER controls the default starting place
     // var MAP_CENTER = [38.8891, -77.02949];
     var MAP_CENTER = [41.9001702, 12.4698422];
@@ -46,7 +46,7 @@ function mallMapJs(){
     });
     map.addLayer(L.tileLayer(MAP_URL_TEMPLATE));
     map.addControl(L.control.zoom({position: 'topleft'}));
-    map.attributionControl.setPrefix('');
+    map.attributionControl.setPrefix('Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community');
 
     // Check for user's first time visiting. Wait to locate the user after displaying tooltip on the first visit.
     if(!($.cookie('myCookie'))) {
