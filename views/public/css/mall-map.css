@@ -115,7 +115,8 @@ div[role="main"] {
 #filters h1 {
     margin-top: 0;
     font-weight: normal;
-    background-color: #FFE400;
+    background-color: #edc86a;
+    color: white;
     position: absolute;
     top: 0;
     left: 0;
@@ -124,7 +125,8 @@ div[role="main"] {
 }
 
 #info-panel h1 {
-    background-color: #FFE400;
+    background-color: #edc86a;
+    color: white;
     margin: -20px -10px 20px;
     padding: 10px;
 }
@@ -210,7 +212,7 @@ a#locate-button {
     display: block;
     padding: .5em 10px;
     z-index: 1010;
-    background-color: #FFE400;
+    background-color: #edc86a;
     border-bottom: 1px solid rgba(255,255,255,.5);
 }
 
