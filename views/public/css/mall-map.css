@@ -216,6 +216,10 @@ a#locate-button {
     border-bottom: 1px solid rgba(255,255,255,.5);
 }
 
+#info-panel .back-button:hover {
+    color: white;
+}
+
 #filters {
     position: absolute;
     left: 0;
