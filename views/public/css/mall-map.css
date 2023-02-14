@@ -36,8 +36,6 @@ body {
     padding: 0;
     margin: 0;
     position: relative;
-    font-family: "Raleway", sans-serif;
-    color: #375e5d;
 }
 
 #map {
@@ -96,7 +94,7 @@ div[role="main"] {
 
 .button {
     color: #fff;
-    background-color: #2b89d9;
+    background-color: #8cbcd8;
     padding: 12px;
     font-size: 16px;
     line-height: 100%;
