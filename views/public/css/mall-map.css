@@ -124,9 +124,10 @@ div[role="main"] {
 
 #info-panel h1 {
     background-color: #edc86a;
-    color: white;
+    color: #3d5a80;
     margin: -20px -10px 20px;
     padding: 10px;
+    font-weight: 300;
 }
 
 a#toggle-map-button:before { content: "\e00f"; }
@@ -212,6 +213,7 @@ a#locate-button {
     z-index: 1010;
     background-color: #edc86a;
     border-bottom: 1px solid rgba(255,255,255,.5);
+    color: #E03529;
 }
 
 #info-panel .back-button:hover {
