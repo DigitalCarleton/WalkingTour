@@ -213,7 +213,7 @@ a#locate-button {
     z-index: 1010;
     background-color: #edc86a;
     border-bottom: 1px solid rgba(255,255,255,.5);
-    color: #E03529;
+    color: #3d5a80;
 }
 
 #info-panel .back-button:hover {
