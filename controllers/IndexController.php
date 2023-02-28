@@ -21,6 +21,9 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
     const ITEM_TYPE_ID_SOUND        = 5;
     const ITEM_TYPE_ID_STILL_IMAGE  = 6;
     const ITEM_TYPE_ID_EVENT        = 8;
+
+    // Changed because original IDs were hard coded by the Omeka team,
+    // and our IDs were different from theirs
     // const ITEM_TYPE_ID_PLACE        = 14;
     const ITEM_TYPE_ID_PLACE        = 18;
 
@@ -30,6 +33,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
     const ELEMENT_ID_EVENT_TYPE   = 29;
     const ELEMENT_ID_MAP_COVERAGE = 38;
 
+    // Same change as above
     // const ELEMENT_ID_PLACE_TYPE   = 87;
     const ELEMENT_ID_PLACE_TYPE   = 51;
 
@@ -184,12 +188,16 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             foreach ($tourItemsDat as $dat){
               $tourItemsIDs[] = (int) $dat["item_id"];
             }
-
-            for ($i = 0; $i < count($tourItemsIDs); $i++){
-                array_push($ids, $tourItemsIDs[$i]);
-            }
-
         }
+
+        for ($i = 0; $i < count($tourItemsIDs); $i++){
+            array_push($ids, $tourItemsIDs[$i]);
+        }
+        
+
+
+        
+
         
         $tourItemsIDs = implode(", ", $tourItemsIDs);
         $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);

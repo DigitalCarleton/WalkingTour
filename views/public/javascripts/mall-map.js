@@ -296,8 +296,8 @@ function mallMapJs(){
 
         // Prepare POST data object for request.
         var postData = {
-            placeTypes: [],
-            eventTypes: [],
+            //placeTypes: [],
+            //eventTypes: [],
         };
 
         // Handle each filter, adding to the POST data object.
