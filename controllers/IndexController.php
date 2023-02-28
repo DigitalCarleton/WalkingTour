@@ -174,6 +174,21 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
 
         // Filter public tours' items
         $request_tour_id = $this->publicTours();
+
+        if ($this->_request->getParam('tourType')) {
+            $request_tour_id = array();
+            $input_id = $this->_request->getParam('tourType');
+            $request_tour_id[$input_id] = "Filter tour";
+        }
+
+        // Filter map coverage.
+        if ($this->_request->getParam('mapCoverage')) {
+            $alias = "map_coverage";
+            $joins[] = "$db->ElementText AS $alias ON $alias.record_id = items.id AND $alias.record_type = 'Item' "
+                     . $db->quoteInto("AND $alias.element_id = ?", self::ELEMENT_ID_MAP_COVERAGE);
+            $wheres[] = $db->quoteInto("$alias.text = ?", $this->_request->getParam('mapCoverage'));
+        }
+
 	    $tourItemTable = $db->getTable( 'TourItem' );
         $ids = array();
         $tourItemsIDs = array();
@@ -193,23 +208,9 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         for ($i = 0; $i < count($tourItemsIDs); $i++){
             array_push($ids, $tourItemsIDs[$i]);
         }
-        
 
-
-        
-
-        
         $tourItemsIDs = implode(", ", $tourItemsIDs);
         $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);
-        
-
-        // Filter map coverage.
-        if ($this->_request->getParam('mapCoverage')) {
-            $alias = "map_coverage";
-            $joins[] = "$db->ElementText AS $alias ON $alias.record_id = items.id AND $alias.record_type = 'Item' "
-                     . $db->quoteInto("AND $alias.element_id = ?", self::ELEMENT_ID_MAP_COVERAGE);
-            $wheres[] = $db->quoteInto("$alias.text = ?", $this->_request->getParam('mapCoverage'));
-        }
 
         // Build the SQL.
         $sql = "SELECT items.id, locations.latitude, locations.longitude\nFROM $db->Location AS locations";
