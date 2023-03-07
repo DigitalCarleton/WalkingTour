@@ -274,6 +274,13 @@ function mallMapJs(){
     });
 
     /*
+    
+    Calculate every polyline, add to a global variable here.
+    
+    */
+   
+
+    /*
      * Filter markers.
      *
      * This must be called on every form change.
@@ -431,6 +438,7 @@ function mallMapJs(){
                     walkingPath.push(p);
                 }
             }
+            console.log(walkingPath);
             var tourPolyline = new L.Polyline(walkingPath, {
                 color: 'blue',
                 weight: 3,

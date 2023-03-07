@@ -155,6 +155,42 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             ->appendStylesheet(src('mall-map', 'css', 'css'));
     }
 
+    // public function queryAction()
+    // {
+    //     // Process only AJAX requests.
+    //     if (!$this->_request->isXmlHttpRequest()) {
+    //         throw new Omeka_Controller_Exception_403;
+    //     }
+
+    //     $db = $this->_helper->db->getDb();
+    //     $joins = array("$db->Item AS items ON items.id = locations.item_id");
+    //     $wheres = array("items.public = 1");
+
+    //     // Filter public tours' items
+    //     $request_tour_id = $this->publicTours();
+
+    //     $tourItemTable = $db->getTable( 'TourItem' );
+    //     $ids = array();
+    //     $tourItemsIDs = array();
+    //     foreach($request_tour_id as $tour_id => $tour_title){
+    //         if($tour_id != 0){
+    //             $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
+    //                                                         WHERE tour_id = $tour_id");
+    //         } else {
+    //             $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items");
+    //         }
+
+    //         foreach ($tourItemsDat as $dat){
+    //           $tourItemsIDs[] = (int) $dat["item_id"];
+    //         }
+    //     }
+
+    //     for ($i = 0; $i < count($tourItemsIDs); $i++){
+    //         array_push($ids, $tourItemsIDs[$i]);
+    //     }
+    //     d($ids);
+    // }
+
     /**
      * Filter items that have been geolocated by the Geolocation plugin.
      *
@@ -208,6 +244,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         for ($i = 0; $i < count($tourItemsIDs); $i++){
             array_push($ids, $tourItemsIDs[$i]);
         }
+        d($ids);
 
         $tourItemsIDs = implode(", ", $tourItemsIDs);
         $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);
