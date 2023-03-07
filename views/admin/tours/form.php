@@ -5,7 +5,7 @@
 <section class="seven columns alpha" id="edit-form">
 
   <div id="tour-metadata">
-	<div class="seven columns alpha" id="form-data">
+	<div id="form-data">
 
 		<fieldset>
 			<div class="field">
