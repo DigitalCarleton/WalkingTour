@@ -17,14 +17,13 @@ function mallMapJs(){
     // document.head.appendChild(imported);
 
     var MAP_URL_TEMPLATE = 'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png';
-
     // MAP_CENTER controls the default starting place
     // var MAP_CENTER = [38.8891, -77.02949];
     var MAP_CENTER = [41.9001702, 12.4698422];
     //  MAP_ZOOM controls the default zoom of the map
     var MAP_ZOOM = 15;
     var MAP_MIN_ZOOM = 14;
-    var MAP_MAX_ZOOM = 18;
+    var MAP_MAX_ZOOM = 17;
     // MAP_MAX_BOUNDS controls the boundaries of the map
     var MAP_MAX_BOUNDS = [[41.908628, 12.451941], [41.88927, 12.90607]];
     var LOCATE_BOUNDS = [[41.908628, 12.451941], [41.88927, 12.90607]];
@@ -50,7 +49,7 @@ function mallMapJs(){
     //                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     //             }));
     map.addControl(L.control.zoom({position: 'topleft'}));
-    map.attributionControl.setPrefix('');
+    map.attributionControl.setPrefix('Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community');
 
     // Check for user's first time visiting. Wait to locate the user after displaying tooltip on the first visit.
     if(!($.cookie('myCookie'))) {
@@ -393,9 +392,14 @@ function mallMapJs(){
                             for (var i = 0; i < response.date.length; i++) {
                                 content.append('<p>' + response.date[i] + '</p>');
                             }
-                            content.append('<p>' + response.description + '</p>');
+
+                            if (response.description) {
+                                content.append('<p>' + response.description + '</p>');
+                            } else {
+                                content.append('<p>No descriptions available.</p>');
+                            }
                             content.append(response.fullsize);
-                            content.append('<p><a href="' + response.url + '" class="button">view more info</a></p>');
+                            content.append('<p><a href="' + response.url + '" class="button">View More</a></p>');
                         });
                     });
                 }
