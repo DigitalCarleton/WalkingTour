@@ -1,7 +1,7 @@
 #admin-tour-image img{max-width: 100%; }
 #tour.edit #admin-tour-image img{margin: 1em 0;}
 #tour.show #admin-tour-image img{margin: 0 0;}
-#tour.edit input[type="text"]{margin-bottom:0;}
+#tour.edit input[type="text"]{margin-bottom:0; width:100%;}
 #tour.edit input#image{background:#eaeaea;padding:.5em 0 .5em .5em;width: 100%;border: 1px solid #D8D8D8;}
 #tour.edit p.explanation{padding:.25em 0;}
 #tour.edit .file-helper{display: inline-block;font-style: italic;padding: .5em 0 0;}
@@ -60,7 +60,7 @@
 	cursor: move; cursor: grab; cursor: -moz-grab; cursor: -webkit-grab;
 }
 #sortable li span:first-child {flex-grow: 1;}		
-.ui-state-highlight { height: 1.5em; line-height: 1.2em; color:#fff;background: linear-gradient(to bottom, #A4C637, #75940A);text-shadow: -1px -1px 1px rgba(0,0,0,.5);}
+.ui-state-highlight { height: 1.5em; line-height: 1.2em; color:#fff;background: linear-gradient(to bottom, #eaf2e1, #8eb763);text-shadow: -1px -1px 1px rgba(0,0,0,.5);}
 
 svg#drag{
 	margin-right: 1em;
@@ -74,5 +74,5 @@ svg#drag{
 	fill:#fff;
 }
 .ui-state-highlight svg#drag #shadow path{
-	fill:#75940A;
+	fill:#eaf2e1;
 }

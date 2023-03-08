@@ -21,6 +21,9 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
     const ITEM_TYPE_ID_SOUND        = 5;
     const ITEM_TYPE_ID_STILL_IMAGE  = 6;
     const ITEM_TYPE_ID_EVENT        = 8;
+
+    // Changed because original IDs were hard coded by the Omeka team,
+    // and our IDs were different from theirs
     // const ITEM_TYPE_ID_PLACE        = 14;
     const ITEM_TYPE_ID_PLACE        = 18;
 
@@ -30,6 +33,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
     const ELEMENT_ID_EVENT_TYPE   = 29;
     const ELEMENT_ID_MAP_COVERAGE = 38;
 
+    // Same change as above
     // const ELEMENT_ID_PLACE_TYPE   = 87;
     const ELEMENT_ID_PLACE_TYPE   = 51;
 
@@ -87,24 +91,20 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
     );
 
     /**
-     * Display the map.
+     * Return an associative array of public tours
+     * 
      */
-    public function indexAction()
+    public function publicTours()
     {
-        //calls down the data table of the Simple Vocab plugin
-        $simpleVocabTerm = $this->_helper->db->getTable('SimpleVocabTerm');
-        $mapCoverages = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_MAP_COVERAGE);
-        $placeTypes = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_PLACE_TYPE);
-        $eventTypes = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_EVENT_TYPE);
-
         // Get the database.
-    		$db = get_db();
-    		// Get the Tour table.
-    		$tour_table = $db->getTable('Tour');
-    		// Build the select query.
-    		$select = $tour_table->getSelect();
-    		// Fetch some items with our select.
-    		$results = $tour_table->fetchObjects($select);
+        $db = get_db();
+        // Get the Tour table.
+        $tour_table = $db->getTable('Tour');
+        // Build the select query.
+        $select = $tour_table->getSelect();
+        // Fetch some items with our select.
+        $results = $tour_table->fetchObjects($select);
+        // Build an array with 
         $_tourTypes = array();
         foreach ($results as $tour){
           if($tour['public']==1){
@@ -112,11 +112,32 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
           }
         }
 
+        return $_tourTypes;
+    }
+
+    /**
+     * Display the map.
+     */
+    public function indexAction()
+    {
+        //calls down the data table of the Simple Vocab plugin
+        $simpleVocabTerm = $this->_helper->db->getTable('SimpleVocabTerm');
+        $mapCoverages = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_MAP_COVERAGE);
+        /* REMOVING ADDITIONAL SIMPLE VOCAB FILTERS -AM */
+        // $placeTypes = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_PLACE_TYPE);
+        // $eventTypes = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_EVENT_TYPE);
+
+        $_tourTypes = $this->publicTours();
+
         $this->view->tour_types = $_tourTypes;
         // $this->view->item_types = $this->_itemTypes;
-        $this->view->map_coverages = explode("\n", $mapCoverages->terms);
-        $this->view->place_types = explode("\n", $placeTypes->terms);
-        $this->view->event_types = explode("\n", $eventTypes->terms);
+        /* REMOVING ADDITIONAL SIMPLE VOCAB FILTERS -AM */
+        // if ($mapCoverages && $placeTypes && $eventTypes) {
+            // $this->view->place_types = explode("\n", $placeTypes->terms);
+            // $this->view->event_types = explode("\n", $eventTypes->terms);
+        if ($mapCoverages) {
+            $this->view->map_coverages = explode("\n", $mapCoverages->terms);
+        }
 
         // Set the JS and CSS files.
         $this->view->headScript()
@@ -125,15 +146,12 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             ->appendFile(src('jquery.cookie', 'javascripts', 'js'))
             ->appendFile('//cdn.leafletjs.com/leaflet-0.7/leaflet.js')
             ->appendFile(src('modernizr.custom.63332', 'javascripts', 'js'))
-            ->appendFile(src('new_markercluster_src', 'javascripts', 'js')) //adding this so that the mall-map markers will load (most of the time; sometimes it breaks)
+            ->appendFile(src('Polyline.encoded', 'javascripts', 'js'))
             ->appendFile(src('mall-map', 'javascripts', 'js'));
         $this->view->headLink()
             ->appendStylesheet('//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css', 'all')
             ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.css', 'all')
             ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.ie.css', 'all', 'lte IE 8')
-            ->appendStylesheet(src('MarkerCluster', 'css', 'css'))
-            ->appendStylesheet(src('MarkerCluster.Default', 'css', 'css'))
-            ->appendStylesheet(src('MarkerCluster.Default.ie', 'css', 'css'), 'all', 'lte IE 8')
             ->appendStylesheet(src('mall-map', 'css', 'css'));
     }
 
@@ -152,30 +170,16 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
 
         $db = $this->_helper->db->getDb();
         $joins = array("$db->Item AS items ON items.id = locations.item_id");
-        // $joins = array("$db->Item AS items ON items.id = tour_items.item_id");
         $wheres = array("items.public = 1");
 
-        $request_tour_id = $this->_request->getParam('tourType');
-        $tourItemTable = $db->getTable( 'TourItem' );
-        if($request_tour_id != 0){
-      		$tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items WHERE tour_id = $request_tour_id");
-        } else {
-          $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items");
-        }
-        $tourItemsIDs = array();
-        foreach ($tourItemsDat as $dat){
-          $tourItemsIDs[] = (int) $dat["item_id"];
-        }
-        $tourItemsIDs = implode(", ", $tourItemsIDs);
-        // // Filter tours
+        // Filter public tours' items
+        $request_tour_id = $this->publicTours();
 
-        if($request_tour_id != 0){
-          $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);
+        if ($this->_request->getParam('tourType')) {
+            $request_tour_id = array();
+            $input_id = $this->_request->getParam('tourType');
+            $request_tour_id[$input_id] = "Filter tour";
         }
-        // Filter item type
-        // if ($this->_request->getParam('tourType')) {
-        //     $wheres[] = $db->quoteInto("items.item_type_id = ?", $this->_request->getParam('tourType'), Zend_Db::INT_TYPE);
-        // }
 
         // Filter map coverage.
         if ($this->_request->getParam('mapCoverage')) {
@@ -184,27 +188,29 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
                      . $db->quoteInto("AND $alias.element_id = ?", self::ELEMENT_ID_MAP_COVERAGE);
             $wheres[] = $db->quoteInto("$alias.text = ?", $this->_request->getParam('mapCoverage'));
         }
-        // // Filter place types (inclusive).
-        // if ($this->_request->getParam('placeTypes')) {
-        //     $alias = "place_types";
-        //     $joins[] = "$db->ElementText AS $alias ON $alias.record_id = items.id AND $alias.record_type = 'Item' "
-        //              . $db->quoteInto("AND $alias.element_id = ?", self::ELEMENT_ID_PLACE_TYPE);
-        //     $placeTypes = array();
-        //     foreach ($this->_request->getParam('placeTypes') as $text) {
-        //         $placeTypes[] = $db->quoteInto("$alias.text = ?", $text);
-        //     }
-        //     $wheres[] = implode(" OR ", $placeTypes);
-        // // Filter event types (inclusive).
-        // } else if ($this->_request->getParam('eventTypes')) {
-        //     $alias = "event_types";
-        //     $joins[] = "$db->ElementText AS $alias ON $alias.record_id = items.id AND $alias.record_type = 'Item' "
-        //              . $db->quoteInto("AND $alias.element_id = ?", self::ELEMENT_ID_EVENT_TYPE);
-        //     $eventTypes = array();
-        //     foreach ($this->_request->getParam('eventTypes') as $text) {
-        //         $eventTypes[] = $db->quoteInto("$alias.text = ?", $text);
-        //     }
-        //     $wheres[] = implode(" OR ", $eventTypes);
-        // }
+
+	    $tourItemTable = $db->getTable( 'TourItem' );
+        $ids = array();
+        $tourItemsIDs = array();
+        foreach($request_tour_id as $tour_id => $tour_title){
+            if($tour_id != 0){
+                $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
+                                                            WHERE tour_id = $tour_id");
+            } else {
+                $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items");
+            }
+
+            foreach ($tourItemsDat as $dat){
+              $tourItemsIDs[] = (int) $dat["item_id"];
+            }
+        }
+
+        for ($i = 0; $i < count($tourItemsIDs); $i++){
+            array_push($ids, $tourItemsIDs[$i]);
+        }
+
+        $tourItemsIDs = implode(", ", $tourItemsIDs);
+        $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);
 
         // Build the SQL.
         $sql = "SELECT items.id, locations.latitude, locations.longitude\nFROM $db->Location AS locations";
@@ -217,9 +223,19 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         }
         $sql .= "\nGROUP BY items.id";
 
+        $dbItems = $db->query($sql)->fetchAll();
+        $orderedItems = array();
+        // orders items to match the order of the tour
+        for ($i = 0; $i < count($ids); $i++) {
+            for ($j = 0; $j < count($dbItems); $j++) {
+                if ($ids[$i] == $dbItems[$j]['id']) {
+                    array_push( $orderedItems, $dbItems[$j] );
+                }
+            }
+        }
         // Build geoJSON: http://www.geojson.org/geojson-spec.html
         $data = array('type' => 'FeatureCollection', 'features' => array());
-        foreach ($db->query($sql)->fetchAll() as $row) {
+        foreach ($orderedItems as $row) {
             $data['features'][] = array(
                 'type' => 'Feature',
                 'geometry' => array(
@@ -231,6 +247,11 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
                 ),
             );
         }
+        // commented code below serves as debugging tool to write output to a file
+        /*$text = "Anything";
+        $var_str = var_export($request_tour_id, true);
+        $var = "<?php\n\n\$text = $var_str;\n\n?>";
+        file_put_contents('filename.php', $var);*/
         $this->_helper->json($data);
     }
 
