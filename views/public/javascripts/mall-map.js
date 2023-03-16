@@ -22,11 +22,11 @@ function mallMapJs(){
     // var MAP_CENTER = [38.8891, -77.02949];
     var MAP_CENTER = [41.9001702, 12.4698422];
     //  MAP_ZOOM controls the default zoom of the map
-    var MAP_ZOOM = 15;
+    var MAP_ZOOM = 14;
     var MAP_MIN_ZOOM = 14;
     var MAP_MAX_ZOOM = 18;
     // MAP_MAX_BOUNDS controls the boundaries of the map
-    var MAP_MAX_BOUNDS = [[41.908628, 12.451941], [41.88927, 12.90607]];
+    var MAP_MAX_BOUNDS = [[41.960039, 12.421941], [41.85927, 12.90607]];
     var LOCATE_BOUNDS = [[41.908628, 12.451941], [41.88927, 12.90607]];
     var MAX_LOCATE_METERS = 8000;
 
