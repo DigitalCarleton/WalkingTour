@@ -155,8 +155,11 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             ->appendStylesheet(src('mall-map', 'css', 'css'));
     }
 
-    // public function queryAction()
-    // {
+/* 
+ *  Beginning to separate tours into separate features
+ */
+// public function queryAction()
+// {
     //     // Process only AJAX requests.
     //     if (!$this->_request->isXmlHttpRequest()) {
     //         throw new Omeka_Controller_Exception_403;
@@ -244,7 +247,6 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         for ($i = 0; $i < count($tourItemsIDs); $i++){
             array_push($ids, $tourItemsIDs[$i]);
         }
-        d($ids);
 
         $tourItemsIDs = implode(", ", $tourItemsIDs);
         $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);
@@ -321,7 +323,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         $data = array(
             'id' => $item->id,
             'title' => metadata($item, array('Dublin Core', 'Title')),
-            'description' => metadata($item, array('Dublin Core', 'Description')),
+            'description' => metadata($item, array('Dublin Core', 'Description'), array('no-escape' => true)),
             'date' => metadata($item, array('Dublin Core', 'Date'), array('all' => true)),
             'thumbnail' => item_image('square_thumbnail', array(), 0, $item),
             'fullsize' => item_image('fullsize', array('style' => 'max-width: 100%; height: auto;'), 0, $item),
