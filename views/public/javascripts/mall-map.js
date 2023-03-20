@@ -24,7 +24,7 @@ function mallMapJs(){
     //  MAP_ZOOM controls the default zoom of the map
     var MAP_ZOOM = 14;
     var MAP_MIN_ZOOM = 14;
-    var MAP_MAX_ZOOM = 18;
+    var MAP_MAX_ZOOM = 17;
     // MAP_MAX_BOUNDS controls the boundaries of the map
     var MAP_MAX_BOUNDS = [[41.960039, 12.421941], [41.85927, 12.90607]];
     var LOCATE_BOUNDS = [[41.908628, 12.451941], [41.88927, 12.90607]];
@@ -400,9 +400,14 @@ function mallMapJs(){
                             for (var i = 0; i < response.date.length; i++) {
                                 content.append('<p>' + response.date[i] + '</p>');
                             }
-                            content.append('<p>' + response.description + '</p>');
+
+                            if (response.description) {
+                                content.append('<p>' + response.description + '</p>');
+                            } else {
+                                content.append('<p>No descriptions available.</p>');
+                            }
                             content.append(response.fullsize);
-                            content.append('<p><a href="' + response.url + '" class="button">view more info</a></p>');
+                            content.append('<p><a href="' + response.url + '" class="button">View More</a></p>');
                         });
                     });
                 }
