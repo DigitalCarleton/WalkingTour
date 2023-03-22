@@ -286,47 +286,29 @@ function mallMapJs() {
     /*
      * Query all the marker data by tours 
     */
-    function doQuery() {
-        jqXhr = $.post('mall-map/index/query', function (response) {
-            markerData = response;
-            doFilters();
-        });
+
+    function getMarkerHTML(color) {
+        let markerHtmlStyles = `
+        background-color: ${color};
+        width: 1.7rem;
+        height: 1.7rem;
+        display: block;
+        left: -0.5rem;
+        top: -0.5rem;
+        position: relative;
+        border-radius: 1.5rem 1.5rem 0;
+        transform: rotate(45deg);`
+        return markerHtmlStyles;
     }
 
-    /*
-     * Filter markers.
-     *
-     * This must be called on every form change.
-     */
-    function doFilters() {
-        console.log(markerData);
-
-        // Prevent concurrent filter requests.
-        if (jqXhr) {
-            jqXhr.abort()
-        }
-
-        // Remove the current markers.
-        if (markers) {
-            map.removeLayer(markers);
-        }
-
-        var mapCoverage = $('#map-coverage');
-        var tourType = $('#tour-type');
-
-
-        var toursToPlot;
-        var mapToPlot;
-        // Handle each filter
-        if ('0' != mapCoverage.val()) {
-            mapToPlot = mapCoverage.val();
-        }
-        if ('0' != tourType.val()) {
-            toursToPlot = [tourType.val()];
-        } else {
-            toursToPlot = Object.keys(markerData);
-        }
-        var postData = {};
+    function doQuery() {
+        const markerFontHtmlStyles = `
+        transform: rotate(-45deg);
+        color:white;
+        text-align: center;
+        padding: 0.2rem 0 0.18rem 0;
+        font-size: 15px;
+        `
 
         // correctly formats coordinates as [lat, long] (API returns [long, lat])
         function orderCoords(path) {
@@ -354,126 +336,168 @@ function mallMapJs() {
         var endLng;
         var url;
         var path;
-        var num = 1;
+
+        jqXhr = $.post('mall-map/index/query', function (response) {
+            markerData = response;
+
+            for (const [tourId, value] of Object.entries(markerData)) {
+                var num = 1;
+                var response = value["Data"];
+
+                var geoJsonLayer = L.geoJson(response.features, {
+                    // adds the correct number to each marker based on order of tour
+                    pointToLayer: function (feature, latlng) {
+                        myCustomColour = feature.properties["marker-color"];
+                        var numberIcon = L.divIcon({
+                            className: "my-custom-pin",
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 40],
+                            popupAnchor: [0, -5],
+                            html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > <p style="${markerFontHtmlStyles}"> ${num} </p> </spam>`
+                        });
+                        // numberIcon.style.backgroundColor = feature.properties["marker-color"];
+                        num++;
+                        return new L.marker(latlng, { icon: numberIcon });
+                    },
+                    onEachFeature: function (feature, layer) {
+                        layer.on('click', function (e) {
+                            // Request the item data and populate and open the marker popup.
+                            var marker = this;
+                            $.post('mall-map/index/get-item', { id: feature.properties.id }, function (response) {
+                                var popupContent = '<h3>' + response.title + '</h3>';
+                                if (response.thumbnail) {
+                                    popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
+                                }
+                                popupContent += '<a href="#" class="open-info-panel button">view more info</a>';
+                                marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
+
+                                window.setTimeout(function () {
+                                    //map.panTo([feature.geometry.coordinates[1],feature.geometry.coordinates[0]]);
+                                    layer.getPopup().update();
+                                    $('.open-info-panel').click(function (e) {
+                                        e.preventDefault();
+                                        $('#info-panel').fadeToggle(200, 'linear');
+                                        $('#toggle-map-button + .back-button').show();
+                                    });
+                                }, 500);
+
+                                // Populate the item info panel.
+                                var content = $('#info-panel-content');
+                                content.empty();
+                                content.append('<h1>' + response.title + '</h1>');
+                                for (var i = 0; i < response.date.length; i++) {
+                                    content.append('<p>' + response.date[i] + '</p>');
+                                }
+
+                                if (response.description) {
+                                    content.append('<p>' + response.description + '</p>');
+                                } else {
+                                    content.append('<p>No descriptions available.</p>');
+                                }
+                                content.append(response.fullsize);
+                                content.append('<p><a href="' + response.url + '" class="button">View More</a></p>');
+                            });
+                        });
+                    }
+                });
+                markerData[tourId].geoJson = geoJsonLayer;
+
+                var walkingPath = [];
+                var json_content = response.features;
+                var pointList = [];
+                for (var i = 0; i < json_content.length; i++) {
+                    lat = json_content[i].geometry.coordinates[1];
+                    lng = json_content[i].geometry.coordinates[0];
+                    var point = new L.LatLng(lat, lng);
+                    pointList[i] = point;
+                }
+                // gets directions from one point to the next, adds this to the overall list of directions
+                for (var i = 0; i < pointList.length - 1; i++) {
+                    startLat = pointList[i]["lat"];
+                    startLng = pointList[i]["lng"];
+                    endLat = pointList[i + 1]["lat"];
+                    endLng = pointList[i + 1]["lng"];
+                    url = `https://api.openrouteservice.org/v2/directions/foot-walking?api_key=${key}&start=${startLng},${startLat}&end=${endLng},${endLat}`;
+                    path = getDirections(url);
+                    path = orderCoords(path);
+                    for (var p of path) {
+                        walkingPath.push(p);
+                    }
+                }
+                var tourPolyline = new L.Polyline(walkingPath, {
+                    color: value["Color"],
+                    weight: 3,
+                    opacity: 1,
+                    smoothFactor: 1
+                });
+
+                markerData[tourId].walkingPath = tourPolyline;
+            }
+
+            doFilters();
+        });
+    }
+
+    /*
+     * Filter markers.
+     *
+     * This must be called on every form change.
+     */
+    function doFilters() {
+        console.log(markerData);
+
+        // Remove the current markers.
+        if (markers) {
+            map.removeLayer(markers);
+        }
+
+        var mapCoverage = $('#map-coverage');
+        var tourType = $('#tour-type');
+
+
+        var toursToPlot;
+        var mapToPlot;
+        // Handle each filter
+        if ('0' != mapCoverage.val()) {
+            mapToPlot = mapCoverage.val();
+        }
+        if ('0' != tourType.val()) {
+            toursToPlot = [tourType.val()];
+        } else {
+            toursToPlot = Object.keys(markerData);
+        }
+        console.log(toursToPlot);
         var pathToPlot = [];
-        var markersToPlot = [];
-        // Make the POST request, handle the GeoJSON response, and add markers.
+        var markerLayers = [];
+        var numMarkers = 0;
+
+        // handle the GeoJSON response, and add markers.
         toursToPlot.forEach(ele => {
-            var response = markerData[ele]["Data"];
-            var walkingPath = [];
-            markersToPlot = markersToPlot.concat(response.features);
-            var json_content = response.features;
-            var pointList = [];
-            for (var i = 0; i < json_content.length; i++) {
-                lat = json_content[i].geometry.coordinates[1];
-                lng = json_content[i].geometry.coordinates[0];
-                var point = new L.LatLng(lat, lng);
-                pointList[i] = point;
-                try {
-                    markers = new L.layerGroup();
-                }
-                catch (err) {
-                    $.getScript("https://unpkg.com/leaflet.markercluster@1.3.0/dist/leaflet.markercluster.js");
-                    // var imported = document.createElement("script");
-                    // imported.src = "/cgmrdev/plugins/MallMap/views/public/javascripts/new_markercluster_src.js";
-                    // document.head.appendChild(imported);
-                }
-            }
-            // gets directions from one point to the next, adds this to the overall list of directions
-            for (var i = 0; i < pointList.length - 1; i++) {
-                startLat = pointList[i]["lat"];
-                startLng = pointList[i]["lng"];
-                endLat = pointList[i + 1]["lat"];
-                endLng = pointList[i + 1]["lng"];
-                url = `https://api.openrouteservice.org/v2/directions/foot-walking?api_key=${key}&start=${startLng},${startLat}&end=${endLng},${endLat}`;
-                path = getDirections(url);
-                path = orderCoords(path);
-                for (var p of path) {
-                    walkingPath.push(p);
-                }
-            }
-            var tourPolyline = new L.Polyline(walkingPath, {
-                color: markerData[ele]["Color"],
-                weight: 3,
-                opacity: 1,
-                smoothFactor: 1
-            });
-
-            pathToPlot.push(tourPolyline);
-
-            for (var j = 0; j < Object.keys(map._layers).length; j++) {
-                var feature = map._layers[Object.keys(map._layers)[j]];
-                // what is the point of this if block?
-                if (feature._path) {
-                    // map.removeLayer(feature); //map._layers[Object.keys(map._layers)[j]] = null;
-                }
-            }
+            numMarkers += markerData[ele].Data.features.length;
+            markerLayers.push(markerData[ele].geoJson);
+            pathToPlot.push(markerData[ele].walkingPath);
         });
 
         //response is an array of coordinate;
-        var item = (1 == markersToPlot.length) ? 'item' : 'items';
-        $('#marker-count').text(markersToPlot.length + " " + item);
-        var geoJsonLayer = L.geoJson(markersToPlot, {
-            // adds the correct number to each marker based on order of tour
-            pointToLayer: function (feature, latlng) {
-                var numberIcon = L.divIcon({
-                    className: "number-icon",
-                    iconSize: [25, 41],
-                    iconAnchor: [12, 40],
-                    popupAnchor: [0, -5],
-                    html: num
-                });
-                // numberIcon.style.backgroundColor = feature.properties["marker-color"];
-                num++;
-                return new L.marker(latlng, { icon: numberIcon });
-            },
-            onEachFeature: function (feature, layer) {
-                layer.on('click', function (e) {
-                    // Request the item data and populate and open the marker popup.
-                    var marker = this;
-                    $.post('mall-map/index/get-item', { id: feature.properties.id }, function (response) {
-                        var popupContent = '<h3>' + response.title + '</h3>';
-                        if (response.thumbnail) {
-                            popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
-                        }
-                        popupContent += '<a href="#" class="open-info-panel button">view more info</a>';
-                        marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
+        var item = (1 == numMarkers) ? 'item' : 'items';
+        $('#marker-count').text(numMarkers + " " + item);
 
-                        window.setTimeout(function () {
-                            //map.panTo([feature.geometry.coordinates[1],feature.geometry.coordinates[0]]);
-                            layer.getPopup().update();
-                            $('.open-info-panel').click(function (e) {
-                                e.preventDefault();
-                                $('#info-panel').fadeToggle(200, 'linear');
-                                $('#toggle-map-button + .back-button').show();
-                            });
-                        }, 500);
+        try {
+            markers = new L.layerGroup();
+        }
+        catch (err) {
+            $.getScript("https://unpkg.com/leaflet.markercluster@1.3.0/dist/leaflet.markercluster.js");
+            // var imported = document.createElement("script");
+            // imported.src = "/cgmrdev/plugins/MallMap/views/public/javascripts/new_markercluster_src.js";
+            // document.head.appendChild(imported);
+        }
 
-                        // Populate the item info panel.
-                        var content = $('#info-panel-content');
-                        content.empty();
-                        content.append('<h1>' + response.title + '</h1>');
-                        for (var i = 0; i < response.date.length; i++) {
-                            content.append('<p>' + response.date[i] + '</p>');
-                        }
-
-                        if (response.description) {
-                            content.append('<p>' + response.description + '</p>');
-                        } else {
-                            content.append('<p>No descriptions available.</p>');
-                        }
-                        content.append(response.fullsize);
-                        content.append('<p><a href="' + response.url + '" class="button">View More</a></p>');
-                    });
-                });
-            }
-        });
-
-        markers.addLayer(geoJsonLayer);
+        markerLayers.forEach(ele => {
+            markers.addLayer(ele);
+        })
         pathToPlot.forEach(ele => {
             ele.addTo(markers);
         })
-        // tourPolyline.addTo(markers);
         map.addLayer(markers);
     }
 
