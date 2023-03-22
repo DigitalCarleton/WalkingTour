@@ -315,6 +315,10 @@ a#locate-button {
     font-family : "Raleway", sans-serif !important;
 }
 
+.leaflet-tile-pane {
+    margin-top: -15px;
+}
+
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {
     border-radius: 0;
 }
