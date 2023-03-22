@@ -49,10 +49,15 @@
                 <button class="button"><?php echo get_option('mall_map_tooltip_button'); ?></button>
             </div>
         </div>
-        <div id="info-panel" style="display: none;">
-            <a href="#" class="back-button">Back to Map</a>
-            <div id="info-panel-content"></div>
+
+        <div id ="info-panel-container" style="display: none;">
+            <div id="info-panel">
+                <a href="#" class="back-button">Back to Map</a>
+                <div id="info-panel-content"></div>
+            </div>
         </div>
+
+        <div>
         <div id="map">
             <a href="#" id="locate-button" class="disabled"><span class="screen-reader-text">Make me center</span></a>
         </div>

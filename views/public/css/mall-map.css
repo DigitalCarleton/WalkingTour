@@ -130,6 +130,7 @@ div[role="main"] {
     margin: -20px -10px 20px;
     padding: 10px;
     font-weight: 300;
+    text-align: center;
 }
 
 a#toggle-map-button:before { content: "\e00f"; }
@@ -285,28 +286,81 @@ a#locate-button {
     border-radius: 10px !important;
     box-sizing: content-box !important;
 }
-
-#info-panel {
-    display: none;
+#info-panel-container {
     position: absolute;
     background: url('../images/bg.jpg') no-repeat top right;
     background-size: cover;
     top: 0;
     left: 0;
-    height: 100%;
+    height: 89%;
     z-index: 1020;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
     width: 100%;
+}
+
+#info-panel{
+    height: 100%;
+    overflow: None;
+    /* -webkit-overflow-scrolling: touch; */
     margin-bottom: 1em;
 }
 
 #info-panel-content {
     padding: 20px 10px;
+    max-height: 100%;
 }
 
 #info-panel p {
-    line-height: 24px;
+    width: 100%;
+    line-height: 1.5;
+    white-space: pre-line;
+    word-break: break-word;
+}
+
+.info-content{
+    display: flex;
+    position: absolute;
+    width: 100%;
+    height: calc(100vh - 100px);
+    color: #222;
+    overflow: hidden;
+}
+@media screen and (max-width: 640px) {
+
+    .info-content {
+        flex-direction: column;
+    }
+
+}
+
+.info-content .image-container{
+    flex: 1 1;
+    margin: 0 1rem;
+}
+.info-content .content-container{
+    flex: 1 1;
+    margin: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+.info-content .content-container .article{
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px 32px;
+    padding-bottom: 20px;
+}
+
+img.image-container{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: no-repeat 50%;
+    background-size: cover;
+    cursor: pointer;
 }
 
 /* Leaflet Overrides */

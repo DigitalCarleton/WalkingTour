@@ -273,7 +273,7 @@ function mallMapJs() {
     // Handle the info panel back button.
     $('a.back-button').click(function (e) {
         e.preventDefault();
-        $('#info-panel').fadeToggle(200, 'linear');
+        $('#info-panel-container').fadeToggle(200, 'linear');
         $('#toggle-map-button + .back-button').hide();
     });
 
@@ -346,6 +346,7 @@ function mallMapJs() {
             dataArray = Object.entries(markerData)
             let requests = dataArray.map(([tourId, value]) => {
                 console.log([tourId, value])
+                console.log(value)
                 return new Promise((resolve) => {
                     var num = 1;
                     var response = value["Data"];
@@ -370,6 +371,7 @@ function mallMapJs() {
                                 // Request the item data and populate and open the marker popup.
                                 var marker = this;
                                 $.post('mall-map/index/get-item', { id: feature.properties.id }, function (response) {
+                                    console.log(response)
                                     var popupContent = '<h3>' + response.title + '</h3>';
                                     if (response.thumbnail) {
                                         popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
@@ -382,32 +384,40 @@ function mallMapJs() {
                                         layer.getPopup().update();
                                         $('.open-info-panel').click(function (e) {
                                             e.preventDefault();
-                                            $('#info-panel').fadeToggle(200, 'linear');
+                                            $('#info-panel-container').fadeToggle(200, 'linear');
                                             $('#toggle-map-button + .back-button').show();
                                         });
                                     }, 500);
-
+                                    console.log(tourId)
                                     // Populate the item info panel.
                                     var content = $('#info-panel-content');
                                     content.empty();
-                                    content.append('<h1>' + response.title + '</h1>');
-                                    for (var i = 0; i < response.date.length; i++) {
-                                        content.append('<p>' + response.date[i] + '</p>');
-                                    }
+                                    content.append('<h1>' + value["Tour Name"] + ` #${num}` + '</h1>');
 
-                                    if (response.description) {
-                                        content.append('<p>' + response.description + '</p>');
+                                    var infoContent = ""
+                                    var leftContent = "";
+                                    var rightContent = "";
+
+                                    leftContent += response.fullsize;
+                                    leftContent += '<p><a href="' + response.url + '" class="button">See Full Details</a></p>';
+                                    infoContent += '<div class = "image-container">' + leftContent + '</div>';
+
+                                    rightContent += '<h2>' + response.title + '</h2>'
+                                    if (response.abstract) {
+                                        rightContent += '<p>' + response.abstract + '</p>';
+                                    } else if (response.description) {
+                                        rightContent += '<p>' + response.description + '</p>';
                                     } else {
-                                        content.append('<p>No descriptions available.</p>');
+                                        rightContent += '<p>No descriptions available.</p>';
                                     }
-                                    content.append(response.fullsize);
-                                    content.append('<p><a href="' + response.url + '" class="button">View More</a></p>');
+                                    infoContent += '<div class = "content-container"> <div class ="article">' + rightContent + '</div></div>';
+
+                                    content.append('<div class = "info-content">' + infoContent + '</div>')
                                 });
                             });
                         }
                     });
                     markerData[tourId].geoJson = geoJsonLayer;
-                    console.log(geoJsonLayer)
                     var walkingPath = [];
                     var json_content = response.features;
                     var pointList = [];

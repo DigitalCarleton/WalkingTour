@@ -236,6 +236,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
                 );
             }
             $returnArray[$tour_id]["Color"] = $randomColor;
+            $returnArray[$tour_id]["Tour Name"] = $request_tour_id[$tour_id];
         }
         $this->_helper->json($returnArray);
         
@@ -271,6 +272,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             'id' => $item->id,
             'title' => metadata($item, array('Dublin Core', 'Title')),
             'description' => metadata($item, array('Dublin Core', 'Description'), array('no-escape' => true)),
+            'abstract' => metadata($item, array('Dublin Core', 'Abstract'), array('no-escape' => true)),
             'date' => metadata($item, array('Dublin Core', 'Date'), array('all' => true)),
             'thumbnail' => item_image('square_thumbnail', array(), 0, $item),
             'fullsize' => item_image('fullsize', array('style' => 'max-width: 100%; height: auto;'), 0, $item),
