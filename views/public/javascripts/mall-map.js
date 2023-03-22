@@ -55,12 +55,12 @@ function mallMapJs() {
     map.attributionControl.setPrefix('Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community');
 
     // Check for user's first time visiting. Wait to locate the user after displaying tooltip on the first visit.
-    if (!($.cookie('myCookie'))) {
-        $('#first-time').show();
-        $.cookie('myCookie', 'visited', { path: '/', expires: 10000 });
-    } else {
-        map.locate({ watch: true });
-    }
+    // if (!($.cookie('myCookie'))) {
+    //     $('#first-time').show();
+    //     $.cookie('myCookie', 'visited', { path: '/', expires: 10000 });
+    // } else {
+    //     map.locate({ watch: true });
+    // }
 
     $("#first-time button").on('click', function () {
         $('#first-time').hide();
@@ -68,7 +68,7 @@ function mallMapJs() {
     });
 
     window.onload = function () {
-        doQuery();
+        doQuery(); å
     };
 
     // Retain previous form state, if needed.
@@ -319,123 +319,126 @@ function mallMapJs() {
             return directions;
         }
 
-        // API call to return walking coordinates between two points
-        function getDirections(theUrl) {
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open("GET", theUrl, false); // false for synchronous request
-            xmlHttp.send(null);
-            var json = JSON.parse(xmlHttp.responseText);
-            var path = json["features"][0]["geometry"]["coordinates"];
-            return path;
+        async function getOverallPath(points, key) {
+            var pointsParam = []
+            points.forEach(ele => {
+                pointsParam.push([ele.lng, ele.lat])
+            })
+            url = "https://api.openrouteservice.org/v2/directions/foot-walking/geojson"
+            const response = await fetch(url, {
+                method: "POST", // *GET, POST, PUT, DELETE, etc.
+                headers: {
+                    'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+                    "Content-Type": "application/json",
+                    'Authorization': key
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `{"coordinates": ${JSON.stringify(pointsParam)}}`, // body data type must match "Content-Type" header
+            })
+            return response.json();
         }
 
         var key = "5b3ce3597851110001cf62489dde4c6690bc423bb86bd99921c5da77";
-        var startLat;
-        var startLng;
-        var endLat;
-        var endLng;
         var url;
-        var path;
 
         jqXhr = $.post('mall-map/index/query', function (response) {
             markerData = response;
+            dataArray = Object.entries(markerData)
+            let requests = dataArray.map(([tourId, value]) => {
+                console.log([tourId, value])
+                return new Promise((resolve) => {
+                    var num = 1;
+                    var response = value["Data"];
 
-            for (const [tourId, value] of Object.entries(markerData)) {
-                var num = 1;
-                var response = value["Data"];
-
-                var geoJsonLayer = L.geoJson(response.features, {
-                    // adds the correct number to each marker based on order of tour
-                    pointToLayer: function (feature, latlng) {
-                        myCustomColour = feature.properties["marker-color"];
-                        var numberIcon = L.divIcon({
-                            className: "my-custom-pin",
-                            iconSize: [25, 41],
-                            iconAnchor: [12, 40],
-                            popupAnchor: [0, -5],
-                            html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > <p style="${markerFontHtmlStyles}"> ${num} </p> </spam>`
-                        });
-                        // numberIcon.style.backgroundColor = feature.properties["marker-color"];
-                        num++;
-                        return new L.marker(latlng, { icon: numberIcon });
-                    },
-                    onEachFeature: function (feature, layer) {
-                        layer.on('click', function (e) {
-                            // Request the item data and populate and open the marker popup.
-                            var marker = this;
-                            $.post('mall-map/index/get-item', { id: feature.properties.id }, function (response) {
-                                var popupContent = '<h3>' + response.title + '</h3>';
-                                if (response.thumbnail) {
-                                    popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
-                                }
-                                popupContent += '<a href="#" class="open-info-panel button">view more info</a>';
-                                marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
-
-                                window.setTimeout(function () {
-                                    //map.panTo([feature.geometry.coordinates[1],feature.geometry.coordinates[0]]);
-                                    layer.getPopup().update();
-                                    $('.open-info-panel').click(function (e) {
-                                        e.preventDefault();
-                                        $('#info-panel').fadeToggle(200, 'linear');
-                                        $('#toggle-map-button + .back-button').show();
-                                    });
-                                }, 500);
-
-                                // Populate the item info panel.
-                                var content = $('#info-panel-content');
-                                content.empty();
-                                content.append('<h1>' + response.title + '</h1>');
-                                for (var i = 0; i < response.date.length; i++) {
-                                    content.append('<p>' + response.date[i] + '</p>');
-                                }
-
-                                if (response.description) {
-                                    content.append('<p>' + response.description + '</p>');
-                                } else {
-                                    content.append('<p>No descriptions available.</p>');
-                                }
-                                content.append(response.fullsize);
-                                content.append('<p><a href="' + response.url + '" class="button">View More</a></p>');
+                    var geoJsonLayer = L.geoJson(response.features, {
+                        // adds the correct number to each marker based on order of tour
+                        pointToLayer: function (feature, latlng) {
+                            myCustomColour = feature.properties["marker-color"];
+                            var numberIcon = L.divIcon({
+                                className: "my-custom-pin",
+                                iconSize: [25, 41],
+                                iconAnchor: [12, 40],
+                                popupAnchor: [0, -5],
+                                html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > <p style="${markerFontHtmlStyles}"> ${num} </p> </spam>`
                             });
+                            // numberIcon.style.backgroundColor = feature.properties["marker-color"];
+                            num++;
+                            return new L.marker(latlng, { icon: numberIcon });
+                        },
+                        onEachFeature: function (feature, layer) {
+                            layer.on('click', function (e) {
+                                // Request the item data and populate and open the marker popup.
+                                var marker = this;
+                                $.post('mall-map/index/get-item', { id: feature.properties.id }, function (response) {
+                                    var popupContent = '<h3>' + response.title + '</h3>';
+                                    if (response.thumbnail) {
+                                        popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
+                                    }
+                                    popupContent += '<a href="#" class="open-info-panel button">view more info</a>';
+                                    marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
+
+                                    window.setTimeout(function () {
+                                        //map.panTo([feature.geometry.coordinates[1],feature.geometry.coordinates[0]]);
+                                        layer.getPopup().update();
+                                        $('.open-info-panel').click(function (e) {
+                                            e.preventDefault();
+                                            $('#info-panel').fadeToggle(200, 'linear');
+                                            $('#toggle-map-button + .back-button').show();
+                                        });
+                                    }, 500);
+
+                                    // Populate the item info panel.
+                                    var content = $('#info-panel-content');
+                                    content.empty();
+                                    content.append('<h1>' + response.title + '</h1>');
+                                    for (var i = 0; i < response.date.length; i++) {
+                                        content.append('<p>' + response.date[i] + '</p>');
+                                    }
+
+                                    if (response.description) {
+                                        content.append('<p>' + response.description + '</p>');
+                                    } else {
+                                        content.append('<p>No descriptions available.</p>');
+                                    }
+                                    content.append(response.fullsize);
+                                    content.append('<p><a href="' + response.url + '" class="button">View More</a></p>');
+                                });
+                            });
+                        }
+                    });
+                    markerData[tourId].geoJson = geoJsonLayer;
+
+                    var walkingPath = [];
+                    var json_content = response.features;
+                    var pointList = [];
+                    for (var i = 0; i < json_content.length; i++) {
+                        lat = json_content[i].geometry.coordinates[1];
+                        lng = json_content[i].geometry.coordinates[0];
+                        var point = new L.LatLng(lat, lng);
+                        pointList[i] = point;
+                    }
+                    getOverallPath(pointList, key).then((data) => {
+                        var path = data["features"][0]["geometry"]["coordinates"];
+                        console.log(data); // JSON data parsed by `data.json()` call
+                        path = orderCoords(path);
+                        for (var p of path) {
+                            walkingPath.push(p);
+                        }
+                        var tourPolyline = new L.Polyline(walkingPath, {
+                            color: value["Color"],
+                            weight: 3,
+                            opacity: 1,
+                            smoothFactor: 1
                         });
-                    }
+                        markerData[tourId].walkingPath = tourPolyline;
+                        resolve()
+                    });
                 });
-                markerData[tourId].geoJson = geoJsonLayer;
+            })
 
-                var walkingPath = [];
-                var json_content = response.features;
-                var pointList = [];
-                for (var i = 0; i < json_content.length; i++) {
-                    lat = json_content[i].geometry.coordinates[1];
-                    lng = json_content[i].geometry.coordinates[0];
-                    var point = new L.LatLng(lat, lng);
-                    pointList[i] = point;
-                }
-                // gets directions from one point to the next, adds this to the overall list of directions
-                for (var i = 0; i < pointList.length - 1; i++) {
-                    startLat = pointList[i]["lat"];
-                    startLng = pointList[i]["lng"];
-                    endLat = pointList[i + 1]["lat"];
-                    endLng = pointList[i + 1]["lng"];
-                    url = `https://api.openrouteservice.org/v2/directions/foot-walking?api_key=${key}&start=${startLng},${startLat}&end=${endLng},${endLat}`;
-                    path = getDirections(url);
-                    path = orderCoords(path);
-                    for (var p of path) {
-                        walkingPath.push(p);
-                    }
-                }
-                var tourPolyline = new L.Polyline(walkingPath, {
-                    color: value["Color"],
-                    weight: 3,
-                    opacity: 1,
-                    smoothFactor: 1
-                });
-
-                markerData[tourId].walkingPath = tourPolyline;
-            }
-
-            doFilters();
+            Promise.all(requests).then(() => doFilters());
         });
+
     }
 
     /*
@@ -477,7 +480,6 @@ function mallMapJs() {
             markerLayers.push(markerData[ele].geoJson);
             pathToPlot.push(markerData[ele].walkingPath);
         });
-
         //response is an array of coordinate;
         var item = (1 == numMarkers) ? 'item' : 'items';
         $('#marker-count').text(numMarkers + " " + item);
