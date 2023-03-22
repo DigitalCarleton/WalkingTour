@@ -155,44 +155,91 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             ->appendStylesheet(src('mall-map', 'css', 'css'));
     }
 
-/* 
- *  Beginning to separate tours into separate features
- */
-// public function queryAction()
-// {
-    //     // Process only AJAX requests.
-    //     if (!$this->_request->isXmlHttpRequest()) {
-    //         throw new Omeka_Controller_Exception_403;
-    //     }
+    function rand_color() {
+        return '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+    }
 
-    //     $db = $this->_helper->db->getDb();
-    //     $joins = array("$db->Item AS items ON items.id = locations.item_id");
-    //     $wheres = array("items.public = 1");
+    /* 
+    *  Beginning to separate tours into separate features
+    */
+    public function queryAction()
+    {
+        // Process only AJAX requests.
+        if (!$this->_request->isXmlHttpRequest()) {
+            throw new Omeka_Controller_Exception_403;
+        }
 
-    //     // Filter public tours' items
-    //     $request_tour_id = $this->publicTours();
+        $db = $this->_helper->db->getDb();
+        $joins = array("$db->Item AS items ON items.id = locations.item_id");
+        $wheres = array("items.public = 1");
 
-    //     $tourItemTable = $db->getTable( 'TourItem' );
-    //     $ids = array();
-    //     $tourItemsIDs = array();
-    //     foreach($request_tour_id as $tour_id => $tour_title){
-    //         if($tour_id != 0){
-    //             $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
-    //                                                         WHERE tour_id = $tour_id");
-    //         } else {
-    //             $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items");
-    //         }
+        // Filter public tours' items
+        $request_tour_id = $this->publicTours();
 
-    //         foreach ($tourItemsDat as $dat){
-    //           $tourItemsIDs[] = (int) $dat["item_id"];
-    //         }
-    //     }
+        $tourItemTable = $db->getTable( 'TourItem' );
+        $tourItemsIDs = array();
+        $returnArray = array();
+        foreach($request_tour_id as $tour_id => $tour_title){
+            if($tour_id != 0){
+                $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
+                                                            WHERE tour_id = $tour_id");
+            } else {
+                $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items");
+            }
+            $tourItemsIDs[$tour_id] = array();
+            foreach ($tourItemsDat as $dat){
+                array_push($tourItemsIDs[$tour_id], (int) $dat["item_id"]);
+            }
+        }
 
-    //     for ($i = 0; $i < count($tourItemsIDs); $i++){
-    //         array_push($ids, $tourItemsIDs[$i]);
-    //     }
-    //     d($ids);
-    // }
+        foreach($tourItemsIDs as $tour_id => $item_array){
+            $randomColor = $this->rand_color();
+
+            $tourItemsID = implode(", ", $item_array);
+            $wheres = array("items.public = 1");
+            $wheres[] = $db->quoteInto("items.id IN ($tourItemsID)", Zend_Db::INT_TYPE);
+
+            $sql = "SELECT items.id, locations.latitude, locations.longitude\nFROM $db->Location AS locations";
+            foreach ($joins as $join) {
+                $sql .= "\nJOIN $join";
+            }
+            foreach ($wheres as $key => $where) {
+                $sql .= (0 == $key) ? "\nWHERE" : "\nAND";
+                $sql .= " ($where)";
+            }
+            $sql .= "\nGROUP BY items.id";
+
+            $dbItems = $db->query($sql)->fetchAll();
+            $orderedItems = array();
+
+            // orders items to match the order of the tour
+            for ($i = 0; $i < count($item_array); $i++) {
+                for ($j = 0; $j < count($dbItems); $j++) {
+                    if ($item_array[$i] == $dbItems[$j]['id']) {
+                        array_push( $orderedItems, $dbItems[$j] );
+                    }
+                }
+            }
+            // Build geoJSON: http://www.geojson.org/geojson-spec.html
+            $returnArray[$tour_id]["Data"] = array('type' => 'FeatureCollection', 'features' => array());
+            foreach ($orderedItems as $row) {
+                $returnArray[$tour_id]["Data"]['features'][] = array(
+                    'type' => 'Feature',
+                    'geometry' => array(
+                        'type' => 'Point',
+                        'coordinates' => array($row['longitude'], $row['latitude']),
+                    ),
+                    'properties' => array(
+                        'id' => $row['id'],
+                        "marker-color"=> $randomColor
+                    ),
+                );
+            }
+            $returnArray[$tour_id]["Color"] = $randomColor;
+        }
+        $this->_helper->json($returnArray);
+        
+    }
 
     /**
      * Filter items that have been geolocated by the Geolocation plugin.
