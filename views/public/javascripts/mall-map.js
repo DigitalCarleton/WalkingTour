@@ -68,7 +68,7 @@ function mallMapJs() {
     });
 
     window.onload = function () {
-        doQuery(); å
+        doQuery();
     };
 
     // Retain previous form state, if needed.
@@ -407,7 +407,7 @@ function mallMapJs() {
                         }
                     });
                     markerData[tourId].geoJson = geoJsonLayer;
-
+                    console.log(geoJsonLayer)
                     var walkingPath = [];
                     var json_content = response.features;
                     var pointList = [];
@@ -419,7 +419,6 @@ function mallMapJs() {
                     }
                     getOverallPath(pointList, key).then((data) => {
                         var path = data["features"][0]["geometry"]["coordinates"];
-                        console.log(data); // JSON data parsed by `data.json()` call
                         path = orderCoords(path);
                         for (var p of path) {
                             walkingPath.push(p);
