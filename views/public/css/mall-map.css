@@ -125,7 +125,7 @@ div[role="main"] {
 }
 
 #info-panel h1 {
-    background-color: #edc86a;
+    background-color: #8cbcd8;
     color: #3d5a80;
     margin: -20px -10px 20px;
     padding: 10px;
@@ -320,7 +320,7 @@ a#locate-button {
     display: flex;
     position: absolute;
     width: 100%;
-    height: calc(100vh - 100px);
+    height: calc(100vh- 50px);
     color: #222;
     overflow: hidden;
 }

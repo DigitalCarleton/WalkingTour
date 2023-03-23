@@ -50,6 +50,16 @@
 				</div>
 			</div>
 
+			<div class = "field">
+				<div class="two columns alpha">
+				  <?php echo $this->formLabel( 'color', __('Color') ); ?>
+				</div>
+				<div class="five columns omega inputs">
+				  <?php echo $this->formTextarea( 'color', $tour->color,array( 'rows' => 1, 'cols' => '40' )  ); ?>
+				  <p class="explanation"><?php echo __('Add a HTML color code as a hexadecimal value for the color shown in the map.');?></p>
+				</div>
+			</div>
+
 		</fieldset>
 
 		<fieldset id="tour-items-picker">

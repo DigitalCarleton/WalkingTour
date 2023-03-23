@@ -105,10 +105,11 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         // Fetch some items with our select.
         $results = $tour_table->fetchObjects($select);
         // Build an array with 
-        $_tourTypes = array();
+        $_tourTypes = array('id' => array(), 'color' => array());
         foreach ($results as $tour){
           if($tour['public']==1){
-            $_tourTypes[$tour['id']] = $tour['title'];
+            $_tourTypes['id'][$tour['id']] = $tour['title'];
+            $_tourTypes['color'][$tour['id']] = $tour['color'];
           }
         }
 
@@ -175,11 +176,16 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
 
         // Filter public tours' items
         $request_tour_id = $this->publicTours();
+        $colorArray = array();
+
+        foreach ($request_tour_id['color'] as $key => $color){
+            debug("$key => $color");
+        }
 
         $tourItemTable = $db->getTable( 'TourItem' );
         $tourItemsIDs = array();
         $returnArray = array();
-        foreach($request_tour_id as $tour_id => $tour_title){
+        foreach($request_tour_id['id'] as $tour_id => $tour_title){
             if($tour_id != 0){
                 $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
                                                             WHERE tour_id = $tour_id");
@@ -231,12 +237,12 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
                     ),
                     'properties' => array(
                         'id' => $row['id'],
-                        "marker-color"=> $randomColor
+                        "marker-color"=> $request_tour_id['color'][$tour_id]
                     ),
                 );
             }
-            $returnArray[$tour_id]["Color"] = $randomColor;
-            $returnArray[$tour_id]["Tour Name"] = $request_tour_id[$tour_id];
+            $returnArray[$tour_id]["Color"] = $request_tour_id['color'][$tour_id];
+            $returnArray[$tour_id]["Tour Name"] = $request_tour_id['id'][$tour_id];
         }
         $this->_helper->json($returnArray);
         
