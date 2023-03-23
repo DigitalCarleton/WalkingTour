@@ -52,8 +52,11 @@
 
         <div id ="info-panel-container" style="display: none;">
             <div id="info-panel">
+                <div style="height: 100%;display: flex;flex-direction: column;">
                 <a href="#" class="back-button">Back to Map</a>
+                <h1 id="info-panel-name"></h1>
                 <div id="info-panel-content"></div>
+                </div>
             </div>
         </div>
 
@@ -62,5 +65,6 @@
             <a href="#" id="locate-button" class="disabled"><span class="screen-reader-text">Make me center</span></a>
         </div>
 
+        </div>
     </div>
-<?php echo foot(); ?>
+    <?php echo foot(); ?>

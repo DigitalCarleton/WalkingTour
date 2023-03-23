@@ -348,8 +348,14 @@ function mallMapJs() {
                 console.log([tourId, value])
                 console.log(value)
                 return new Promise((resolve) => {
-                    var num = 1;
+                    var numMarker = 1;
+                    var numPopup;
                     var response = value["Data"];
+                    var itemIDList = [];
+
+                    response.features.forEach(ele => {
+                        itemIDList.push(ele.properties.id)
+                    })
 
                     var geoJsonLayer = L.geoJson(response.features, {
                         // adds the correct number to each marker based on order of tour
@@ -360,10 +366,10 @@ function mallMapJs() {
                                 iconSize: [25, 41],
                                 iconAnchor: [12, 40],
                                 popupAnchor: [0, -5],
-                                html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > <p style="${markerFontHtmlStyles}"> ${num} </p> </spam>`
+                                html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > <p style="${markerFontHtmlStyles}"> ${numMarker} </p> </spam>`
                             });
                             // numberIcon.style.backgroundColor = feature.properties["marker-color"];
-                            num++;
+                            numMarker++;
                             return new L.marker(latlng, { icon: numberIcon });
                         },
                         onEachFeature: function (feature, layer) {
@@ -386,23 +392,23 @@ function mallMapJs() {
                                             e.preventDefault();
                                             $('#info-panel-container').fadeToggle(200, 'linear');
                                             $('#toggle-map-button + .back-button').show();
+                                            marker.closePopup();
                                         });
                                     }, 500);
-                                    console.log(tourId)
                                     // Populate the item info panel.
+                                    numPopup = itemIDList.findIndex((ele) => ele == response.id) + 1
+                                    document.getElementById("info-panel-name").innerHTML = value["Tour Name"] + ` #${numPopup}`;
                                     var content = $('#info-panel-content');
                                     content.empty();
-                                    content.append('<h1>' + value["Tour Name"] + ` #${num}` + '</h1>');
 
                                     var infoContent = ""
                                     var leftContent = "";
                                     var rightContent = "";
 
                                     leftContent += response.fullsize;
-                                    leftContent += '<p><a href="' + response.url + '" class="button">See Full Details</a></p>';
                                     infoContent += '<div class = "image-container">' + leftContent + '</div>';
 
-                                    rightContent += '<h2>' + response.title + '</h2>'
+                                    rightContent += '<h2 class = info-panel-title>' + response.title + '</h2>'
                                     if (response.abstract) {
                                         rightContent += '<p>' + response.abstract + '</p>';
                                     } else if (response.description) {
@@ -410,6 +416,7 @@ function mallMapJs() {
                                     } else {
                                         rightContent += '<p>No descriptions available.</p>';
                                     }
+                                    rightContent += '<p><a href="' + response.url + '" class="button">See Full Details</a></p>';
                                     infoContent += '<div class = "content-container"> <div class ="article">' + rightContent + '</div></div>';
 
                                     content.append('<div class = "info-content">' + infoContent + '</div>')
