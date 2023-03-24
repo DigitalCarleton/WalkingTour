@@ -261,7 +261,6 @@ function mallMapJs() {
     $('a.back-button').click(function (e) {
         e.preventDefault();
         $('#info-panel-container').fadeToggle(200, 'linear');
-        $('#toggle-map-button + .back-button + .next-button').hide();
     });
 
     function hexToRgb(hex) {
