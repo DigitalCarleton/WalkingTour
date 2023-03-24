@@ -20,18 +20,11 @@
                 <option value="<?php echo $map_coverage; ?>"><?php echo $map_coverage; ?></option>
                 <?php endforeach; ?>
             </select>
-            <label for="tour-type">Tours (in progress)</label>
-            <select id="tour-type" name="tour-type">
-                <option value="0">All Tours</option>
-                <?php foreach ($this->tour_types as $tour_type_id => $tour_type): ?>
-                <option value="<?php echo $tour_type_id; ?>"><?php echo $tour_type; ?></option>
-                <?php endforeach; ?>
-            </select>
-            <div id="place-type-div" style="display: none;">
-                <p>Place Types</p>
-                <label class="on"><input type="checkbox" name="place-type-all" value="0" checked="checked"/> All Place Types</label>
-                <?php foreach ($this->place_types as $place_type): ?>
-                <label><input type="checkbox" name="place-type" value="<?php echo htmlspecialchars($place_type); ?>" /> <?php echo $place_type; ?></label>
+            <div id="tour-type-div">
+                <p>Tours</p>
+                <label class="on"><input type="checkbox" name="place-type-all" value="0" checked="checked"/> All Tours</label>
+                <?php foreach ($this->tour_types['id'] as $tour_type_id => $tour_type): ?>
+                <label class="label<?php echo $tour_type_id ?>"><input type="checkbox" name="place-type" value="<?php echo $tour_type_id; ?>"/> <?php echo $tour_type; ?></label>
                 <?php endforeach; ?>
             </div>
             <div id="event-type-div" style="display: none;">

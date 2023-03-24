@@ -226,6 +226,10 @@ a#locate-button {
     color: #edc86a;
 }
 
+#tour-type-div p{
+    margin: 0.75rem 0 0.5rem 0;
+}
+
 #filters {
     position: absolute;
     left: 0;
@@ -250,11 +254,13 @@ a#locate-button {
     width: 100%;
     color: #DF582D;
     position: relative;
+    font-weight: 550;
+    letter-spacing: 0.5px;
 }
 
 #filters div label.on {
-    background-color: rgba(33, 201, 0, 0.15);
-    color: #36A036;;
+    background-color: rgba(33, 201, 0, 0.15) !important;
+    color: #36A036 !important;
 }
 
 #filters div label:before {
@@ -274,7 +280,7 @@ a#locate-button {
 
 #filters div label.on:before {
     content: "\e006";
-    background-color: rgba(33, 201, 0, 1);
+    background-color: rgba(33, 201, 0, 1) !important;
 }
 
 #filters div input[type=checkbox] {

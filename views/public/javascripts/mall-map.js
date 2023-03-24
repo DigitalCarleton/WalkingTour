@@ -206,26 +206,6 @@ function mallMapJs() {
         doFilters();
     });
 
-    // Filter item type.
-    $('#tour-type').change(function () {
-        var itemType = $(this);
-        if ('Place' == itemType.find(':selected').text()) {
-            $('#place-type-div').show({ duration: 'fast' });
-        } else {
-            // Reset and hide the place type select.
-            $('input[name=place-type]').removeAttr('checked');
-            $('#place-type-div').hide({ duration: 'fast' });
-        }
-        if ('Event' == itemType.find(':selected').text()) {
-            $('#event-type-div').show({ duration: 'fast' });
-        } else {
-            // Reset and hide the event type checkboxes.
-            $('input[name=event-type]').removeAttr('checked');
-            $('#event-type-div').hide({ duration: 'fast' });
-        }
-        doFilters();
-    });
-
     $('#map-coverage,#tour-type').on('touchstart touchend', function (event) {
         event.stopPropagation();
     });
@@ -277,11 +257,34 @@ function mallMapJs() {
         $('#toggle-map-button + .back-button').hide();
     });
 
-    /*
-    
-    Calculate every polyline, add to a global variable here.
-    
-    */
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    function createCustomCSS() {
+        console.log("here")
+        console.log(markerData);
+        var style = document.createElement('style')
+        var css = ""
+        for (const tour_id in markerData) {
+            var color = markerData[tour_id]['Color']
+            var rgb = hexToRgb(color)
+            css += `label.label${tour_id}:before {
+                        background-color: ${color} !important;
+                    }
+                    label.label${tour_id} {
+                        background-color: rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15) !important; 
+                        color: ${color} !important;
+                    }\n`
+        }
+        style.innerHTML = css;
+        document.body.appendChild(style);
+    }
 
     /*
      * Query all the marker data by tours 
@@ -452,7 +455,10 @@ function mallMapJs() {
                 });
             })
 
-            Promise.all(requests).then(() => doFilters());
+            Promise.all(requests).then(() => {
+                createCustomCSS();
+                doFilters();
+            });
         });
 
     }
@@ -471,20 +477,23 @@ function mallMapJs() {
         }
 
         var mapCoverage = $('#map-coverage');
-        var tourType = $('#tour-type');
+        var tourTypeCheck = $('input[name=place-type]:checked')
 
-
-        var toursToPlot;
+        var toursToPlot = [];
         var mapToPlot;
         // Handle each filter
         if ('0' != mapCoverage.val()) {
             mapToPlot = mapCoverage.val();
         }
-        if ('0' != tourType.val()) {
-            toursToPlot = [tourType.val()];
+
+        if (tourTypeCheck.length) {
+            tourTypeCheck.each(function () {
+                toursToPlot.push(this.value);
+            });
         } else {
             toursToPlot = Object.keys(markerData);
         }
+
         console.log(toursToPlot);
         var pathToPlot = [];
         var markerLayers = [];
