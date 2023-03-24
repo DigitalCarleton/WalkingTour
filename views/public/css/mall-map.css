@@ -226,6 +226,30 @@ a#locate-button {
     color: #edc86a;
 }
 
+#info-panel .next-button {
+    display: block;
+    padding: .5em 10px;
+    z-index: 1010;
+    color: white;
+    text-shadow: 0.5px 0.5px 2px black;
+}
+
+#info-panel .next-button:hover {
+    color: #edc86a;
+}
+
+#info-panel .prev-button {
+    display: block;
+    padding: .5em 10px;
+    z-index: 1010;
+    color: white;
+    text-shadow: 0.5px 0.5px 2px black;
+}
+
+#info-panel .prev-button:hover {
+    color: #edc86a;
+}
+
 #tour-type-div p{
     margin: 0.75rem 0 0.5rem 0;
 }

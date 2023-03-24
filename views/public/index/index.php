@@ -46,7 +46,11 @@
         <div id ="info-panel-container" style="display: none;">
             <div id="info-panel">
                 <div style="height: 100%;display: flex;flex-direction: column;">
+                <div style="display:flex;">
                 <a href="#" class="back-button">Back to Map</a>
+                <a href="#" class="next-button">Next Item</a>
+                <a href="#" class="prev-button">Prev Item</a>
+                </div>
                 <h1 id="info-panel-name"></h1>
                 <div id="info-panel-content"></div>
                 </div>
