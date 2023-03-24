@@ -128,6 +128,13 @@ function mallMapJs() {
     // Handle the filter form.
     $('#filter-button').click(function (e) {
         e.preventDefault();
+
+        // First close any popups
+        var popupDiv = $('.leaflet-pane .leaflet-popup-pane')
+        if (popupDiv.children().length > 0) {
+            popupDiv.empty()
+        }
+
         var filterButton = $(this);
         var clicks = filterButton.data('clicks');
         if (clicks) {
@@ -304,11 +311,31 @@ function mallMapJs() {
 
     function populatePopup(itemIDList, value, response, allItems) {
         var numPopup = itemIDList.findIndex((ele) => ele == response.id);
+
         $('.next-button').unbind("click");
         window.setTimeout(function () {
             $('.next-button').click(function (e) {
                 e.preventDefault();
-                var newId = itemIDList[numPopup + 1]
+                if (numPopup + 1 == itemIDList.length) {
+                    var newId = itemIDList[0]
+                } else {
+                    var newId = itemIDList[numPopup + 1]
+                }
+                var newResponse = allItems[newId]
+                console.log(response)
+                populatePopup(itemIDList, value, newResponse, allItems)
+            })
+        }, 500)
+
+        $('.prev-button').unbind("click");
+        window.setTimeout(function () {
+            $('.prev-button').click(function (e) {
+                e.preventDefault();
+                if (numPopup - 1 == -1) {
+                    var newId = itemIDList[itemIDList.length - 1]
+                } else {
+                    var newId = itemIDList[numPopup - 1]
+                }
                 var newResponse = allItems[newId]
                 console.log(response)
                 populatePopup(itemIDList, value, newResponse, allItems)
@@ -428,7 +455,13 @@ function mallMapJs() {
                             },
                             onEachFeature: function (feature, layer) {
                                 layer.on('click', function (e) {
-                                    // Request the item data and populate and open the marker popup.
+                                    // Close the filerting
+                                    var filterButton = $('filter-button');
+                                    filterButton.removeClass('on').
+                                        find('.screen-reader-text').
+                                        html('Filters');
+                                    $('#filters').fadeOut(200, 'linear');
+
                                     var marker = this;
                                     response = allItems[feature.properties.id]
                                     console.log(response)
@@ -438,10 +471,12 @@ function mallMapJs() {
                                         popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
                                     }
                                     popupContent += '<a href="#" class="open-info-panel button">view more info</a>';
-                                    marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
+                                    if (!layer.getPopup()) {
+                                        marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
+                                    }
 
                                     window.setTimeout(function () {
-                                        layer.getPopup().update();
+                                        layer.getPopup().update()
                                         $('.open-info-panel').click(function (e) {
                                             e.preventDefault();
                                             $('#info-panel-container').fadeToggle(200, 'linear');
@@ -450,10 +485,7 @@ function mallMapJs() {
                                         });
                                     }, 500);
 
-                                    // Panel
-
                                     // Populate the item info panel.
-                                    var numPopup = itemIDList.findIndex((ele) => ele == response.id);
                                     populatePopup(itemIDList, value, response, allItems);
                                 });
 
