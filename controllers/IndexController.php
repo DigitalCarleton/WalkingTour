@@ -155,13 +155,14 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             ->appendStylesheet(src('mall-map', 'css', 'css'));
     }
 
-    /**
-     * Filter items that have been geolocated by the Geolocation plugin.
-     *
-     * Since this is mobile-first, optimized SQL queries are preferable to using
-     * the Omeka API.
-     */
-    public function filterAction()
+    function rand_color() {
+        return '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+    }
+
+    /* 
+    *  Beginning to separate tours into separate features
+    */
+    public function queryAction()
     {
         // Process only AJAX requests.
         if (!$this->_request->isXmlHttpRequest()) {
@@ -175,23 +176,9 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         // Filter public tours' items
         $request_tour_id = $this->publicTours();
 
-        if ($this->_request->getParam('tourType')) {
-            $request_tour_id = array();
-            $input_id = $this->_request->getParam('tourType');
-            $request_tour_id[$input_id] = "Filter tour";
-        }
-
-        // Filter map coverage.
-        if ($this->_request->getParam('mapCoverage')) {
-            $alias = "map_coverage";
-            $joins[] = "$db->ElementText AS $alias ON $alias.record_id = items.id AND $alias.record_type = 'Item' "
-                     . $db->quoteInto("AND $alias.element_id = ?", self::ELEMENT_ID_MAP_COVERAGE);
-            $wheres[] = $db->quoteInto("$alias.text = ?", $this->_request->getParam('mapCoverage'));
-        }
-
-	    $tourItemTable = $db->getTable( 'TourItem' );
-        $ids = array();
+        $tourItemTable = $db->getTable( 'TourItem' );
         $tourItemsIDs = array();
+        $returnArray = array();
         foreach($request_tour_id as $tour_id => $tour_title){
             if($tour_id != 0){
                 $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
@@ -199,60 +186,59 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             } else {
                 $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items");
             }
-
+            $tourItemsIDs[$tour_id] = array();
             foreach ($tourItemsDat as $dat){
-              $tourItemsIDs[] = (int) $dat["item_id"];
+                array_push($tourItemsIDs[$tour_id], (int) $dat["item_id"]);
             }
         }
 
-        for ($i = 0; $i < count($tourItemsIDs); $i++){
-            array_push($ids, $tourItemsIDs[$i]);
-        }
+        foreach($tourItemsIDs as $tour_id => $item_array){
+            $randomColor = $this->rand_color();
 
-        $tourItemsIDs = implode(", ", $tourItemsIDs);
-        $wheres[] = $db->quoteInto("items.id IN ($tourItemsIDs)", Zend_Db::INT_TYPE);
+            $tourItemsID = implode(", ", $item_array);
+            $wheres = array("items.public = 1");
+            $wheres[] = $db->quoteInto("items.id IN ($tourItemsID)", Zend_Db::INT_TYPE);
 
-        // Build the SQL.
-        $sql = "SELECT items.id, locations.latitude, locations.longitude\nFROM $db->Location AS locations";
-        foreach ($joins as $join) {
-            $sql .= "\nJOIN $join";
-        }
-        foreach ($wheres as $key => $where) {
-            $sql .= (0 == $key) ? "\nWHERE" : "\nAND";
-            $sql .= " ($where)";
-        }
-        $sql .= "\nGROUP BY items.id";
+            $sql = "SELECT items.id, locations.latitude, locations.longitude\nFROM $db->Location AS locations";
+            foreach ($joins as $join) {
+                $sql .= "\nJOIN $join";
+            }
+            foreach ($wheres as $key => $where) {
+                $sql .= (0 == $key) ? "\nWHERE" : "\nAND";
+                $sql .= " ($where)";
+            }
+            $sql .= "\nGROUP BY items.id";
 
-        $dbItems = $db->query($sql)->fetchAll();
-        $orderedItems = array();
-        // orders items to match the order of the tour
-        for ($i = 0; $i < count($ids); $i++) {
-            for ($j = 0; $j < count($dbItems); $j++) {
-                if ($ids[$i] == $dbItems[$j]['id']) {
-                    array_push( $orderedItems, $dbItems[$j] );
+            $dbItems = $db->query($sql)->fetchAll();
+            $orderedItems = array();
+
+            // orders items to match the order of the tour
+            for ($i = 0; $i < count($item_array); $i++) {
+                for ($j = 0; $j < count($dbItems); $j++) {
+                    if ($item_array[$i] == $dbItems[$j]['id']) {
+                        array_push( $orderedItems, $dbItems[$j] );
+                    }
                 }
             }
+            // Build geoJSON: http://www.geojson.org/geojson-spec.html
+            $returnArray[$tour_id]["Data"] = array('type' => 'FeatureCollection', 'features' => array());
+            foreach ($orderedItems as $row) {
+                $returnArray[$tour_id]["Data"]['features'][] = array(
+                    'type' => 'Feature',
+                    'geometry' => array(
+                        'type' => 'Point',
+                        'coordinates' => array($row['longitude'], $row['latitude']),
+                    ),
+                    'properties' => array(
+                        'id' => $row['id'],
+                        "marker-color"=> $randomColor
+                    ),
+                );
+            }
+            $returnArray[$tour_id]["Color"] = $randomColor;
         }
-        // Build geoJSON: http://www.geojson.org/geojson-spec.html
-        $data = array('type' => 'FeatureCollection', 'features' => array());
-        foreach ($orderedItems as $row) {
-            $data['features'][] = array(
-                'type' => 'Feature',
-                'geometry' => array(
-                    'type' => 'Point',
-                    'coordinates' => array($row['longitude'], $row['latitude']),
-                ),
-                'properties' => array(
-                    'id' => $row['id'],
-                ),
-            );
-        }
-        // commented code below serves as debugging tool to write output to a file
-        /*$text = "Anything";
-        $var_str = var_export($request_tour_id, true);
-        $var = "<?php\n\n\$text = $var_str;\n\n?>";
-        file_put_contents('filename.php', $var);*/
-        $this->_helper->json($data);
+        $this->_helper->json($returnArray);
+        
     }
 
     /**
@@ -284,7 +270,7 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         $data = array(
             'id' => $item->id,
             'title' => metadata($item, array('Dublin Core', 'Title')),
-            'description' => metadata($item, array('Dublin Core', 'Description')),
+            'description' => metadata($item, array('Dublin Core', 'Description'), array('no-escape' => true)),
             'date' => metadata($item, array('Dublin Core', 'Date'), array('all' => true)),
             'thumbnail' => item_image('square_thumbnail', array(), 0, $item),
             'fullsize' => item_image('fullsize', array('style' => 'max-width: 100%; height: auto;'), 0, $item),

@@ -39,7 +39,9 @@ body {
 }
 
 #map {
-    width: 100%;
+    top:0; 
+    bottom:0; 
+    width:100%; 
 }
 
 h1 { 
@@ -311,6 +313,10 @@ a#locate-button {
 
 .leaflet-container {
     font-family : "Raleway", sans-serif !important;
+}
+
+.leaflet-tile-pane {
+    margin-top: -15px;
 }
 
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {

@@ -165,15 +165,15 @@ class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
 
   		for($i=0;$i<=5;$i++){
   			if(array_key_exists($i,$results) && is_object($results[$i])){
-  				$tourItems .='<div class="recent-row"><p class="recent"><a href="/admin/tours/show/'.$results[$i]->id.'">'
-  					.$results[$i]->title.'</a></p><p class="dash-edit"><a href="/admin/tours/edit/'.$results[$i]->id.'">Edit</a></p></div>';
+  				$tourItems .='<div class="recent-row"><p class="recent"><a href="'.html_escape(url('tours/show/')).$results[$i]->id.'">'
+  					.$results[$i]->title.'</a></p><p class="dash-edit"><a href="'.html_escape(url('tours/edit/')).$results[$i]->id.'">Edit</a></p></div>';
   			}
   		}
 
   		$html .= '<section class="five columns alpha"><div class="panel">';
   		$html .= '<h2>'.__('Recent Tours').'</h2>';
   		$html .= ''.$tourItems.'';
-  		$html .= '<p><a class="add-new-item" href="'.html_escape(url('tour-builder/tours/add/')).'">'.__('Add a new tour').'</a></p>';
+  		$html .= '<p><a class="add-new-item green button" href="'.html_escape(url('tours/add/')).'">'.__('Add a new tour').'</a></p>';
   		$html .= '</div></section>';
 
   		echo $html;
