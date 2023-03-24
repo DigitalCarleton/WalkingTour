@@ -52,7 +52,7 @@ function mallMapJs() {
     //                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     //             }));
     map.addControl(L.control.zoom({ position: 'topleft' }));
-    map.attributionControl.setPrefix('Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community');
+    map.attributionControl.setPrefix('Tiles &copy; Esri');
 
     // Check for user's first time visiting. Wait to locate the user after displaying tooltip on the first visit.
     // if (!($.cookie('myCookie'))) {
@@ -322,7 +322,6 @@ function mallMapJs() {
                     var newId = itemIDList[numPopup + 1]
                 }
                 var newResponse = allItems[newId]
-                console.log(response)
                 populatePopup(itemIDList, value, newResponse, allItems)
             })
         }, 500)
@@ -337,7 +336,6 @@ function mallMapJs() {
                     var newId = itemIDList[numPopup - 1]
                 }
                 var newResponse = allItems[newId]
-                console.log(response)
                 populatePopup(itemIDList, value, newResponse, allItems)
             })
         }, 500)
@@ -464,7 +462,6 @@ function mallMapJs() {
 
                                     var marker = this;
                                     response = allItems[feature.properties.id]
-                                    console.log(response)
                                     // Popup
                                     var popupContent = '<h3>' + response.title + '</h3>';
                                     if (response.thumbnail) {
@@ -534,8 +531,6 @@ function mallMapJs() {
      * This must be called on every form change.
      */
     function doFilters() {
-        console.log(markerData);
-
         // Remove the current markers.
         if (markers) {
             map.removeLayer(markers);

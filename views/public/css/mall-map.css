@@ -134,6 +134,7 @@ div[role="main"] {
     text-align: center;
     z-index: 4000;
     font-size: 2rem;
+    margin: auto;
     text-shadow: 0.5px 0.5px 2px black;
 }
 
@@ -396,8 +397,8 @@ a#locate-button {
         padding: 5px 0;
     }
     .panel-title a{
-        width: 35px;
-        height: 30px;
+        width: 25px;
+        height: 25px;
     }
 }
 
