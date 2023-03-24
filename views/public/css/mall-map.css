@@ -129,6 +129,7 @@ div[role="main"] {
     color: white;
     margin: 0;
     padding: 15px;
+    padding-top: 20px;
     font-weight: 600;
     text-align: center;
     z-index: 4000;
@@ -226,28 +227,22 @@ a#locate-button {
     color: #edc86a;
 }
 
-#info-panel .next-button {
+.panel-title a {
     display: block;
-    padding: .5em 10px;
-    z-index: 1010;
-    color: white;
-    text-shadow: 0.5px 0.5px 2px black;
+    margin: 25px;
+    width: 40px;
+    height: 40px;
+    border-top: 5px solid white;
+    border-left: 5px solid white;
+    filter: drop-shadow(2px 2px 2px black);
 }
 
-#info-panel .next-button:hover {
-    color: #edc86a;
+#info-panel .next-button {
+    transform: rotate(135deg);
 }
 
 #info-panel .prev-button {
-    display: block;
-    padding: .5em 10px;
-    z-index: 1010;
-    color: white;
-    text-shadow: 0.5px 0.5px 2px black;
-}
-
-#info-panel .prev-button:hover {
-    color: #edc86a;
+    transform: rotate(-45deg);
 }
 
 #tour-type-div p{
@@ -387,12 +382,22 @@ a#locate-button {
     }
     #info-panel h1{
         font-size: 1.5rem;
+        padding: 0;
+        line-height: 40px;
     }
     .info-content .image-container{
-        height: 250px;
+        height: 25%;
     }
     h2.info-panel-title{
         font-size: 1rem;
+    }
+    .panel-title{
+        justify-content: center;
+        padding: 5px 0;
+    }
+    .panel-title a{
+        width: 35px;
+        height: 30px;
     }
 }
 
@@ -430,6 +435,11 @@ h2.info-panel-title{
     line-height: 1.33;
     margin: 12px 0;
     margin-top: 1.45rem;
+}
+.panel-title{
+    display: flex;
+    justify-content: space-between;
+    background-color: #8cbcd8;
 }
 
 /* Leaflet Overrides */
