@@ -55,12 +55,12 @@ function mallMapJs() {
     map.attributionControl.setPrefix('Tiles &copy; Esri');
 
     // Check for user's first time visiting. Wait to locate the user after displaying tooltip on the first visit.
-    // if (!($.cookie('myCookie'))) {
-    //     $('#first-time').show();
-    //     $.cookie('myCookie', 'visited', { path: '/', expires: 10000 });
-    // } else {
-    //     map.locate({ watch: true });
-    // }
+    if (!($.cookie('myCookie'))) {
+        $('#first-time').show();
+        $.cookie('myCookie', 'visited', { path: '/', expires: 10000 });
+    } else {
+        map.locate({ watch: true });
+    }
 
     $("#first-time button").on('click', function () {
         $('#first-time').hide();
