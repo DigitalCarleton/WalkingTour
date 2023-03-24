@@ -452,6 +452,8 @@ function mallMapJs() {
                             },
                             onEachFeature: function (feature, layer) {
                                 layer.on('click', function (e) {
+				    // center click location
+			            map.flyTo(e.latlng, 16);      
                                     // Close the filerting
                                     var filterButton = $('filter-button');
                                     filterButton.removeClass('on').
@@ -471,8 +473,8 @@ function mallMapJs() {
                                         marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
                                     }
 
-                                    window.setTimeout(function () {
-                                        layer.getPopup().update()
+                                    window.setTimeout(function () {      
+					layer.getPopup().update()
                                         $('.open-info-panel').click(function (e) {
                                             e.preventDefault();
                                             $('#info-panel-container').fadeToggle(200, 'linear');
