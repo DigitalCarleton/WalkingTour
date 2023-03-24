@@ -156,10 +156,6 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             ->appendStylesheet(src('mall-map', 'css', 'css'));
     }
 
-    function rand_color() {
-        return '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
-    }
-
     /* 
     *  Beginning to separate tours into separate features
     */
@@ -199,7 +195,6 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         }
 
         foreach($tourItemsIDs as $tour_id => $item_array){
-            $randomColor = $this->rand_color();
 
             $tourItemsID = implode(", ", $item_array);
             $wheres = array("items.public = 1");

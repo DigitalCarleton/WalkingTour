@@ -344,11 +344,26 @@ a#locate-button {
 }
 
 @media screen and (max-width: 640px) {
-
     .info-content {
         flex-direction: column;
     }
-
+    #info-panel{
+        height: 840px;
+    }
+    #info-panel-container{
+        border-left-width: 16px;
+        border-right-width: 16px;
+        border-bottom-width: 16px;
+    }
+    #info-panel h1{
+        font-size: 1.5rem;
+    }
+    .info-content .image-container{
+        height: 250px;
+    }
+    h2.info-panel-title{
+        font-size: 1rem;
+    }
 }
 
 .info-content .image-container{
