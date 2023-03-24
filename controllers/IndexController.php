@@ -174,10 +174,6 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         $request_tour_id = $this->publicTours();
         $colorArray = array();
 
-        foreach ($request_tour_id['color'] as $key => $color){
-            debug("$key => $color");
-        }
-
         $tourItemTable = $db->getTable( 'TourItem' );
         $tourItemsIDs = array();
         $returnArray = array();
