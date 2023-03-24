@@ -13,9 +13,9 @@
         <a id="filter-button"><span class="screen-reader-text">Filters</span></a>
         <div id="filters">
             <h1>Select Filters</h1>
-            <label for="map-coverage">Map Era</label>
+            <label for="map-coverage">Item Century</label>
             <select id="map-coverage" name="map-coverage">
-                <option value="0">All Map Eras</option>
+                <option value="0">All Item Centuries</option>
                 <?php foreach ($this->map_coverages as $map_coverage): ?>
                 <option value="<?php echo $map_coverage; ?>"><?php echo $map_coverage; ?></option>
                 <?php endforeach; ?>
