@@ -416,7 +416,7 @@ function mallMapJs() {
                                     } else {
                                         rightContent += '<p>No descriptions available.</p>';
                                     }
-                                    rightContent += '<p><a href="' + response.url + '" class="button">See Full Details</a></p>';
+                                    rightContent += '<p><a href="' + response.url + '" class="button" target="_blank">See Full Details</a></p>';
                                     infoContent += '<div class = "content-container"> <div class ="article">' + rightContent + '</div></div>';
 
                                     content.append('<div class = "info-content">' + infoContent + '</div>')
