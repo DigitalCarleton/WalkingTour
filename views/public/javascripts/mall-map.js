@@ -60,7 +60,9 @@ function mallMapJs() {
         onAdd: function (map) {
             var llBounds = map.getBounds();
             var container = L.DomUtil.create('div', 'extentControl');
+            $(container).attr('id', 'extent-control');
             $(container).css('width', '26px').css('height', '26px').css('outline', '1px black');
+            $(container).addClass('extentControl-disabled')
             $(container).on('click', function () {
                 map.fitBounds(llBounds);
             });
@@ -91,6 +93,13 @@ function mallMapJs() {
     // Retain previous form state, if needed.
     retainFormState();
 
+    map.on('zoomend', function () {
+        if (map.getZoom() == MAP_MIN_ZOOM) {
+            $('#extent-control').addClass('extentControl-disabled')
+        } else {
+            $('#extent-control').removeClass('extentControl-disabled')
+        }
+    })
 
     // Handle location found.
     map.on('locationfound', function (e) {
