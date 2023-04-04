@@ -17,7 +17,7 @@
 }
 
 a#locate-button:before, #filter-button:before, 
-#filters div label.on:before, #toggle-map-button,
+#filters div label.on:before, #toggle-map-button, .extentControl.leaflet-control:before,
 .back-button:before{
     font-family: 'icomoon';
     speak: none;
@@ -515,6 +515,16 @@ h2.info-panel-title{
 }
 
 /* Leaflet Overrides */
+
+.extentControl{
+    background : url(icons.png) no-repeat 50% 50%;
+    background-size: 20px 20px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+    border-radius: 4px;
+    cursor: pointer !important;
+    background-color: #f4f4f4;
+    color: #bbb;
+}
 
 .leaflet-container {
     font-family : "Raleway", sans-serif !important;

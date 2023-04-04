@@ -53,6 +53,22 @@ function mallMapJs() {
     //                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     //             }));
     map.addControl(L.control.zoom({ position: 'topleft' }));
+    var extentControl = L.Control.extend({
+        options: {
+            position: 'topleft'
+        },
+        onAdd: function (map) {
+            var llBounds = map.getBounds();
+            var container = L.DomUtil.create('div', 'extentControl');
+            $(container).css('width', '26px').css('height', '26px').css('outline', '1px black');
+            $(container).on('click', function () {
+                map.fitBounds(llBounds);
+            });
+            return container;
+        }
+    })
+
+    map.addControl(new extentControl());
     map.attributionControl.setPrefix('Tiles &copy; Esri');
 
     // Check for user's first time visiting. Wait to locate the user after displaying tooltip on the first visit.
