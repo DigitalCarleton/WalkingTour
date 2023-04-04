@@ -152,6 +152,33 @@ function mallMapJs() {
         filterButton.data('clicks', !clicks);
     });
 
+    $('#tour-confirm-button').click(function (e) {
+        e.preventDefault();
+        var filterButton = $('#filter-button');
+        filterButton.removeClass('on').
+            find('.screen-reader-text').
+            html('Filters');
+        $('#filters').fadeToggle(200, 'linear');
+        var tourSelected = []
+        var tourTypeCheck = $('input[name=place-type]:checked')
+
+        if (tourTypeCheck.length) {
+            tourTypeCheck.each(function () {
+                tourSelected.push(markerData[this.value].walkingPath);
+            });
+        } else {
+            var toursToPlot = Object.keys(markerData);
+            console.log(toursToPlot)
+            toursToPlot.forEach((ele) => {
+                tourSelected.push(markerData[ele].walkingPath);
+            });
+        }
+
+        let polylineGroup = L.featureGroup(tourSelected);
+        let bounds = polylineGroup.getBounds();
+        map.fitBounds(bounds);
+    })
+
     // Revert form to default and display all markers.
     $('#all-button').click(function (e) {
         e.preventDefault();
@@ -279,10 +306,10 @@ function mallMapJs() {
         for (const tour_id in markerData) {
             var color = markerData[tour_id]['Color']
             var rgb = hexToRgb(color)
-            css += `label.label${tour_id}:before {
+            css += `#filters div label.label${tour_id}.on:before {
                         background-color: ${color} !important;
                     }
-                    label.label${tour_id} {
+                    #filters div label.label${tour_id}.on {
                         background-color: rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15) !important; 
                         color: ${color} !important;
                     }\n`
@@ -292,7 +319,7 @@ function mallMapJs() {
     }
 
     /*
-     * Query all the marker data by tours 
+     * Get the popup content for each item 
     */
 
     function getMarkerHTML(color) {
@@ -396,16 +423,6 @@ function mallMapJs() {
 
         // Populate the item info panel.
         populatePopup(itemIDList, value, response, allItems);
-    }
-
-    async function getAllItems(items) {
-        result = {}
-        await Promise.all(items.map(async (feature) => {
-            await $.post('mall-map/index/get-item', { id: feature.properties.id }, function (response) {
-                result[feature.properties.id] = response;
-            })
-        }));
-        return result;
     }
 
     function doQuery() {
@@ -662,9 +679,9 @@ function mallMapJs() {
      * when navigating back to the map from another page.
      */
     function retainFormState() {
-        if ('0' != $('#map-coverage').val()) {
-            addHistoricMapLayer();
-        }
+        // if ('0' != $('#map-coverage').val()) {
+        //     addHistoricMapLayer();
+        // }
         if ('Place' == $('#tour-type').find(':selected').text()) {
             var placeTypes = $('input[name=place-type]:checked');
             if (placeTypes.length) {

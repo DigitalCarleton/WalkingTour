@@ -8,20 +8,18 @@
     <?php echo link_to_home_page('<span class="screen-reader-text">Home</span>', array('id' => 'home-button')); ?>
     <div id="dialog"></div>
     <div role="main">
-        <h1 id="marker-count"></h1>
-        <a href="#" id="toggle-map-button" class="on" style="display: none;"><span class="screen-reader-text">Map On</span></a>
-        <a id="filter-button"><span class="screen-reader-text">Filters</span></a>
+        <div class = "map-title">
+            <h1 id="marker-count"></h1>
+            <a href="#" id="toggle-map-button" class="on" style="display: none;"><span class="screen-reader-text">Map On</span></a>
+            <a id="filter-button"><span class="screen-reader-text">Filters</span></a>
+        </div>
         <div id="filters">
             <h1>Select Filters</h1>
-            <label for="map-coverage">Item Century</label>
-            <select id="map-coverage" name="map-coverage">
-                <option value="0">All Item Centuries</option>
-                <?php foreach ($this->map_coverages as $map_coverage): ?>
-                <option value="<?php echo $map_coverage; ?>"><?php echo $map_coverage; ?></option>
-                <?php endforeach; ?>
-            </select>
             <div id="tour-type-div">
-                <p>Tours</p>
+                <div class="tour-filter">
+                    <p>Tours</p>
+                    <a href="#" class="button" id="tour-confirm-button">Show tours</a>
+                </div>
                 <label class="on"><input type="checkbox" name="place-type-all" value="0" checked="checked"/> All Tours</label>
                 <?php foreach ($this->tour_types['id'] as $tour_type_id => $tour_type): ?>
                 <label class="label<?php echo $tour_type_id ?>"><input type="checkbox" name="place-type" value="<?php echo $tour_type_id; ?>"/> <?php echo $tour_type; ?></label>

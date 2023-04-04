@@ -81,6 +81,16 @@ label {
     background-image: linear-gradient(90deg, rgba(255, 194, 0, 0.6), rgba(190, 183, 0, 0.35));
 } */
 
+/*
+    padding: 0.375em 0;
+    background-color: #8cbcd8;
+    color: #fff;
+    margin: 0;
+    font-size: 24px;
+    line-height: 36px;
+    text-shadow: 0.5px 0.5px 2px black;
+    text-align: center;
+*/
 .screen-reader-text {
     display: none;
 }
@@ -183,6 +193,32 @@ a#locate-button {
     background-color: rgba(255,255,255.8);
 }
 
+.map-title{
+    display: flex;
+    padding: 0.05em 0;
+    background-color: #8cbcd8;
+    color: #fff;
+    font-size: 24px;
+    line-height: 36px;
+    text-shadow: 0.5px 0.5px 2px black;
+    text-align: center;
+    justify-content: space-between;
+    align-items: center;
+    height: 3em;
+}
+
+.map-title #marker-count {
+    margin: 0;
+    padding: 0;
+    flex: 1;
+    text-align: center;
+}
+
+.map-title #filter-button {
+    flex: 0;
+    text-align: right;
+}
+
 #filter-button:before { content: "\e013"; }
 
 #filter-button.on:before, a.back-button:before { content: "\e00d"; }
@@ -192,9 +228,9 @@ a#locate-button {
     position: absolute;
     top: 0;
     font-size: 24px;
-    height: 2.25em;
+    height: 3em;
     line-height: 2.25em;
-    padding: 0 10px;
+    padding: 10px;
     color: #fff;
     border-left: 1px solid rgba(255,255,255,.15);
     cursor: pointer;
@@ -202,6 +238,21 @@ a#locate-button {
 
 #filter-button {
     right: 0;
+}
+
+.tour-filter{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 0.5rem 0;
+}
+
+.tour-filter #tour-confirm-button {
+    background-color: #8cbcd8;
+    color: #fff;
+    padding: 10px;
+    margin-right: 1.3rem;
+    border-radius: 3px;
 }
 
 #toggle-map-button {
@@ -247,13 +298,13 @@ a#locate-button {
 }
 
 #tour-type-div p{
-    margin: 0.75rem 0 0.5rem 0;
+    margin: 0;
+    font-size: 20px;
 }
 
 #filters {
     position: absolute;
     left: 0;
-    top: 54px;
     height: 100%;
     background: rgba(255, 255, 255, 0.9);
     background-size: cover;
@@ -299,7 +350,7 @@ a#locate-button {
 }
 
 #filters div label.on:before {
-    content: "\e006";
+    content: "\ea10";
     background-color: rgba(33, 201, 0, 1) !important;
 }
 
@@ -369,7 +420,27 @@ a#locate-button {
     overflow: hidden;
 }
 
+@media screen and (max-width: 958px) {
+    .tour-filter #tour-confirm-button {
+        margin: 0;
+    }
+}
+
 @media screen and (max-width: 640px) {
+    .map-title{
+        padding: 0.375em 2.85714%;
+        height: 2.25em;
+    }
+
+    .map-title #marker-count{
+        flex: 0 1 auto;
+    }
+
+    .map-title #filter-button{
+        height: 2.25em;
+        padding: 0 10px;
+    }
+
     .info-content {
         flex-direction: column;
     }
