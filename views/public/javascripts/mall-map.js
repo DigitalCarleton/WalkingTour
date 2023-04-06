@@ -405,17 +405,18 @@ function mallMapJs() {
         }, 500)
 
         document.getElementById("info-panel-name").innerHTML = value["Tour Name"] + ` #${numPopup + 1}`;
+        $('.panel-title').css("backgroundColor", value['Color'])
         var content = $('#info-panel-content');
         content.empty();
 
         var infoContent = ""
         var leftContent = "";
         var rightContent = "";
-
+        console.log(value)
         leftContent += response.fullsize;
         infoContent += '<div class = "image-container">' + leftContent + '</div>';
 
-        rightContent += '<h2 class = info-panel-title>' + response.title + '</h2>'
+        rightContent += `<h2 class = info-panel-title>` + response.title + '</h2>'
         if (response.abstract) {
             rightContent += '<p>' + response.abstract + '</p>';
         } else if (response.description) {
