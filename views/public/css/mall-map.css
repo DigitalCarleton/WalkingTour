@@ -310,7 +310,7 @@ a#locate-button {
     background-size: cover;
     width: 100%;
     z-index: 1001;
-    padding: 80px 10px 20px;
+    padding: 10px 20px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     display: none;

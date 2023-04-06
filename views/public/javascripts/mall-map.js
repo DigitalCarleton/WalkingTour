@@ -331,12 +331,15 @@ function mallMapJs() {
         for (const tour_id in markerData) {
             var color = markerData[tour_id]['Color']
             var rgb = hexToRgb(color)
-            css += `#filters div label.label${tour_id}.on:before {
+            css += `#filters div label.label${tour_id}:before {
                         background-color: ${color} !important;
                     }
-                    #filters div label.label${tour_id}.on {
+                    #filters div label.label${tour_id} {
                         background-color: rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15) !important; 
                         color: ${color} !important;
+                    }
+                    #filters div label.label${tour_id}.on:before {
+                        background-color: rgba(33, 201, 0, 1) !important;
                     }\n`
         }
         style.innerHTML = css;

@@ -14,7 +14,6 @@
             <a id="filter-button"><span class="screen-reader-text">Filters</span></a>
         </div>
         <div id="filters">
-            <h1>Select Filters</h1>
             <div id="tour-type-div">
                 <div class="tour-filter">
                     <p>Tours</p>
