@@ -283,17 +283,27 @@ a#locate-button {
     margin: 25px;
     width: 40px;
     height: 40px;
+    /* display: block;
+    margin: 25px;
+    width: 40px;
+    height: 40px;
     border-top: 5px solid white;
     border-left: 5px solid white;
+    filter: drop-shadow(2px 2px 2px black); */
+}
+
+#info-panel .next-button:before {
+    content: "\203A";
+    font-size: 7rem;
+    color: white;
     filter: drop-shadow(2px 2px 2px black);
 }
 
-#info-panel .next-button {
-    transform: rotate(135deg);
-}
-
-#info-panel .prev-button {
-    transform: rotate(-45deg);
+#info-panel .prev-button:before {
+    content: "\2039";
+    font-size: 7rem;
+    color: white;
+    filter: drop-shadow(2px 2px 2px black);
 }
 
 #tour-type-div p{
@@ -469,6 +479,12 @@ a#locate-button {
     .panel-title a{
         width: 25px;
         height: 25px;
+    }
+    #info-panel .next-button:before{
+        font-size: 5rem;
+    }
+    #info-panel .prev-button:before{
+        font-size: 5rem;
     }
 }
 
