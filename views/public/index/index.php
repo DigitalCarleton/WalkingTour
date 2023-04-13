@@ -17,7 +17,7 @@
             <div id="tour-type-div">
                 <div class="tour-filter">
                     <p>Tours</p>
-                    <a href="#" class="button" id="tour-confirm-button">Show tours</a>
+                    <a href="#" class="button" id="tour-confirm-button">Choose tour</a>
                 </div>
                 <label class="on"><input type="checkbox" name="place-type-all" value="0" checked="checked"/> All Tours</label>
                 <?php foreach ($this->tour_types['id'] as $tour_type_id => $tour_type): ?>
