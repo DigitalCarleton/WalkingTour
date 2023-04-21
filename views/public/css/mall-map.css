@@ -306,6 +306,16 @@ a#locate-button {
     filter: drop-shadow(2px 2px 2px black);
 }
 
+#info-panel .prev-button.off:before,
+#info-panel .next-button.off:before {
+    content: "";
+}
+
+#info-panel .prev-button.off,
+#info-panel .next-button.off {
+    cursor: default;
+}
+
 #tour-type-div p{
     margin: 0;
     font-size: 20px;
@@ -599,7 +609,6 @@ h2.info-panel-title{
 
 #first-time {
     position: absolute;
-    top: 3.3125em;
     left: 0;
     width: 100%;
     height: 100%;

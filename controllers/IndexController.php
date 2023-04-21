@@ -110,6 +110,8 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
           if($tour['public']==1){
             $_tourTypes['id'][$tour['id']] = $tour['title'];
             $_tourTypes['color'][$tour['id']] = $tour['color'];
+            $_tourTypes['description'][$tour['id']] = $tour['description'];
+            $_tourTypes['credits'][$tour['id']] = $tour['credits'];
           }
         }
 
@@ -234,6 +236,8 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             }
             $returnArray[$tour_id]["Color"] = $request_tour_id['color'][$tour_id];
             $returnArray[$tour_id]["Tour Name"] = $request_tour_id['id'][$tour_id];
+            $returnArray[$tour_id]["Description"] = $request_tour_id['description'][$tour_id];
+            $returnArray[$tour_id]["Credits"] = $request_tour_id['credits'][$tour_id];
         }
         $this->_helper->json($returnArray);
         
