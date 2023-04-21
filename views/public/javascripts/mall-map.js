@@ -203,6 +203,12 @@ function mallMapJs() {
                 tourSelected.push(markerData[ele].walkingPath);
             });
         }
+
+        filterButton.removeClass('on').
+            find('.screen-reader-text').
+            html('Filters');
+        $('#filters').fadeToggle(200, 'linear');
+
         if (curTourSelected) {
             console.log(curTourSelected)
             curTourSelected.Data.features.forEach(ele => {
@@ -210,10 +216,6 @@ function mallMapJs() {
             })
             console.log(itemIDList)
 
-            filterButton.removeClass('on').
-                find('.screen-reader-text').
-                html('Filters');
-            $('#filters').fadeToggle(200, 'linear');
             $('#info-panel-container').fadeToggle(200, 'linear');
             $('#toggle-map-button + .back-button').show();
             populateTourIntroPopup(itemIDList, curTourSelected);
