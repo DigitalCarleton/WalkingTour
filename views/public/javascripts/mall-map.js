@@ -356,18 +356,17 @@ function mallMapJs() {
 
         var infoContent = ""
         var rightContent = "";
-        var text = ""
         // click title to show the popup on map
         if (value.Description != "") {
-            text += value.Description
+            rightContent += '<p>' + value.Description + '</p>'
         } else {
-            text += "No descriptions available."
+            rightContent += "<p> No descriptions available. </p>"
         }
 
         if (value.Credits != "") {
-            text += "\nCredits: " + value.Credits
+            rightContent += "<h2 class = credits> Credits </h2>"
+            rightContent += '<p>' + value.Credits + '</p>'
         }
-        rightContent += '<p> ' + text + '</p>';
         rightContent += '<p><a href="#" class="button" id="start-tour" target="_blank">Start Tour</a></p>';
         window.setTimeout(function () {
             $('#start-tour').click(function (e) {

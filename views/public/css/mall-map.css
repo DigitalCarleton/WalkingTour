@@ -533,6 +533,13 @@ h2.info-panel-title{
     margin: 12px 0;
     margin-top: 1.45rem;
 }
+h2.credits{
+    width: 100%;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.33;
+    margin: 0;
+}
 .panel-title{
     display: flex;
     justify-content: space-between;
