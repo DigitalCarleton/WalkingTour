@@ -151,7 +151,6 @@ a#toggle-map-button:before { content: "\e00f"; }
 
 a#locate-button:before { 
     content: "\e012";
-    background-color: rgba(255, 255, 255, 0.8);
     width: 100%;
     height: 100%;
     display: block;
@@ -162,20 +161,19 @@ a#locate-button:before {
 a#locate-button {
     position: absolute;
     bottom: 11px;
-    z-index: 1000;
+    z-index: 100000;
     text-decoration: none;
-    color: #fff;
-    background-color: #2B89D9;
-    -webkit-box-shadow: 0 0 20px rgba(0,0,0,.15);
-    -moz-box-shadow: 0 0 20px rgba(0,0,0,.15);
-    box-shadow: 0 0 20px rgba(0,0,0,.15);
+    color: black;
+    background-color: white;
+    -webkit-box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+    -moz-box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+    box-shadow: 0 1px 5px rgba(0,0,0,0.65);
     font-size: 20px;
     line-height: 100%;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
-    border: 1px solid #78B6EB;
-    border-radius: 3px;
+    border-radius: 4px;
     overflow: hidden;
 }
 
@@ -655,6 +653,30 @@ h2.credits{
     border-top: 10px solid rgba(0, 0, 0, 0);
 }
 
+#first-time .tooltip-locate {
+    background-color: #fff;
+    position: absolute;
+    max-width: 50%;
+    right: 592px;
+    bottom: 8rem;
+    padding: 0 20px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+#first-time .tooltip-locate:before {
+    content: "";
+    width: 10px;
+    height: 20px;
+    position: absolute;
+    top: 100px;
+    left: 0;
+    transform: rotate(180deg);
+    border-right: 10px solid #FFF;
+    border-top: 10px solid rgba(0, 0, 0, 0);
+}
+
 #first-time button {
     border: 0;
     -webkit-border-radius: 0px;
@@ -675,6 +697,16 @@ h2.credits{
     #first-time .tooltip {
         max-width: 90%;
         right: 5%;
+    }
+
+    #first-time .tooltip-locate {
+        max-width: 90%;
+        right: 5%;
+        /* top: 70%; */
+    }
+
+    #first-time .tooltip-locate::before {
+        top: 124px;
     }
 
 }

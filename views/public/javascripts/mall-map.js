@@ -6,8 +6,6 @@ $(document).ready(function () {
     mallMapJs()
 });
 
-// TODO: each tour will have a intro popup
-
 function mallMapJs() {
     $.getScript("https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js");
     var imported = document.createElement("script");
@@ -70,6 +68,7 @@ function mallMapJs() {
             $(container).attr('id', 'extent-control');
             $(container).css('width', '26px').css('height', '26px').css('outline', '1px black');
             $(container).addClass('extentControl-disabled')
+            $(container).addClass('leaflet-bar')
             $(container).on('click', function () {
                 map.fitBounds(llBounds);
             });
@@ -83,14 +82,21 @@ function mallMapJs() {
     // Check for user's first time visiting. Wait to locate the user after displaying tooltip on the first visit.
     if (!($.cookie('myCookie'))) {
         $('#first-time').show();
+        $('.tooltip-locate').toggle();
         $.cookie('myCookie', 'visited', { path: '/', expires: 10000 });
-    } else {
-        map.locate({ watch: true });
     }
 
-    $("#first-time button").on('click', function () {
+    $("#first-time > div.tooltip > button").on('click', function () {
+        console.log('tes')
+        $('.tooltip').fadeToggle();
+        $('.tooltip-locate').fadeToggle();
+        // map.locate({ watch: true });
+        // document.querySelector("#first-time > div.tooltip > button")
+    });
+
+    $("#first-time > div.tooltip-locate > button").on('click', function () {
         $('#first-time').hide();
-        map.locate({ watch: true });
+        // map.locate({ watch: true });
     });
 
     window.onload = function () {
@@ -110,6 +116,7 @@ function mallMapJs() {
 
     // Handle location found.
     map.on('locationfound', function (e) {
+        console.log("here")
         // User within location bounds. Set the location marker.
         if (L.latLngBounds(LOCATE_BOUNDS).contains(e.latlng)) {
             launchTooltip();
@@ -120,7 +127,7 @@ function mallMapJs() {
                 // Pan to location only on first locate.
                 map.panTo(e.latlng);
             }
-            $('#locate-button').removeClass('disabled');
+            // $('#locate-button').removeClass('disabled');
             locationMarker = L.marker(e.latlng, {
                 icon: L.icon({
                     iconUrl: 'plugins/MallMap/views/public/images/location.png',
@@ -132,7 +139,7 @@ function mallMapJs() {
             // User outside location bounds.
         } else {
             map.stopLocate();
-            $('#locate-button').addClass('disabled');
+            // $('#locate-button').addClass('disabled');
             var locateMeters = e.latlng.distanceTo(map.options.center);
             // Show out of bounds message only if within a certain distance.
             if (MAX_LOCATE_METERS > locateMeters) {
@@ -148,7 +155,8 @@ function mallMapJs() {
     // Handle location error.
     map.on('locationerror', function () {
         map.stopLocate();
-        $('#locate-button').addClass('disabled');
+        console.log('error')
+        // $('#locate-button').addClass('disabled');
     });
 
     // Set up the dialog window.
@@ -235,9 +243,6 @@ function mallMapJs() {
     // Handle locate button.
     $('#locate-button').click(function (e) {
         e.preventDefault();
-        if ($(this).hasClass('disabled')) {
-            return;
-        }
         if (locationMarker) {
             map.removeLayer(locationMarker)
             locationMarker = null;
