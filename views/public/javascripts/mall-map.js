@@ -44,40 +44,38 @@ function mallMapJs() {
     var allItems = {};
     var allMarkers = {};
 
-    // Set the base map layer.
-    map = L.map('map', {
-        center: MAP_CENTER,
-        zoom: MAP_ZOOM,
-        minZoom: MAP_MIN_ZOOM,
-        maxZoom: MAP_MAX_ZOOM,
-        maxBounds: MAP_MAX_BOUNDS,
-        zoomControl: false
-    });
-    map.addLayer(L.tileLayer(MAP_URL_TEMPLATE));
-    // map.addLayer(L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    //                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    //             }));
-    map.addControl(L.control.zoom({ position: 'topleft' }));
-    var extentControl = L.Control.extend({
-        options: {
-            position: 'topleft'
-        },
-        onAdd: function (map) {
-            var llBounds = map.getBounds();
-            var container = L.DomUtil.create('div', 'extentControl');
-            $(container).attr('id', 'extent-control');
-            $(container).css('width', '26px').css('height', '26px').css('outline', '1px black');
-            $(container).addClass('extentControl-disabled')
-            $(container).addClass('leaflet-bar')
-            $(container).on('click', function () {
-                map.fitBounds(llBounds);
-            });
-            return container;
-        }
-    })
-
-    map.addControl(new extentControl());
-    map.attributionControl.setPrefix('Tiles &copy; Esri');
+    function mapSetUp() {
+        // Set the base map layer.
+        map = L.map('map', {
+            center: MAP_CENTER,
+            zoom: MAP_ZOOM,
+            minZoom: MAP_MIN_ZOOM,
+            maxZoom: MAP_MAX_ZOOM,
+            maxBounds: MAP_MAX_BOUNDS,
+            zoomControl: false
+        });
+        map.addLayer(L.tileLayer(MAP_URL_TEMPLATE));
+        map.addControl(L.control.zoom({ position: 'topleft' }));
+        var extentControl = L.Control.extend({
+            options: {
+                position: 'topleft'
+            },
+            onAdd: function (map) {
+                var llBounds = map.getBounds();
+                var container = L.DomUtil.create('div', 'extentControl');
+                $(container).attr('id', 'extent-control');
+                $(container).css('width', '26px').css('height', '26px').css('outline', '1px black');
+                $(container).addClass('extentControl-disabled')
+                $(container).addClass('leaflet-bar')
+                $(container).on('click', function () {
+                    map.fitBounds(llBounds);
+                });
+                return container;
+            }
+        })
+        map.addControl(new extentControl());
+        map.attributionControl.setPrefix('Tiles &copy; Esri');
+    }
 
     // Check for user's first time visiting. Wait to locate the user after displaying tooltip on the first visit.
     if (!($.cookie('myCookie'))) {
@@ -100,7 +98,10 @@ function mallMapJs() {
     });
 
     window.onload = function () {
-        doQuery();
+        jqXhr = $.post('mall-map/index/map-config', function (response) {
+            mapSetUp();
+            doQuery();
+        })
     };
 
     // Retain previous form state, if needed.

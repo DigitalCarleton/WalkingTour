@@ -158,6 +158,25 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             ->appendStylesheet(src('mall-map', 'css', 'css'));
     }
 
+    public function mapConfigAction() 
+    {
+        // Process only AJAX requests.
+        if (!$this->_request->isXmlHttpRequest()) {
+            throw new Omeka_Controller_Exception_403;
+        }
+
+        $returnArray = array();
+        $returnArray['mall_map_center'] = get_option('mall_map_center');
+        $returnArray['mall_map_default_zoom'] = get_option('mall_map_default_zoom');
+        $returnArray['mall_map_max_zoom'] = get_option('mall_map_max_zoom');
+        $returnArray['mall_map_min_zoom'] = get_option('mall_map_min_zoom');
+        $returnArray['mall_map_max_bounds'] = get_option('mall_map_max_bounds');
+        $returnArray['mall_map_locate_bounds'] = get_option('mall_map_locate_bounds');
+        $returnArray['mall_map_max_locate_meters'] = get_option('mall_map_max_locate_meters');
+
+        $this->_helper->json($returnArray);
+    }
+
     /* 
     *  Beginning to separate tours into separate features
     */
@@ -285,4 +304,6 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         );
         $this->_helper->json($data);
     }
+
+    //https://omeka.readthedocs.io/en/latest/Reference/libraries/globals/get_option.html
 }

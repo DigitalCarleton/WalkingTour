@@ -112,6 +112,13 @@ class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
     {
         set_option('mall_map_filter_tooltip', $_POST['mall_map_filter_tooltip']);
         set_option('mall_map_tooltip_button', $_POST['mall_map_tooltip_button']);
+        set_option('mall_map_center', $_POST['mall_map_center']);
+        set_option('mall_map_default_zoom', $_POST['mall_map_default_zoom']);
+        set_option('mall_map_max_zoom', $_POST['mall_map_max_zoom']);
+        set_option('mall_map_min_zoom', $_POST['mall_map_min_zoom']);
+        set_option('mall_map_max_bounds', $_POST['mall_map_max_bounds']);
+        set_option('mall_map_locate_bounds', $_POST['mall_map_locate_bounds']);
+        set_option('mall_map_max_locate_meters', $_POST['mall_map_max_locate_meters']);
     }
 
     public function hookDefineRoutes($args)

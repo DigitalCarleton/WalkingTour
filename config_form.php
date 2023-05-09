@@ -9,6 +9,7 @@
         </div>
     </div>
 </div>
+
 <div class="field">
     <div class="two columns alpha">
         <label for="mall_map_tooltip_button"><?php echo __('Tooltip Button Text'); ?></label>    
@@ -17,6 +18,90 @@
         <p class="explanation"><?php echo __('The text that appears on the button to close the tooltip.'); ?></p>
         <div class="input-block">        
             <input type="text" name="mall_map_tooltip_button" id="mall_map_tooltip_button" value="<?php echo get_option('mall_map_tooltip_button'); ?>" />
+        </div>
+    </div>
+</div>
+
+<div class="field">
+    <div class="two columns alpha">
+        <label for="mall_map_center"><?php echo __('Map Center Coordinates'); ?></label>    
+    </div>    
+    <div class="inputs five columns omega">
+        <p class="explanation"><?php echo __('Controls the default starting place.'); ?></p>
+        <div class="input-block">        
+            <input type="text" name="mall_map_center" id="mall_map_center" value="<?php echo get_option('mall_map_center'); ?>" />
+        </div>
+    </div>
+</div>
+
+<div class="field">
+    <div class="two columns alpha">
+        <label for="mall_map_default_zoom"><?php echo __('Map Default Zoom'); ?></label>    
+    </div>    
+    <div class="inputs five columns omega">
+        <p class="explanation"><?php echo __('Controls the default zoom of the map.'); ?></p>
+        <div class="input-block">        
+            <input type="text" name="mall_map_default_zoom" id="mall_map_default_zoom" value="<?php echo get_option('mall_map_default_zoom'); ?>" />
+        </div>
+    </div>
+</div>
+
+<div class="field">
+    <div class="two columns alpha">
+        <label for="mall_map_max_zoom"><?php echo __('Map Max Zoom'); ?></label>    
+    </div>    
+    <div class="inputs five columns omega">
+        <p class="explanation"><?php echo __('Controls the max zoom of the map.'); ?></p>
+        <div class="input-block">        
+            <input type="text" name="mall_map_max_zoom" id="mall_map_max_zoom" value="<?php echo get_option('mall_map_max_zoom'); ?>" />
+        </div>
+    </div>
+</div>
+
+<div class="field">
+    <div class="two columns alpha">
+        <label for="mall_map_min_zoom"><?php echo __('Map Min Zoom'); ?></label>    
+    </div>    
+    <div class="inputs five columns omega">
+        <p class="explanation"><?php echo __('Controls the min zoom of the map.'); ?></p>
+        <div class="input-block">        
+            <input type="text" name="mall_map_min_zoom" id="mall_map_min_zoom" value="<?php echo get_option('mall_map_min_zoom'); ?>" />
+        </div>
+    </div>
+</div>
+
+<div class="field">
+    <div class="two columns alpha">
+        <label for="mall_map_max_bounds"><?php echo __('Map Max Bounds'); ?></label>    
+    </div>    
+    <div class="inputs five columns omega">
+        <p class="explanation"><?php echo __('Controls the max bounds of the map.'); ?></p>
+        <div class="input-block">        
+            <input type="text" name="mall_map_max_bounds" id="mall_map_max_bounds" value="<?php echo get_option('mall_map_max_bounds'); ?>" />
+        </div>
+    </div>
+</div>
+
+<div class="field">
+    <div class="two columns alpha">
+        <label for="mall_map_locate_bounds"><?php echo __('Map Locate Bounds'); ?></label>    
+    </div>    
+    <div class="inputs five columns omega">
+        <p class="explanation"><?php echo __('Controls the locate bounds of the map.'); ?></p>
+        <div class="input-block">        
+            <input type="text" name="mall_map_locate_bounds" id="mall_map_locate_bounds" value="<?php echo get_option('mall_map_locate_bounds'); ?>" />
+        </div>
+    </div>
+</div>
+
+<div class="field">
+    <div class="two columns alpha">
+        <label for="mall_map_max_locate_meters"><?php echo __('Map Max Locate Meters'); ?></label>    
+    </div>    
+    <div class="inputs five columns omega">
+        <p class="explanation"><?php echo __('Controls the max locate meter of the map.'); ?></p>
+        <div class="input-block">        
+            <input type="text" name="mall_map_max_locate_meters" id="mall_map_max_locate_meters" value="<?php echo get_option('mall_map_max_locate_meters'); ?>" />
         </div>
     </div>
 </div>
