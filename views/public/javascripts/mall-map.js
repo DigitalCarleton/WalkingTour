@@ -25,15 +25,15 @@ function mallMapJs() {
 
     // MAP_CENTER controls the default starting place
     // var MAP_CENTER = [38.8891, -77.02949];
-    var MAP_CENTER = [41.9001702, 12.4698422];
+    var MAP_CENTER;
     //  MAP_ZOOM controls the default zoom of the map
-    var MAP_ZOOM = 14;
-    var MAP_MIN_ZOOM = 14;
-    var MAP_MAX_ZOOM = 17;
+    var MAP_ZOOM;
+    var MAP_MIN_ZOOM;
+    var MAP_MAX_ZOOM;
     // MAP_MAX_BOUNDS controls the boundaries of the map
-    var MAP_MAX_BOUNDS = [[41.960039, 12.421941], [41.85927, 12.90607]];
-    var LOCATE_BOUNDS = [[41.908628, 12.451941], [41.88927, 12.90607]];
-    var MAX_LOCATE_METERS = 8000;
+    var MAP_MAX_BOUNDS;
+    var LOCATE_BOUNDS;
+    var MAX_LOCATE_METERS;
 
     var map;
     var historicMapLayer;
@@ -43,39 +43,6 @@ function mallMapJs() {
     var markerData;
     var allItems = {};
     var allMarkers = {};
-
-    function mapSetUp() {
-        // Set the base map layer.
-        map = L.map('map', {
-            center: MAP_CENTER,
-            zoom: MAP_ZOOM,
-            minZoom: MAP_MIN_ZOOM,
-            maxZoom: MAP_MAX_ZOOM,
-            maxBounds: MAP_MAX_BOUNDS,
-            zoomControl: false
-        });
-        map.addLayer(L.tileLayer(MAP_URL_TEMPLATE));
-        map.addControl(L.control.zoom({ position: 'topleft' }));
-        var extentControl = L.Control.extend({
-            options: {
-                position: 'topleft'
-            },
-            onAdd: function (map) {
-                var llBounds = map.getBounds();
-                var container = L.DomUtil.create('div', 'extentControl');
-                $(container).attr('id', 'extent-control');
-                $(container).css('width', '26px').css('height', '26px').css('outline', '1px black');
-                $(container).addClass('extentControl-disabled')
-                $(container).addClass('leaflet-bar')
-                $(container).on('click', function () {
-                    map.fitBounds(llBounds);
-                });
-                return container;
-            }
-        })
-        map.addControl(new extentControl());
-        map.attributionControl.setPrefix('Tiles &copy; Esri');
-    }
 
     // Check for user's first time visiting. Wait to locate the user after displaying tooltip on the first visit.
     if (!($.cookie('myCookie'))) {
@@ -99,66 +66,13 @@ function mallMapJs() {
 
     window.onload = function () {
         jqXhr = $.post('mall-map/index/map-config', function (response) {
-            mapSetUp();
+            mapSetUp(response);
             doQuery();
         })
     };
 
     // Retain previous form state, if needed.
     retainFormState();
-
-    map.on('zoomend', function () {
-        if (map.getZoom() == MAP_MIN_ZOOM) {
-            $('#extent-control').addClass('extentControl-disabled')
-        } else {
-            $('#extent-control').removeClass('extentControl-disabled')
-        }
-    })
-
-    // Handle location found.
-    map.on('locationfound', function (e) {
-        console.log("here")
-        // User within location bounds. Set the location marker.
-        if (L.latLngBounds(LOCATE_BOUNDS).contains(e.latlng)) {
-            launchTooltip();
-            if (locationMarker) {
-                // Remove the existing location marker before adding to map.
-                map.removeLayer(locationMarker);
-            } else {
-                // Pan to location only on first locate.
-                map.panTo(e.latlng);
-            }
-            // $('#locate-button').removeClass('disabled');
-            locationMarker = L.marker(e.latlng, {
-                icon: L.icon({
-                    iconUrl: 'plugins/MallMap/views/public/images/location.png',
-                    iconSize: [50, 50]
-                })
-            });
-            locationMarker.addTo(map).
-                bindPopup("You are within " + e.accuracy / 2 + " meters from this point");
-            // User outside location bounds.
-        } else {
-            map.stopLocate();
-            // $('#locate-button').addClass('disabled');
-            var locateMeters = e.latlng.distanceTo(map.options.center);
-            // Show out of bounds message only if within a certain distance.
-            if (MAX_LOCATE_METERS > locateMeters) {
-                var locateMiles = Math.ceil((locateMeters * 0.000621371) * 100) / 100;
-                $('#dialog').text('You are ' + locateMiles + ' miles from the National Mall.').
-                    dialog('option', 'title', 'Not Quite on the Mall').
-                    dialog('open');
-            }
-
-        }
-    });
-
-    // Handle location error.
-    map.on('locationerror', function () {
-        map.stopLocate();
-        console.log('error')
-        // $('#locate-button').addClass('disabled');
-    });
 
     // Set up the dialog window.
     $('#dialog').dialog({
@@ -169,6 +83,7 @@ function mallMapJs() {
 
     // Handle the filter form.
     $('#filter-button').click(function (e) {
+        console.log("here")
         e.preventDefault();
 
         // First close any popups
@@ -347,6 +262,127 @@ function mallMapJs() {
         $('#info-panel-container').fadeToggle(200, 'linear');
         // prev_item.openPopup();
     });
+
+    function parse1DArrayPoint(text) {
+        ptn = text.split(",")
+        ptn.forEach(function (ele, index) {
+            temp_ele = ele.replace(/\s+/g, '');
+            temp_ele = temp_ele.replace('[', '');
+            temp_ele = temp_ele.replace(']', '');
+            this[index] = parseFloat(temp_ele)
+        }, ptn); // use arr as this
+        return ptn;
+    }
+
+    function parse2DArrayPoint(text) {
+        ptn = text.match(/(\[[0-9]*.[0-9]*, [0-9]*.[0-9]*\])/g)
+        b_new = []
+        ptn.forEach(ele => {
+            temp_ele = ele.split(",")
+            temp_ele.forEach(function (ele_inner, index_inner) {
+                temp_ele_inner = ele_inner.replace(/\s+/g, '');
+                temp_ele_inner = temp_ele_inner.replace('[', '');
+                temp_ele_inner = temp_ele_inner.replace(']', '');
+                this[index_inner] = parseFloat(temp_ele_inner)
+            }, temp_ele)
+            b_new.push(temp_ele)
+        })
+        return b_new
+    }
+
+    function mapSetUp(response) {
+        console.log(response)
+        MAP_MAX_ZOOM = parseInt(response['mall_map_max_zoom'])
+        MAP_MIN_ZOOM = parseInt(response['mall_map_min_zoom'])
+        MAP_CENTER = parse1DArrayPoint(response['mall_map_center'])
+        MAP_ZOOM = parseInt(response["mall_map_default_zoom"])
+        MAP_MAX_BOUNDS = parse2DArrayPoint(response["mall_map_max_bounds"])
+        LOCATE_BOUNDS = parse2DArrayPoint(response['mall_map_locate_bounds'])
+        MAX_LOCATE_METERS = parseInt(response["mall_map_max_locate_meters"])
+        // Set the base map layer.
+        map = L.map('map', {
+            center: MAP_CENTER,
+            zoom: MAP_ZOOM,
+            minZoom: MAP_MIN_ZOOM,
+            maxZoom: MAP_MAX_ZOOM,
+            maxBounds: MAP_MAX_BOUNDS,
+            zoomControl: false
+        });
+        map.addLayer(L.tileLayer(MAP_URL_TEMPLATE));
+        map.addControl(L.control.zoom({ position: 'topleft' }));
+        var extentControl = L.Control.extend({
+            options: {
+                position: 'topleft'
+            },
+            onAdd: function (map) {
+                var llBounds = map.getBounds();
+                var container = L.DomUtil.create('div', 'extentControl');
+                $(container).attr('id', 'extent-control');
+                $(container).css('width', '26px').css('height', '26px').css('outline', '1px black');
+                $(container).addClass('extentControl-disabled')
+                $(container).addClass('leaflet-bar')
+                $(container).on('click', function () {
+                    map.fitBounds(llBounds);
+                });
+                return container;
+            }
+        })
+        map.addControl(new extentControl());
+        map.attributionControl.setPrefix('Tiles &copy; Esri');
+
+        map.on('zoomend', function () {
+            if (map.getZoom() == MAP_MIN_ZOOM) {
+                $('#extent-control').addClass('extentControl-disabled')
+            } else {
+                $('#extent-control').removeClass('extentControl-disabled')
+            }
+        })
+
+        // Handle location found.
+        map.on('locationfound', function (e) {
+            console.log("here")
+            // User within location bounds. Set the location marker.
+            if (L.latLngBounds(LOCATE_BOUNDS).contains(e.latlng)) {
+                launchTooltip();
+                if (locationMarker) {
+                    // Remove the existing location marker before adding to map.
+                    map.removeLayer(locationMarker);
+                } else {
+                    // Pan to location only on first locate.
+                    map.panTo(e.latlng);
+                }
+                // $('#locate-button').removeClass('disabled');
+                locationMarker = L.marker(e.latlng, {
+                    icon: L.icon({
+                        iconUrl: 'plugins/MallMap/views/public/images/location.png',
+                        iconSize: [50, 50]
+                    })
+                });
+                locationMarker.addTo(map).
+                    bindPopup("You are within " + e.accuracy / 2 + " meters from this point");
+                // User outside location bounds.
+            } else {
+                map.stopLocate();
+                // $('#locate-button').addClass('disabled');
+                var locateMeters = e.latlng.distanceTo(map.options.center);
+                // Show out of bounds message only if within a certain distance.
+                if (MAX_LOCATE_METERS > locateMeters) {
+                    var locateMiles = Math.ceil((locateMeters * 0.000621371) * 100) / 100;
+                    $('#dialog').text('You are ' + locateMiles + ' miles from the National Mall.').
+                        dialog('option', 'title', 'Not Quite on the Mall').
+                        dialog('open');
+                }
+
+            }
+        });
+
+        // Handle location error.
+        map.on('locationerror', function () {
+            map.stopLocate();
+            console.log('error')
+            // $('#locate-button').addClass('disabled');
+        });
+    }
 
     function populateTourIntroPopup(itemIDList, value) {
         $('.next-button').unbind("click");
