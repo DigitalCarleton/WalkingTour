@@ -6,10 +6,6 @@ $(document).ready(function () {
     mallMapJs()
 });
 
-// TODO: single select on one tour; each tour will have a intro popup
-// navigation is one directional
-// each popup fly to the loc on map
-
 function mallMapJs() {
     $.getScript("https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js");
     var imported = document.createElement("script");
@@ -46,6 +42,7 @@ function mallMapJs() {
     var locationMarker;
     var markerData;
     var allItems = {};
+    var allMarkers = {};
 
     // Set the base map layer.
     map = L.map('map', {
@@ -71,6 +68,7 @@ function mallMapJs() {
             $(container).attr('id', 'extent-control');
             $(container).css('width', '26px').css('height', '26px').css('outline', '1px black');
             $(container).addClass('extentControl-disabled')
+            $(container).addClass('leaflet-bar')
             $(container).on('click', function () {
                 map.fitBounds(llBounds);
             });
@@ -84,14 +82,21 @@ function mallMapJs() {
     // Check for user's first time visiting. Wait to locate the user after displaying tooltip on the first visit.
     if (!($.cookie('myCookie'))) {
         $('#first-time').show();
+        $('.tooltip-locate').toggle();
         $.cookie('myCookie', 'visited', { path: '/', expires: 10000 });
-    } else {
-        map.locate({ watch: true });
     }
 
-    $("#first-time button").on('click', function () {
+    $("#first-time > div.tooltip > button").on('click', function () {
+        console.log('tes')
+        $('.tooltip').fadeToggle();
+        $('.tooltip-locate').fadeToggle();
+        // map.locate({ watch: true });
+        // document.querySelector("#first-time > div.tooltip > button")
+    });
+
+    $("#first-time > div.tooltip-locate > button").on('click', function () {
         $('#first-time').hide();
-        map.locate({ watch: true });
+        // map.locate({ watch: true });
     });
 
     window.onload = function () {
@@ -111,6 +116,7 @@ function mallMapJs() {
 
     // Handle location found.
     map.on('locationfound', function (e) {
+        console.log("here")
         // User within location bounds. Set the location marker.
         if (L.latLngBounds(LOCATE_BOUNDS).contains(e.latlng)) {
             launchTooltip();
@@ -121,7 +127,7 @@ function mallMapJs() {
                 // Pan to location only on first locate.
                 map.panTo(e.latlng);
             }
-            $('#locate-button').removeClass('disabled');
+            // $('#locate-button').removeClass('disabled');
             locationMarker = L.marker(e.latlng, {
                 icon: L.icon({
                     iconUrl: 'plugins/MallMap/views/public/images/location.png',
@@ -133,7 +139,7 @@ function mallMapJs() {
             // User outside location bounds.
         } else {
             map.stopLocate();
-            $('#locate-button').addClass('disabled');
+            // $('#locate-button').addClass('disabled');
             var locateMeters = e.latlng.distanceTo(map.options.center);
             // Show out of bounds message only if within a certain distance.
             if (MAX_LOCATE_METERS > locateMeters) {
@@ -149,7 +155,8 @@ function mallMapJs() {
     // Handle location error.
     map.on('locationerror', function () {
         map.stopLocate();
-        $('#locate-button').addClass('disabled');
+        console.log('error')
+        // $('#locate-button').addClass('disabled');
     });
 
     // Set up the dialog window.
@@ -188,25 +195,40 @@ function mallMapJs() {
     $('#tour-confirm-button').click(function (e) {
         e.preventDefault();
         var filterButton = $('#filter-button');
-        filterButton.removeClass('on').
-            find('.screen-reader-text').
-            html('Filters');
-        $('#filters').fadeToggle(200, 'linear');
         var tourSelected = []
         var tourTypeCheck = $('input[name=place-type]:checked')
+        var curTourSelected;
+        var itemIDList = [];
 
         if (tourTypeCheck.length) {
             tourTypeCheck.each(function () {
                 tourSelected.push(markerData[this.value].walkingPath);
+                curTourSelected = markerData[this.value];
             });
         } else {
             var toursToPlot = Object.keys(markerData);
-            console.log(toursToPlot)
             toursToPlot.forEach((ele) => {
                 tourSelected.push(markerData[ele].walkingPath);
             });
         }
 
+        filterButton.removeClass('on').
+            find('.screen-reader-text').
+            html('Filters');
+        $('#filters').fadeToggle(200, 'linear');
+
+        if (curTourSelected) {
+            console.log(curTourSelected)
+            curTourSelected.Data.features.forEach(ele => {
+                itemIDList.push(ele.properties.id)
+            })
+            console.log(itemIDList)
+
+            $('#info-panel-container').fadeToggle(200, 'linear');
+            $('#toggle-map-button + .back-button').show();
+            populateTourIntroPopup(itemIDList, curTourSelected);
+            // value = curTourSelected
+        }
         let polylineGroup = L.featureGroup(tourSelected);
         let bounds = polylineGroup.getBounds();
         map.fitBounds(bounds);
@@ -221,9 +243,6 @@ function mallMapJs() {
     // Handle locate button.
     $('#locate-button').click(function (e) {
         e.preventDefault();
-        if ($(this).hasClass('disabled')) {
-            return;
-        }
         if (locationMarker) {
             map.removeLayer(locationMarker)
             locationMarker = null;
@@ -280,6 +299,9 @@ function mallMapJs() {
 
     // Filter place type.
     $('input[name=place-type]').change(function () {
+        // allow only one box checked
+        $('input[name=place-type]:checked').not(this).prop('checked', false).
+            parent().removeClass('on');
         // Handle all place types checkbox.
         var placeTypeAll = $('input[name=place-type-all]');
         if ($('input[name=place-type]:checked').length) {
@@ -322,7 +344,46 @@ function mallMapJs() {
     $('a.back-button').click(function (e) {
         e.preventDefault();
         $('#info-panel-container').fadeToggle(200, 'linear');
+        // prev_item.openPopup();
     });
+
+    function populateTourIntroPopup(itemIDList, value) {
+        $('.next-button').unbind("click");
+        $('.prev-button').unbind("click");
+
+        $('.prev-button').addClass('off');
+        $('.next-button').addClass('off');
+
+        document.getElementById("info-panel-name").innerHTML = value["Tour Name"];
+        $('.panel-title').css("backgroundColor", value['Color'])
+        var content = $('#info-panel-content');
+        content.empty();
+
+        var infoContent = ""
+        var rightContent = "";
+        // click title to show the popup on map
+        if (value.Description != "") {
+            rightContent += '<p>' + value.Description + '</p>'
+        } else {
+            rightContent += "<p> No descriptions available. </p>"
+        }
+
+        if (value.Credits != "") {
+            rightContent += "<h2 class = credits> Credits </h2>"
+            rightContent += '<p>' + value.Credits + '</p>'
+        }
+        rightContent += '<p><a href="#" class="button" id="start-tour" target="_blank">Start Tour</a></p>';
+        window.setTimeout(function () {
+            $('#start-tour').click(function (e) {
+                var newId = itemIDList[0]
+                // value.allMarker[numPopup].closePopup();
+                popupButtonEvent(e, newId, itemIDList, value);
+            })
+        }, 500)
+        infoContent += '<div class = "content-container"> <div class ="article">' + rightContent + '</div></div>';
+
+        content.append('<div class = "info-content">' + infoContent + '</div>')
+    }
 
     function hexToRgb(hex) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -377,43 +438,48 @@ function mallMapJs() {
         var response = allItems[id]
         if (response == undefined) {
             $.post('mall-map/index/get-item', { id: id }, function (response) {
-                allItems[id] = response
-                // fly to the point
-
-                console.log(value)
-                populatePopup(itemIDList, value, response)
+                allItems[id] = response;
+                populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id));
             })
         } else {
-            populatePopup(itemIDList, value, response)
+            populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id))
         }
     }
 
-    function populatePopup(itemIDList, value, response) {
+    function populatePopup(itemIDList, value, response, numPopup) {
         var numPopup = itemIDList.findIndex((ele) => ele == response.id);
+        var coor = value.Data.features[numPopup].geometry.coordinates;
+        map.flyTo([coor[1], coor[0]], 16);
 
         $('.next-button').unbind("click");
-        window.setTimeout(function () {
-            $('.next-button').click(function (e) {
-                if (numPopup + 1 == itemIDList.length) {
-                    var newId = itemIDList[0]
-                } else {
-                    var newId = itemIDList[numPopup + 1]
-                }
-                popupButtonEvent(e, newId, itemIDList, value);
-            })
-        }, 500)
-
         $('.prev-button').unbind("click");
-        window.setTimeout(function () {
-            $('.prev-button').click(function (e) {
-                if (numPopup - 1 == -1) {
-                    var newId = itemIDList[itemIDList.length - 1]
-                } else {
+
+        if (numPopup + 1 == itemIDList.length) {
+            $('.next-button').addClass('off');
+        } else {
+            $('.next-button').removeClass('off');
+            $('.next-button').unbind("click");
+            window.setTimeout(function () {
+                $('.next-button').click(function (e) {
+                    var newId = itemIDList[numPopup + 1]
+                    // value.allMarker[numPopup].closePopup();
+                    popupButtonEvent(e, newId, itemIDList, value);
+                })
+            }, 500)
+        }
+
+        if (numPopup - 1 == -1 || numPopup == -1) {
+            $('.prev-button').addClass('off');
+        } else {
+            $('.prev-button').removeClass('off');
+            window.setTimeout(function () {
+                $('.prev-button').click(function (e) {
                     var newId = itemIDList[numPopup - 1]
-                }
-                popupButtonEvent(e, newId, itemIDList, value);
-            })
-        }, 500)
+                    // value.allMarker[numPopup].closePopup();
+                    popupButtonEvent(e, newId, itemIDList, value);
+                })
+            }, 500)
+        }
 
         document.getElementById("info-panel-name").innerHTML = value["Tour Name"] + ` #${numPopup + 1}`;
         $('.panel-title').css("backgroundColor", value['Color'])
@@ -451,6 +517,8 @@ function mallMapJs() {
         popupContent += '<a href="#" class="open-info-panel button">view more info</a>';
         if (!layer.getPopup()) {
             marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
+            console.log(marker)
+            allMarkers[response.id] = marker;
         }
 
         window.setTimeout(function () {
@@ -464,7 +532,7 @@ function mallMapJs() {
         }, 500);
 
         // Populate the item info panel.
-        populatePopup(itemIDList, value, response, allItems);
+        populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id));
     }
 
     function doQuery() {
@@ -524,6 +592,7 @@ function mallMapJs() {
                         itemIDList.push(ele.properties.id)
                     })
                     tourToItem[tourId] = itemIDList;
+                    markerList = []
                     var geoJsonLayer = L.geoJson(response.features, {
                         // adds the correct number to each marker based on order of tour
                         pointToLayer: function (feature, latlng) {
@@ -537,7 +606,7 @@ function mallMapJs() {
                             });
                             // numberIcon.style.backgroundColor = feature.properties["marker-color"];
                             numMarker++;
-                            return new L.marker(latlng, { icon: numberIcon });
+                            return L.marker(latlng, { icon: numberIcon });
                         },
                         onEachFeature: function (feature, layer) {
                             layer.on('click', function (e) {
@@ -560,10 +629,12 @@ function mallMapJs() {
                                 } else {
                                     featureOnclickAction(response, layer, marker, itemIDList, value);
                                 }
+
                             });
 
                         }
                     });
+                    markerData[tourId].allMarker = markerList;
                     markerData[tourId].geoJson = geoJsonLayer;
                     var walkingPath = [];
                     var json_content = response.features;
