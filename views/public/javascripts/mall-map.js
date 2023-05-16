@@ -6,7 +6,15 @@ $(document).ready(function () {
     mallMapJs()
 });
 
+// TODO: single select on one tour; each tour will have a intro popup
+// navigation is one directional
+// each popup fly to the loc on map
+
 function mallMapJs() {
+    $.getScript("https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js");
+    var imported = document.createElement("script");
+    imported.src = "/cgmrdev/plugins/MallMap/views/public/javascripts/new_markercluster_src.js";
+    document.head.appendChild(imported);
     // Set map height to be window height minus header height.
     var windowheight = $(window).height();
     $('#map').css('height', windowheight - 54);
@@ -370,6 +378,9 @@ function mallMapJs() {
         if (response == undefined) {
             $.post('mall-map/index/get-item', { id: id }, function (response) {
                 allItems[id] = response
+                // fly to the point
+
+                console.log(value)
                 populatePopup(itemIDList, value, response)
             })
         } else {
@@ -412,10 +423,12 @@ function mallMapJs() {
         var infoContent = ""
         var leftContent = "";
         var rightContent = "";
-        console.log(value)
-        leftContent += response.fullsize;
-        infoContent += '<div class = "image-container">' + leftContent + '</div>';
+        if (response.fullsize) {
+            leftContent += response.fullsize;
+            infoContent += '<div class = "image-container">' + leftContent + '</div>';
+        }
 
+        // click title to show the popup on map
         rightContent += `<h2 class = info-panel-title>` + response.title + '</h2>'
         if (response.abstract) {
             rightContent += '<p>' + response.abstract + '</p>';
@@ -632,10 +645,7 @@ function mallMapJs() {
             markers = new L.layerGroup();
         }
         catch (err) {
-            $.getScript("https://unpkg.com/leaflet.markercluster@1.3.0/dist/leaflet.markercluster.js");
-            // var imported = document.createElement("script");
-            // imported.src = "/cgmrdev/plugins/MallMap/views/public/javascripts/new_markercluster_src.js";
-            // document.head.appendChild(imported);
+
         }
 
         markerLayers.forEach(ele => {
