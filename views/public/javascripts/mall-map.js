@@ -37,6 +37,7 @@ function mallMapJs() {
     var jqXhr;
     var locationMarker;
     var markerData;
+    var allItems = {};
 
     // Set the base map layer.
     map = L.map('map', {
@@ -52,15 +53,33 @@ function mallMapJs() {
     //                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     //             }));
     map.addControl(L.control.zoom({ position: 'topleft' }));
-    map.attributionControl.setPrefix('Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community');
+    var extentControl = L.Control.extend({
+        options: {
+            position: 'topleft'
+        },
+        onAdd: function (map) {
+            var llBounds = map.getBounds();
+            var container = L.DomUtil.create('div', 'extentControl');
+            $(container).attr('id', 'extent-control');
+            $(container).css('width', '26px').css('height', '26px').css('outline', '1px black');
+            $(container).addClass('extentControl-disabled')
+            $(container).on('click', function () {
+                map.fitBounds(llBounds);
+            });
+            return container;
+        }
+    })
+
+    map.addControl(new extentControl());
+    map.attributionControl.setPrefix('Tiles &copy; Esri');
 
     // Check for user's first time visiting. Wait to locate the user after displaying tooltip on the first visit.
-    // if (!($.cookie('myCookie'))) {
-    //     $('#first-time').show();
-    //     $.cookie('myCookie', 'visited', { path: '/', expires: 10000 });
-    // } else {
-    //     map.locate({ watch: true });
-    // }
+    if (!($.cookie('myCookie'))) {
+        $('#first-time').show();
+        $.cookie('myCookie', 'visited', { path: '/', expires: 10000 });
+    } else {
+        map.locate({ watch: true });
+    }
 
     $("#first-time button").on('click', function () {
         $('#first-time').hide();
@@ -74,6 +93,13 @@ function mallMapJs() {
     // Retain previous form state, if needed.
     retainFormState();
 
+    map.on('zoomend', function () {
+        if (map.getZoom() == MAP_MIN_ZOOM) {
+            $('#extent-control').addClass('extentControl-disabled')
+        } else {
+            $('#extent-control').removeClass('extentControl-disabled')
+        }
+    })
 
     // Handle location found.
     map.on('locationfound', function (e) {
@@ -128,6 +154,13 @@ function mallMapJs() {
     // Handle the filter form.
     $('#filter-button').click(function (e) {
         e.preventDefault();
+
+        // First close any popups
+        var popupDiv = $('.leaflet-pane .leaflet-popup-pane')
+        if (popupDiv.children().length > 0) {
+            popupDiv.empty()
+        }
+
         var filterButton = $(this);
         var clicks = filterButton.data('clicks');
         if (clicks) {
@@ -143,6 +176,33 @@ function mallMapJs() {
         }
         filterButton.data('clicks', !clicks);
     });
+
+    $('#tour-confirm-button').click(function (e) {
+        e.preventDefault();
+        var filterButton = $('#filter-button');
+        filterButton.removeClass('on').
+            find('.screen-reader-text').
+            html('Filters');
+        $('#filters').fadeToggle(200, 'linear');
+        var tourSelected = []
+        var tourTypeCheck = $('input[name=place-type]:checked')
+
+        if (tourTypeCheck.length) {
+            tourTypeCheck.each(function () {
+                tourSelected.push(markerData[this.value].walkingPath);
+            });
+        } else {
+            var toursToPlot = Object.keys(markerData);
+            console.log(toursToPlot)
+            toursToPlot.forEach((ele) => {
+                tourSelected.push(markerData[ele].walkingPath);
+            });
+        }
+
+        let polylineGroup = L.featureGroup(tourSelected);
+        let bounds = polylineGroup.getBounds();
+        map.fitBounds(bounds);
+    })
 
     // Revert form to default and display all markers.
     $('#all-button').click(function (e) {
@@ -206,26 +266,6 @@ function mallMapJs() {
         doFilters();
     });
 
-    // Filter item type.
-    $('#tour-type').change(function () {
-        var itemType = $(this);
-        if ('Place' == itemType.find(':selected').text()) {
-            $('#place-type-div').show({ duration: 'fast' });
-        } else {
-            // Reset and hide the place type select.
-            $('input[name=place-type]').removeAttr('checked');
-            $('#place-type-div').hide({ duration: 'fast' });
-        }
-        if ('Event' == itemType.find(':selected').text()) {
-            $('#event-type-div').show({ duration: 'fast' });
-        } else {
-            // Reset and hide the event type checkboxes.
-            $('input[name=event-type]').removeAttr('checked');
-            $('#event-type-div').hide({ duration: 'fast' });
-        }
-        doFilters();
-    });
-
     $('#map-coverage,#tour-type').on('touchstart touchend', function (event) {
         event.stopPropagation();
     });
@@ -273,18 +313,41 @@ function mallMapJs() {
     // Handle the info panel back button.
     $('a.back-button').click(function (e) {
         e.preventDefault();
-        $('#info-panel').fadeToggle(200, 'linear');
-        $('#toggle-map-button + .back-button').hide();
+        $('#info-panel-container').fadeToggle(200, 'linear');
     });
 
-    /*
-    
-    Calculate every polyline, add to a global variable here.
-    
-    */
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    }
+
+    function createCustomCSS() {
+        var style = document.createElement('style')
+        var css = ""
+        for (const tour_id in markerData) {
+            var color = markerData[tour_id]['Color']
+            var rgb = hexToRgb(color)
+            css += `#filters div label.label${tour_id}:before {
+                        background-color: ${color} !important;
+                    }
+                    #filters div label.label${tour_id} {
+                        background-color: rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.15) !important; 
+                        color: ${color} !important;
+                    }
+                    #filters div label.label${tour_id}.on:before {
+                        background-color: rgba(33, 201, 0, 1) !important;
+                    }\n`
+        }
+        style.innerHTML = css;
+        document.body.appendChild(style);
+    }
 
     /*
-     * Query all the marker data by tours 
+     * Get the popup content for each item 
     */
 
     function getMarkerHTML(color) {
@@ -299,6 +362,96 @@ function mallMapJs() {
         border-radius: 1.5rem 1.5rem 0;
         transform: rotate(45deg);`
         return markerHtmlStyles;
+    }
+
+    function popupButtonEvent(e, id, itemIDList, value) {
+        e.preventDefault();
+        var response = allItems[id]
+        if (response == undefined) {
+            $.post('mall-map/index/get-item', { id: id }, function (response) {
+                allItems[id] = response
+                populatePopup(itemIDList, value, response)
+            })
+        } else {
+            populatePopup(itemIDList, value, response)
+        }
+    }
+
+    function populatePopup(itemIDList, value, response) {
+        var numPopup = itemIDList.findIndex((ele) => ele == response.id);
+
+        $('.next-button').unbind("click");
+        window.setTimeout(function () {
+            $('.next-button').click(function (e) {
+                if (numPopup + 1 == itemIDList.length) {
+                    var newId = itemIDList[0]
+                } else {
+                    var newId = itemIDList[numPopup + 1]
+                }
+                popupButtonEvent(e, newId, itemIDList, value);
+            })
+        }, 500)
+
+        $('.prev-button').unbind("click");
+        window.setTimeout(function () {
+            $('.prev-button').click(function (e) {
+                if (numPopup - 1 == -1) {
+                    var newId = itemIDList[itemIDList.length - 1]
+                } else {
+                    var newId = itemIDList[numPopup - 1]
+                }
+                popupButtonEvent(e, newId, itemIDList, value);
+            })
+        }, 500)
+
+        document.getElementById("info-panel-name").innerHTML = value["Tour Name"] + ` #${numPopup + 1}`;
+        $('.panel-title').css("backgroundColor", value['Color'])
+        var content = $('#info-panel-content');
+        content.empty();
+
+        var infoContent = ""
+        var leftContent = "";
+        var rightContent = "";
+        console.log(value)
+        leftContent += response.fullsize;
+        infoContent += '<div class = "image-container">' + leftContent + '</div>';
+
+        rightContent += `<h2 class = info-panel-title>` + response.title + '</h2>'
+        if (response.abstract) {
+            rightContent += '<p>' + response.abstract + '</p>';
+        } else if (response.description) {
+            rightContent += '<p>' + response.description + '</p>';
+        } else {
+            rightContent += '<p>No descriptions available.</p>';
+        }
+        rightContent += '<p><a href="' + response.url + '" class="button" target="_blank">See Full Details</a></p>';
+        infoContent += '<div class = "content-container"> <div class ="article">' + rightContent + '</div></div>';
+
+        content.append('<div class = "info-content">' + infoContent + '</div>')
+    }
+
+    function featureOnclickAction(response, layer, marker, itemIDList, value) {
+        var popupContent = '<h3>' + response.title + '</h3>';
+        if (response.thumbnail) {
+            popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
+        }
+        popupContent += '<a href="#" class="open-info-panel button">view more info</a>';
+        if (!layer.getPopup()) {
+            marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
+        }
+
+        window.setTimeout(function () {
+            layer.getPopup().update()
+            $('.open-info-panel').click(function (e) {
+                e.preventDefault();
+                $('#info-panel-container').fadeToggle(200, 'linear');
+                $('#toggle-map-button + .back-button').show();
+                marker.closePopup();
+            });
+        }, 500);
+
+        // Populate the item info panel.
+        populatePopup(itemIDList, value, response, allItems);
     }
 
     function doQuery() {
@@ -340,16 +493,24 @@ function mallMapJs() {
 
         var key = "5b3ce3597851110001cf62489dde4c6690bc423bb86bd99921c5da77";
         var url;
-
+        var itemArray = []
+        var tourToItem = {}
         jqXhr = $.post('mall-map/index/query', function (response) {
             markerData = response;
             dataArray = Object.entries(markerData)
+            for (const tour in markerData) {
+                itemArray = itemArray.concat(markerData[tour]['Data']['features'])
+            }
             let requests = dataArray.map(([tourId, value]) => {
-                console.log([tourId, value])
                 return new Promise((resolve) => {
-                    var num = 1;
+                    var numMarker = 1;
                     var response = value["Data"];
+                    var itemIDList = [];
 
+                    response.features.forEach(ele => {
+                        itemIDList.push(ele.properties.id)
+                    })
+                    tourToItem[tourId] = itemIDList;
                     var geoJsonLayer = L.geoJson(response.features, {
                         // adds the correct number to each marker based on order of tour
                         pointToLayer: function (feature, latlng) {
@@ -359,55 +520,38 @@ function mallMapJs() {
                                 iconSize: [25, 41],
                                 iconAnchor: [12, 40],
                                 popupAnchor: [0, -5],
-                                html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > <p style="${markerFontHtmlStyles}"> ${num} </p> </spam>`
+                                html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > <p style="${markerFontHtmlStyles}"> ${numMarker} </p> </spam>`
                             });
                             // numberIcon.style.backgroundColor = feature.properties["marker-color"];
-                            num++;
+                            numMarker++;
                             return new L.marker(latlng, { icon: numberIcon });
                         },
                         onEachFeature: function (feature, layer) {
                             layer.on('click', function (e) {
-                                // Request the item data and populate and open the marker popup.
+                                // center click location
+                                map.flyTo(e.latlng, 16);
+                                // Close the filerting
+                                var filterButton = $('filter-button');
+                                filterButton.removeClass('on').
+                                    find('.screen-reader-text').
+                                    html('Filters');
+                                $('#filters').fadeOut(200, 'linear');
+
                                 var marker = this;
-                                $.post('mall-map/index/get-item', { id: feature.properties.id }, function (response) {
-                                    var popupContent = '<h3>' + response.title + '</h3>';
-                                    if (response.thumbnail) {
-                                        popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
-                                    }
-                                    popupContent += '<a href="#" class="open-info-panel button">view more info</a>';
-                                    marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
-
-                                    window.setTimeout(function () {
-                                        //map.panTo([feature.geometry.coordinates[1],feature.geometry.coordinates[0]]);
-                                        layer.getPopup().update();
-                                        $('.open-info-panel').click(function (e) {
-                                            e.preventDefault();
-                                            $('#info-panel').fadeToggle(200, 'linear');
-                                            $('#toggle-map-button + .back-button').show();
-                                        });
-                                    }, 500);
-
-                                    // Populate the item info panel.
-                                    var content = $('#info-panel-content');
-                                    content.empty();
-                                    content.append('<h1>' + response.title + '</h1>');
-                                    for (var i = 0; i < response.date.length; i++) {
-                                        content.append('<p>' + response.date[i] + '</p>');
-                                    }
-
-                                    if (response.description) {
-                                        content.append('<p>' + response.description + '</p>');
-                                    } else {
-                                        content.append('<p>No descriptions available.</p>');
-                                    }
-                                    content.append(response.fullsize);
-                                    content.append('<p><a href="' + response.url + '" class="button">View More</a></p>');
-                                });
+                                response = allItems[feature.properties.id]
+                                if (response == undefined) {
+                                    $.post('mall-map/index/get-item', { id: feature.properties.id }, function (response) {
+                                        allItems[feature.properties.id] = response;
+                                        featureOnclickAction(response, layer, marker, itemIDList, value);
+                                    })
+                                } else {
+                                    featureOnclickAction(response, layer, marker, itemIDList, value);
+                                }
                             });
+
                         }
                     });
                     markerData[tourId].geoJson = geoJsonLayer;
-                    console.log(geoJsonLayer)
                     var walkingPath = [];
                     var json_content = response.features;
                     var pointList = [];
@@ -434,10 +578,11 @@ function mallMapJs() {
                     });
                 });
             })
-
-            Promise.all(requests).then(() => doFilters());
+            Promise.all(requests).then(() => {
+                createCustomCSS();
+                doFilters();
+            });
         });
-
     }
 
     /*
@@ -446,29 +591,29 @@ function mallMapJs() {
      * This must be called on every form change.
      */
     function doFilters() {
-        console.log(markerData);
-
         // Remove the current markers.
         if (markers) {
             map.removeLayer(markers);
         }
 
         var mapCoverage = $('#map-coverage');
-        var tourType = $('#tour-type');
+        var tourTypeCheck = $('input[name=place-type]:checked')
 
-
-        var toursToPlot;
+        var toursToPlot = [];
         var mapToPlot;
         // Handle each filter
         if ('0' != mapCoverage.val()) {
             mapToPlot = mapCoverage.val();
         }
-        if ('0' != tourType.val()) {
-            toursToPlot = [tourType.val()];
+
+        if (tourTypeCheck.length) {
+            tourTypeCheck.each(function () {
+                toursToPlot.push(this.value);
+            });
         } else {
             toursToPlot = Object.keys(markerData);
         }
-        console.log(toursToPlot);
+
         var pathToPlot = [];
         var markerLayers = [];
         var numMarkers = 0;
@@ -563,9 +708,9 @@ function mallMapJs() {
      * when navigating back to the map from another page.
      */
     function retainFormState() {
-        if ('0' != $('#map-coverage').val()) {
-            addHistoricMapLayer();
-        }
+        // if ('0' != $('#map-coverage').val()) {
+        //     addHistoricMapLayer();
+        // }
         if ('Place' == $('#tour-type').find(':selected').text()) {
             var placeTypes = $('input[name=place-type]:checked');
             if (placeTypes.length) {
