@@ -24,6 +24,7 @@ class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
         'install',
         'uninstall',
         'define_acl',
+        'upgrade',
         'define_routes',
         'config',
         'config_form',
@@ -80,6 +81,14 @@ class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
   		$db->query( "DROP TABLE IF EXISTS `$db->TourItem`" );
   		$db->query( "DROP TABLE IF EXISTS `$db->Tour`" );
   	}
+
+    public function hookUpgrade( $args )
+    {
+        if (version_compare($args['old_version'], '0.1-dev', "<")){
+            $sql = "ALTER TABLE `{$db->prefix}tour_items` ADD COLUMN `exhibit_id` INT( 10 ) UNSIGNED NOT NULL AFTER `item_id`";
+            $this->_db->query($sql);
+        }
+    }
 
   	public function hookDefineAcl( $args )
   	{
