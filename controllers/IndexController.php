@@ -124,23 +124,24 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
     public function indexAction()
     {
         //calls down the data table of the Simple Vocab plugin
-        $simpleVocabTerm = $this->_helper->db->getTable('SimpleVocabTerm');
-        $mapCoverages = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_MAP_COVERAGE);
+        // $simpleVocabTerm = $this->_helper->db->getTable('SimpleVocabTerm');
+        // $mapCoverages = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_MAP_COVERAGE);
+        // error_log($mapCoverages);
+        // log($mapCoverages);
         /* REMOVING ADDITIONAL SIMPLE VOCAB FILTERS -AM */
         // $placeTypes = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_PLACE_TYPE);
         // $eventTypes = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_EVENT_TYPE);
-
         $_tourTypes = $this->publicTours();
-
+        
         $this->view->tour_types = $_tourTypes;
         // $this->view->item_types = $this->_itemTypes;
         /* REMOVING ADDITIONAL SIMPLE VOCAB FILTERS -AM */
         // if ($mapCoverages && $placeTypes && $eventTypes) {
             // $this->view->place_types = explode("\n", $placeTypes->terms);
             // $this->view->event_types = explode("\n", $eventTypes->terms);
-        if ($mapCoverages) {
-            $this->view->map_coverages = explode("\n", $mapCoverages->terms);
-        }
+        // if ($mapCoverages) {
+        //     $this->view->map_coverages = explode("\n", $mapCoverages->terms);
+        // }
 
         // Set the JS and CSS files.
         $this->view->headScript()
