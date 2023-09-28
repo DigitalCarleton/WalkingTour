@@ -14,83 +14,6 @@
 class MallMap_IndexController extends Omeka_Controller_AbstractActionController
 {
     /**
-     * Filterable item type IDs
-     */
-    const ITEM_TYPE_ID_DOCUMENT     = 1;
-    const ITEM_TYPE_ID_MOVING_IMAGE = 3;
-    const ITEM_TYPE_ID_SOUND        = 5;
-    const ITEM_TYPE_ID_STILL_IMAGE  = 6;
-    const ITEM_TYPE_ID_EVENT        = 8;
-
-    // Changed because original IDs were hard coded by the Omeka team,
-    // and our IDs were different from theirs
-    // const ITEM_TYPE_ID_PLACE        = 14;
-    const ITEM_TYPE_ID_PLACE        = 18;
-
-    /**
-     * Filterable element IDs
-     */
-    const ELEMENT_ID_EVENT_TYPE   = 29;
-    const ELEMENT_ID_MAP_COVERAGE = 38;
-
-    // Same change as above
-    // const ELEMENT_ID_PLACE_TYPE   = 87;
-    const ELEMENT_ID_PLACE_TYPE   = 51;
-
-    /**
-     * @var array Filterable item types in display order
-     */
-    // public $_itemTypes = array(
-    //     self::ITEM_TYPE_ID_PLACE        => 'Place',
-    //     self::ITEM_TYPE_ID_EVENT        => 'Event',
-    //     self::ITEM_TYPE_ID_DOCUMENT     => 'Document',
-    //     self::ITEM_TYPE_ID_STILL_IMAGE  => 'Image', // Still Image
-    //     self::ITEM_TYPE_ID_MOVING_IMAGE => 'Video', // Moving Image
-    //     self::ITEM_TYPE_ID_SOUND        => 'Audio', // Sound
-    // );
-
-    /**
-     * @var array Data used when adding the historic map layer.
-     */
-     //Lets you specify the map tiles: located in the /omeka/plugins/MallMap/maps folder.
-     // However, we must tile the map since they have {z}/{x}/{y} - can use https://www.maptiler.com to do this.
-    private $_historicMapData = array(
-        'Pre-1800s' => array(
-            'url' => '/mallhistory/plugins/MallMap/maps/1791/{z}/{x}/{y}.jpg',
-            'title' => 'Map by Faehtz, E.F.M. (1791)',
-        ),
-        '1800-1829' => array(
-            'url' => '/mallhistory/plugins/MallMap/maps/1828/{z}/{x}/{y}.jpg',
-            'title' => 'Map by Elliot, William (1828)',
-        ),
-        '1830-1859' => array(
-            'url' => '/mallhistory/plugins/MallMap/maps/1858/{z}/{x}/{y}.jpg',
-            'title' => 'Map by Boschke, A. (1858)',
-        ),
-        '1860-1889' => array(
-            'url' => '/mallhistory/plugins/MallMap/maps/1887/{z}/{x}/{y}.jpg',
-            'title' => 'Map by Silversparre, Axel (1887)',
-        ),
-        '1890-1919' => array(
-            'url' => '/mallhistory/plugins/MallMap/maps/1917/{z}/{x}/{y}.jpg',
-            'title' => 'Map by U.S. Public Buildings Commission (1917)',
-        ),
-        '1920-1949' => array(
-            'url' => '/mallhistory/plugins/MallMap/maps/1942/{z}/{x}/{y}.jpg',
-            'title' => 'Map by General Drafting Company (1942)',
-        ),
-        '1950-1979' => array(
-            'url' => '/mallhistory/plugins/MallMap/maps/1978/{z}/{x}/{y}.jpg',
-            'title' => 'Map by Alexandria Drafting Company (1978)',
-        ),
-        '1980-1999' => array(
-            'url' => '/mallhistory/plugins/MallMap/maps/1996/{z}/{x}/{y}.jpg',
-            'title' => 'Map by Joseph Passonneau and Partners (1996)',
-        ),
-        //'2000-present' => array('url' => null, 'title' => null),
-    );
-
-    /**
      * Return an associative array of public tours
      * 
      */
@@ -123,25 +46,8 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
      */
     public function indexAction()
     {
-        //calls down the data table of the Simple Vocab plugin
-        // $simpleVocabTerm = $this->_helper->db->getTable('SimpleVocabTerm');
-        // $mapCoverages = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_MAP_COVERAGE);
-        // error_log($mapCoverages);
-        // log($mapCoverages);
-        /* REMOVING ADDITIONAL SIMPLE VOCAB FILTERS -AM */
-        // $placeTypes = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_PLACE_TYPE);
-        // $eventTypes = $simpleVocabTerm->findByElementId(self::ELEMENT_ID_EVENT_TYPE);
         $_tourTypes = $this->publicTours();
-        
         $this->view->tour_types = $_tourTypes;
-        // $this->view->item_types = $this->_itemTypes;
-        /* REMOVING ADDITIONAL SIMPLE VOCAB FILTERS -AM */
-        // if ($mapCoverages && $placeTypes && $eventTypes) {
-            // $this->view->place_types = explode("\n", $placeTypes->terms);
-            // $this->view->event_types = explode("\n", $eventTypes->terms);
-        // if ($mapCoverages) {
-        //     $this->view->map_coverages = explode("\n", $mapCoverages->terms);
-        // }
 
         // Set the JS and CSS files.
         $this->view->headScript()
@@ -264,22 +170,6 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
     }
 
     /**
-     * Get data about the selected historical map.
-     */
-    public function historicMapDataAction()
-    {
-        // Process only AJAX requests.
-        if (!$this->_request->isXmlHttpRequest()) {
-            throw new Omeka_Controller_Exception_403;
-        }
-        if (!isset($this->_historicMapData[$this->_request->getParam('text')])) {
-            throw new Omeka_Controller_Exception_404;
-        }
-        $data = $this->_historicMapData[$this->_request->getParam('text')];
-        $this->_helper->json($data);
-    }
-
-    /**
      * Get data about the selected item.
      */
     public function getItemAction()
@@ -305,6 +195,4 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         );
         $this->_helper->json($data);
     }
-
-    //https://omeka.readthedocs.io/en/latest/Reference/libraries/globals/get_option.html
 }

@@ -96,7 +96,7 @@
 </section>
 
 <script>
-	var allItems=<?php echo availableLocationItemsJSON(); //echo availableItemsJSON();?>;
+	var allItems=<?php echo availableLocationItemsJSON();?>;
 	var svg_icon='<?php echo $svg_icon;?>';
 
 	jQuery('#tour-item-search').on('focus', function() {
