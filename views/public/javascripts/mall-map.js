@@ -1,7 +1,3 @@
-// jQuery(window).load(function() {
-// mallMapJs()
-// });
-
 $(document).ready(function () {
     mallMapJs()
 });
@@ -14,24 +10,14 @@ function mallMapJs() {
     // Set map height to be window height minus header height.
     var windowheight = $(window).height();
     $('#map').css('height', windowheight - 54);
-    //adding this so that the mall-map markers will load (most of the time; sometimes it breaks)
-    // $.getScript("https://unpkg.com/leaflet.markercluster@1.3.0/dist/leaflet.markercluster.js");
-    // var imported = document.createElement("script");
-    // imported.src = "/cgmrdev/plugins/MallMap/views/public/javascripts/new_markercluster_src.js";
-    // document.head.appendChild(imported);
 
     var MAP_URL_TEMPLATE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
-    // var MAP_URL_TEMPLATE_HIST = 'https://allmaps.xyz/maps/0450b5c641e09dd1/{z}/{x}/{y}.png';
 
-    // MAP_CENTER controls the default starting place
-    // var MAP_CENTER = [38.8891, -77.02949];
     var MAP_CENTER;
-    //  MAP_ZOOM controls the default zoom of the map
-    var MAP_ZOOM;
+    var MAP_ZOOM;  // MAP_ZOOM controls the default zoom of the map
     var MAP_MIN_ZOOM;
     var MAP_MAX_ZOOM;
-    // MAP_MAX_BOUNDS controls the boundaries of the map
-    var MAP_MAX_BOUNDS;
+    var MAP_MAX_BOUNDS;  // MAP_MAX_BOUNDS controls the boundaries of the map
     var LOCATE_BOUNDS;
     var MAX_LOCATE_METERS;
 
@@ -55,13 +41,10 @@ function mallMapJs() {
         console.log('tes')
         $('.tooltip').fadeToggle();
         $('.tooltip-locate').fadeToggle();
-        // map.locate({ watch: true });
-        // document.querySelector("#first-time > div.tooltip > button")
     });
 
     $("#first-time > div.tooltip-locate > button").on('click', function () {
         $('#first-time').hide();
-        // map.locate({ watch: true });
     });
 
     window.onload = function () {
@@ -143,7 +126,6 @@ function mallMapJs() {
             $('#info-panel-container').fadeToggle(200, 'linear');
             $('#toggle-map-button + .back-button').show();
             populateTourIntroPopup(itemIDList, curTourSelected);
-            // value = curTourSelected
         }
         let polylineGroup = L.featureGroup(tourSelected);
         let bounds = polylineGroup.getBounds();
@@ -260,7 +242,6 @@ function mallMapJs() {
     $('a.back-button').click(function (e) {
         e.preventDefault();
         $('#info-panel-container').fadeToggle(200, 'linear');
-        // prev_item.openPopup();
     });
 
     function parse1DArrayPoint(text) {
@@ -270,7 +251,7 @@ function mallMapJs() {
             temp_ele = temp_ele.replace('[', '');
             temp_ele = temp_ele.replace(']', '');
             this[index] = parseFloat(temp_ele)
-        }, ptn); // use arr as this
+        }, ptn);
         return ptn;
     }
 
@@ -351,7 +332,6 @@ function mallMapJs() {
                     // Pan to location only on first locate.
                     map.panTo(e.latlng);
                 }
-                // $('#locate-button').removeClass('disabled');
                 locationMarker = L.marker(e.latlng, {
                     icon: L.icon({
                         iconUrl: 'plugins/MallMap/views/public/images/location.png',
@@ -363,7 +343,6 @@ function mallMapJs() {
                 // User outside location bounds.
             } else {
                 map.stopLocate();
-                // $('#locate-button').addClass('disabled');
                 var locateMeters = e.latlng.distanceTo(map.options.center);
                 // Show out of bounds message only if within a certain distance.
                 if (MAX_LOCATE_METERS > locateMeters) {
@@ -379,8 +358,7 @@ function mallMapJs() {
         // Handle location error.
         map.on('locationerror', function () {
             map.stopLocate();
-            console.log('error')
-            // $('#locate-button').addClass('disabled');
+            console.log('location error')
         });
     }
 
@@ -413,7 +391,6 @@ function mallMapJs() {
         window.setTimeout(function () {
             $('#start-tour').click(function (e) {
                 var newId = itemIDList[0]
-                // value.allMarker[numPopup].closePopup();
                 popupButtonEvent(e, newId, itemIDList, value);
             })
         }, 500)
@@ -641,7 +618,6 @@ function mallMapJs() {
                                 popupAnchor: [0, -5],
                                 html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > <p style="${markerFontHtmlStyles}"> ${numMarker} </p> </spam>`
                             });
-                            // numberIcon.style.backgroundColor = feature.properties["marker-color"];
                             numMarker++;
                             return L.marker(latlng, { icon: numberIcon });
                         },
@@ -826,9 +802,6 @@ function mallMapJs() {
      * when navigating back to the map from another page.
      */
     function retainFormState() {
-        // if ('0' != $('#map-coverage').val()) {
-        //     addHistoricMapLayer();
-        // }
         if ('Place' == $('#tour-type').find(':selected').text()) {
             var placeTypes = $('input[name=place-type]:checked');
             if (placeTypes.length) {
@@ -845,13 +818,5 @@ function mallMapJs() {
             }
             $('#event-type-div').show({ duration: 'fast' });
         }
-    }
-
-    var debugTimestamp;
-    function start() {
-        debugTimestamp = new Date().getTime();
-    }
-    function stop() {
-        console.log((new Date().getTime() / 1000) - (debugTimestamp / 1000));
     }
 }

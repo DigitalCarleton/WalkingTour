@@ -712,10 +712,14 @@ h2.credits{
     #map {
         height: calc(100vh - 54px - 75px) !important;
     }
+}
 
-    /* #extent-control {
-        width: 32px !important;
-    height: 32px !important;
-    } */
+@media screen and (min-width: 60em) {
+    #filters {
+        height: auto;
+    }
 
+    .map #map {
+        min-height: 60em;
+    }
 }

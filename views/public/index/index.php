@@ -24,13 +24,6 @@
                 <label class="label<?php echo $tour_type_id ?>"><input type="checkbox" name="place-type" value="<?php echo $tour_type_id; ?>"/> <?php echo $tour_type; ?></label>
                 <?php endforeach; ?>
             </div>
-            <div id="event-type-div" style="display: none;">
-                <p>Event Types</p>
-                <label class="on"><input type="checkbox" name="event-type-all" value="0" checked="checked"/> All Event Types</label>
-                <?php foreach ($this->event_types as $event_type): ?>
-                <label><input type="checkbox" name="event-type" value="<?php echo htmlspecialchars($event_type); ?>" /> <?php echo $event_type; ?></label>
-                <?php endforeach; ?>
-            </div>
         </div>
         <div id="first-time">
             <div class="overlay"></div>
