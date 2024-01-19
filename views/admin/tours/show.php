@@ -74,7 +74,7 @@ if( $tour->getItems() ): ?>
 
 <section class="three columns omega">
   <div id="edit" class="panel">
-    <?php if( is_allowed( 'TourBuilder_Tours', 'edit' ) ): ?>
+    <?php if( is_allowed( 'WalkingTourBuilder_Tours', 'edit' ) ): ?>
     <a href="<?php echo url( array( 'action' => 'edit', 'id' => $tour->id ) ); ?>"
        class="edit big green button">
       <?php echo __('Edit'); ?>
@@ -86,7 +86,7 @@ if( $tour->getItems() ): ?>
       <?php echo __('View Public Page'); ?>
     </a>
 
-    <?php if( is_allowed( 'TourBuilder_Tours', 'delete' ) ): ?>
+    <?php if( is_allowed( 'WalkingTourBuilder_Tours', 'delete' ) ): ?>
     <?php echo link_to_tour( __('Delete'),
 		array( 'class' => 'delete-confirm big red button' ),
 		'delete-confirm' ); ?>

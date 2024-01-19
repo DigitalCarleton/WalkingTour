@@ -1,6 +1,6 @@
 <?php
 $pageTitle = __('Browse Tours') . ' ' . __('(%s total)', $total_results );
-$editable = is_allowed( 'TourBuilder_Tours', 'edit' );
+$editable = is_allowed( 'WalkingTourBuilder_Tours', 'edit' );
 $addUrl = url( array( 'action' => 'add' ) );
 
 echo head( array( 'title' => $pageTitle, 'bodyid'=>'tour','bodyclass' => 'tours browse' ) );
@@ -10,7 +10,7 @@ echo flash();
 <?php if( $total_results ): ?>
 
 <div class="table-actions">
-  <?php if( is_allowed( 'TourBuilder_Tours', 'add' ) ): ?>
+  <?php if( is_allowed( 'WalkingTourBuilder_Tours', 'add' ) ): ?>
   <a class="add button small green" href="<?php echo $addUrl; ?>">
     <?php echo __('Add a Tour'); ?>
   </a>
@@ -74,7 +74,7 @@ echo flash();
 
   <?php if( total_records( 'Tour' ) === 0 ): ?>
     <h2><?php echo __('You have no tours.'); ?></h2>
-    <?php if( is_allowed( 'TourBuilder_Tours', 'add' ) ): ?>
+    <?php if( is_allowed( 'WalkingTourBuilder_Tours', 'add' ) ): ?>
     <p><?php echo __('Get started by adding your first tour.'); ?></p>
     <a class="add big green button" href="<?php echo $addUrl; ?>">
       <?php echo __('Add a Tour'); ?>
