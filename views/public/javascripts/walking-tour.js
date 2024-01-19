@@ -1,8 +1,8 @@
 $(document).ready(function () {
-    mallMapJs()
+    walkingTourJs()
 });
 
-function mallMapJs() {
+function walkingTourJs() {
     $.getScript("https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js");
     var imported = document.createElement("script");
     imported.src = "/cgmrdev/plugins/WalkingTour/views/public/javascripts/new_markercluster_src.js";
@@ -347,9 +347,9 @@ function mallMapJs() {
                 // Show out of bounds message only if within a certain distance.
                 if (MAX_LOCATE_METERS > locateMeters) {
                     var locateMiles = Math.ceil((locateMeters * 0.000621371) * 100) / 100;
-                    $('#dialog').text('You are ' + locateMiles + ' miles from the National Mall.').
-                        dialog('option', 'title', 'Not Quite on the Mall').
-                        dialog('open');
+                    // $('#dialog').text('You are ' + locateMiles + ' miles from the National Mall.').
+                    //     dialog('option', 'title', 'Not Quite on the Mall').
+                    //     dialog('open');
                 }
 
             }
