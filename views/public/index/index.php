@@ -28,12 +28,12 @@
         <div id="first-time">
             <div class="overlay"></div>
             <div class="tooltip">
-                <p><?php echo get_option('mall_map_filter_tooltip'); ?></p>
-                <button class="button"><?php echo get_option('mall_map_tooltip_button'); ?></button>
+                <p><?php echo get_option('walking_tour_filter_tooltip'); ?></p>
+                <button class="button"><?php echo get_option('walking_tour_tooltip_button'); ?></button>
             </div>
             <div class="tooltip-locate">
                 <p>Click here to see your position if you are on location.</p>
-                <button class="button"><?php echo get_option('mall_map_tooltip_button'); ?></button>
+                <button class="button"><?php echo get_option('walking_tour_tooltip_button'); ?></button>
             </div>
         </div>
 

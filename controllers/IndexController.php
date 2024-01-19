@@ -1,17 +1,17 @@
 <?php
 /**
- * Mall Map
+ * Walking Tour
  *
  * @copyright Copyright 2007-2012 Roy Rosenzweig Center for History and New Media
  * @license http://www.gnu.org/licenses/gpl-3.0.txt GNU GPLv3
  */
 
 /**
- * The Mall Map controller
+ * The Walking Tour controller
  *
  * @package Omeka\Plugins\Mall
  */
-class MallMap_IndexController extends Omeka_Controller_AbstractActionController
+class WalkingTour_IndexController extends Omeka_Controller_AbstractActionController
 {
     /**
      * Return an associative array of public tours
@@ -57,12 +57,12 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
             ->appendFile('//cdn.leafletjs.com/leaflet-0.7/leaflet.js')
             ->appendFile(src('modernizr.custom.63332', 'javascripts', 'js'))
             ->appendFile(src('Polyline.encoded', 'javascripts', 'js'))
-            ->appendFile(src('mall-map', 'javascripts', 'js'));
+            ->appendFile(src('walking-tour', 'javascripts', 'js'));
         $this->view->headLink()
             ->appendStylesheet('//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css', 'all')
             ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.css', 'all')
             ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.ie.css', 'all', 'lte IE 8')
-            ->appendStylesheet(src('mall-map', 'css', 'css'));
+            ->appendStylesheet(src('walking-tour', 'css', 'css'));
     }
 
     public function mapConfigAction() 
@@ -73,13 +73,13 @@ class MallMap_IndexController extends Omeka_Controller_AbstractActionController
         }
 
         $returnArray = array();
-        $returnArray['mall_map_center'] = get_option('mall_map_center');
-        $returnArray['mall_map_default_zoom'] = get_option('mall_map_default_zoom');
-        $returnArray['mall_map_max_zoom'] = get_option('mall_map_max_zoom');
-        $returnArray['mall_map_min_zoom'] = get_option('mall_map_min_zoom');
-        $returnArray['mall_map_max_bounds'] = get_option('mall_map_max_bounds');
-        $returnArray['mall_map_locate_bounds'] = get_option('mall_map_locate_bounds');
-        $returnArray['mall_map_max_locate_meters'] = get_option('mall_map_max_locate_meters');
+        $returnArray['walking_tour_center'] = get_option('walking_tour_center');
+        $returnArray['walking_tour_default_zoom'] = get_option('walking_tour_default_zoom');
+        $returnArray['walking_tour_max_zoom'] = get_option('walking_tour_max_zoom');
+        $returnArray['walking_tour_min_zoom'] = get_option('walking_tour_min_zoom');
+        $returnArray['walking_tour_max_bounds'] = get_option('walking_tour_max_bounds');
+        $returnArray['walking_tour_locate_bounds'] = get_option('walking_tour_locate_bounds');
+        $returnArray['walking_tour_max_locate_meters'] = get_option('walking_tour_max_locate_meters');
 
         $this->_helper->json($returnArray);
     }

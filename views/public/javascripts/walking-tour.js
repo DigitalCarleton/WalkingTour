@@ -5,7 +5,7 @@ $(document).ready(function () {
 function mallMapJs() {
     $.getScript("https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js");
     var imported = document.createElement("script");
-    imported.src = "/cgmrdev/plugins/MallMap/views/public/javascripts/new_markercluster_src.js";
+    imported.src = "/cgmrdev/plugins/WalkingTour/views/public/javascripts/new_markercluster_src.js";
     document.head.appendChild(imported);
     // Set map height to be window height minus header height.
     var windowheight = $(window).height();
@@ -48,7 +48,7 @@ function mallMapJs() {
     });
 
     window.onload = function () {
-        jqXhr = $.post('mall-map/index/map-config', function (response) {
+        jqXhr = $.post('walking-tour/index/map-config', function (response) {
             mapSetUp(response);
             doQuery();
         })
@@ -273,13 +273,13 @@ function mallMapJs() {
 
     function mapSetUp(response) {
         console.log(response)
-        MAP_MAX_ZOOM = parseInt(response['mall_map_max_zoom'])
-        MAP_MIN_ZOOM = parseInt(response['mall_map_min_zoom'])
-        MAP_CENTER = parse1DArrayPoint(response['mall_map_center'])
-        MAP_ZOOM = parseInt(response["mall_map_default_zoom"])
-        MAP_MAX_BOUNDS = parse2DArrayPoint(response["mall_map_max_bounds"])
-        LOCATE_BOUNDS = parse2DArrayPoint(response['mall_map_locate_bounds'])
-        MAX_LOCATE_METERS = parseInt(response["mall_map_max_locate_meters"])
+        MAP_MAX_ZOOM = parseInt(response['walking_tour_max_zoom'])
+        MAP_MIN_ZOOM = parseInt(response['walking_tour_min_zoom'])
+        MAP_CENTER = parse1DArrayPoint(response['walking_tour_center'])
+        MAP_ZOOM = parseInt(response["walking_tour_default_zoom"])
+        MAP_MAX_BOUNDS = parse2DArrayPoint(response["walking_tour_max_bounds"])
+        LOCATE_BOUNDS = parse2DArrayPoint(response['walking_tour_locate_bounds'])
+        MAX_LOCATE_METERS = parseInt(response["walking_tour_max_locate_meters"])
         // Set the base map layer.
         map = L.map('map', {
             center: MAP_CENTER,
@@ -334,7 +334,7 @@ function mallMapJs() {
                 }
                 locationMarker = L.marker(e.latlng, {
                     icon: L.icon({
-                        iconUrl: 'plugins/MallMap/views/public/images/location.png',
+                        iconUrl: 'plugins/WalkingTour/views/public/images/location.png',
                         iconSize: [50, 50]
                     })
                 });
@@ -451,7 +451,7 @@ function mallMapJs() {
         e.preventDefault();
         var response = allItems[id]
         if (response == undefined) {
-            $.post('mall-map/index/get-item', { id: id }, function (response) {
+            $.post('walking-tour/index/get-item', { id: id }, function (response) {
                 allItems[id] = response;
                 populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id));
             })
@@ -590,7 +590,7 @@ function mallMapJs() {
         var url;
         var itemArray = []
         var tourToItem = {}
-        jqXhr = $.post('mall-map/index/query', function (response) {
+        jqXhr = $.post('walking-tour/index/query', function (response) {
             markerData = response;
             dataArray = Object.entries(markerData)
             for (const tour in markerData) {
@@ -635,7 +635,7 @@ function mallMapJs() {
                                 var marker = this;
                                 response = allItems[feature.properties.id]
                                 if (response == undefined) {
-                                    $.post('mall-map/index/get-item', { id: feature.properties.id }, function (response) {
+                                    $.post('walking-tour/index/get-item', { id: feature.properties.id }, function (response) {
                                         allItems[feature.properties.id] = response;
                                         featureOnclickAction(response, layer, marker, itemIDList, value);
                                     })
@@ -747,7 +747,7 @@ function mallMapJs() {
     function addHistoricMapLayer() {
         // Get the historic map data
         var getData = { 'text': $('#map-coverage').val() };
-        $.get('mall-map/index/historic-map-data', getData, function (response) {
+        $.get('walking-tour/index/historic-map-data', getData, function (response) {
             historicMapLayer = L.tileLayer(
                 response.url,
                 { tms: true, opacity: 1.00 }
