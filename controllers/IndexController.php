@@ -97,6 +97,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $db = $this->_helper->db->getDb();
         $joins = array("$db->Item AS items ON items.id = locations.item_id");
         $wheres = array("items.public = 1");
+        $prefix=$db->prefix;
 
         // Filter public tours' items
         $request_tour_id = $this->publicTours();
@@ -107,10 +108,10 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $returnArray = array();
         foreach($request_tour_id['id'] as $tour_id => $tour_title){
             if($tour_id != 0){
-                $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items 
+                $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM ".$prefix."tour_items 
                                                             WHERE tour_id = $tour_id");
             } else {
-                $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM omeka_tour_items");
+                $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM ".$prefix."tour_items");
             }
             $tourItemsIDs[$tour_id] = array();
             foreach ($tourItemsDat as $dat){

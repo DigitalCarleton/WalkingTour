@@ -16,7 +16,7 @@ function availableLocationItemsJSON() {
 				$locationItemsIDs[] = (int) $dat["item_id"];
 			}
 			$locationItemsIDs = implode(", ", $locationItemsIDs);
-			$items = $itemTable->fetchObjects( "SELECT * FROM omeka_items WHERE id IN ($locationItemsIDs) ORDER BY modified DESC" );
+			$items = $itemTable->fetchObjects( "SELECT * FROM ".$prefix."items WHERE id IN ($locationItemsIDs) ORDER BY modified DESC" );
 			foreach($items as $key => $arr) {
 				$items[$key]['label'] = metadata( $arr, array( 'Dublin Core', 'Title' ) );
 			}

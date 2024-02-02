@@ -9,7 +9,7 @@ class TourItem extends Omeka_Record_AbstractRecord
 	public $tour_id;
 	public $item_id;
 	public $ordinal = 0;
-	public $exhibit_id;
+	public $exhibit_id = 0;
 
 	protected $_related = array(
 		'Tour' => 'getTour',
