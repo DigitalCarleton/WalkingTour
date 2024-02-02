@@ -1,29 +1,30 @@
 <?php
 /**
- * Mall Map
+ * Walking Tour
  *
  * @copyright Copyright 2007-2012 Roy Rosenzweig Center for History and New Media
  * @license http://www.gnu.org/licenses/gpl-3.0.txt GNU GPLv3
  */
 
 /**
- * The Mall Map plugin.
+ * The Waling Tour plugin.
  *
  * @package Omeka\Plugins\Mall
  */
 
 
- if( !defined( 'MALLMAP_PLUGIN_DIR' ) )
+ if( !defined( 'WALKINGTOUR_PLUGIN_DIR' ) )
  {
- 	define( 'MALLMAP_PLUGIN_DIR', dirname( __FILE__ ) );
+ 	define( 'WALKINGTOUR_PLUGIN_DIR', dirname( __FILE__ ) );
  }
 
-class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
+class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
 {
     protected $_hooks = array(
         'install',
         'uninstall',
         'define_acl',
+        'upgrade',
         'define_routes',
         'config',
         'config_form',
@@ -39,8 +40,8 @@ class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
     );
 
     protected $_options = array(
-        'mall_map_filter_tooltip' => '',
-        'mall_map_tooltip_button' => 'OK'
+        'walking_tour_filter_tooltip' => '',
+        'walking_tour_tooltip_button' => 'OK'
     );
 
     public function hookInstall()
@@ -56,6 +57,7 @@ class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
               `postscript_text` text collate utf8_unicode_ci,
               `featured` tinyint( 1 ) default '0',
               `public` tinyint( 1 ) default '0',
+              `color` text collate utf8_unicode_ci,
               PRiMARY KEY( `id` )
            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ";
 
@@ -80,18 +82,26 @@ class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
   		$db->query( "DROP TABLE IF EXISTS `$db->Tour`" );
   	}
 
+    public function hookUpgrade( $args )
+    {
+        if (version_compare($args['old_version'], '0.1-dev', "<")){
+            $sql = "ALTER TABLE `{$db->prefix}tour_items` ADD COLUMN `exhibit_id` INT( 10 ) UNSIGNED NOT NULL AFTER `item_id`";
+            $this->_db->query($sql);
+        }
+    }
+
   	public function hookDefineAcl( $args )
   	{
   		$acl = $args['acl'];
 
   		// Create the ACL context
-      $acl->addResource( 'TourBuilder_Tours' );
+      $acl->addResource( 'WalkingTourBuilder_Tours' );
 
   		// Allow anyone to look but not touch
-  		$acl->allow( null, 'TourBuilder_Tours', array('browse', 'show') );
+  		$acl->allow( null, 'WalkingTourBuilder_Tours', array('browse', 'show') );
 
   		// Allow contributor (and better) to do anything with tours
-  		$acl->allow( 'contributor','TourBuilder_Tours');
+  		$acl->allow( 'contributor','WalkingTourBuilder_Tours');
 
   	}
 
@@ -109,24 +119,31 @@ class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
 
     public function hookConfig()
     {
-        set_option('mall_map_filter_tooltip', $_POST['mall_map_filter_tooltip']);
-        set_option('mall_map_tooltip_button', $_POST['mall_map_tooltip_button']);
+        set_option('walking_tour_filter_tooltip', $_POST['walking_tour_filter_tooltip']);
+        set_option('walking_tour_tooltip_button', $_POST['walking_tour_tooltip_button']);
+        set_option('walking_tour_center', $_POST['walking_tour_center']);
+        set_option('walking_tour_default_zoom', $_POST['walking_tour_default_zoom']);
+        set_option('walking_tour_max_zoom', $_POST['walking_tour_max_zoom']);
+        set_option('walking_tour_min_zoom', $_POST['walking_tour_min_zoom']);
+        set_option('walking_tour_max_bounds', $_POST['walking_tour_max_bounds']);
+        set_option('walking_tour_locate_bounds', $_POST['walking_tour_locate_bounds']);
+        set_option('walking_tour_max_locate_meters', $_POST['walking_tour_max_locate_meters']);
     }
 
     public function hookDefineRoutes($args)
     {
         $args['router']->addConfig( new Zend_Config_Ini(
-            MALLMAP_PLUGIN_DIR .
+            WALKINGTOUR_PLUGIN_DIR .
             DIRECTORY_SEPARATOR .
             'routes.ini', 'routes' ) );
         if (is_admin_theme()) {
             return;
         }
         else {
-          $args['router']->addRoute('mall_map',
-              new Zend_Controller_Router_Route('map',
+          $args['router']->addRoute('walking_tour',
+              new Zend_Controller_Router_Route('walking-tour',
                   array(
-                      'module' => 'mall-map',
+                      'module' => 'walking-tour',
                       'controller' => 'index',
                       'action' => 'index',
                   )
@@ -137,7 +154,7 @@ class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
 
     public function filterAdminDashboardStats( $stats )
   	{
-  		if( is_allowed( 'TourBuilder_Tours', 'browse' ) )
+  		if( is_allowed( 'WalkingTourBuilder_Tours', 'browse' ) )
   		{
   			$stats[] = array( link_to( 'tours', array(),
   					total_records( 'Tours' ) ),
@@ -185,7 +202,7 @@ class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
   	    $module = $request->getModuleName();
   	    $controller = $request->getControllerName();
         
-  	    if ($module == 'mall-map' && $controller == 'tours')
+  	    if ($module == 'walking-tour' && $controller == 'tours')
         {
   	        queue_css_file('tour-1.7');
             queue_js_url('//code.jquery.com/jquery-migrate-3.0.0.min.js');

@@ -50,6 +50,16 @@
 				</div>
 			</div>
 
+			<div class = "field">
+				<div class="two columns alpha">
+				  <?php echo $this->formLabel( 'color', __('Color') ); ?>
+				</div>
+				<div class="five columns omega inputs">
+				  <?php echo $this->formTextarea( 'color', $tour->color,array( 'rows' => 1, 'cols' => '40' )  ); ?>
+				  <p class="explanation"><?php echo __('Add a HTML color code as a hexadecimal value for the color shown in the map.');?></p>
+				</div>
+			</div>
+
 		</fieldset>
 
 		<fieldset id="tour-items-picker">
@@ -71,7 +81,9 @@
 					foreach($tourItems as $ti){
 						$html  = '<li data-id="'.$ti->id.'" class="ui-state-default">';
 						$html .= '<span>'.$svg_icon.metadata($ti,array('Dublin Core','Title')).'</span>';
-						$html .= '<span class="remove">Remove</span></li>';
+						// $html .= '<span class="remove" id = "item_'.$ti->id. '">Link Exhibit &nbsp</span>';
+						$html .= '<span class="remove">&nbsp Remove</span></li>';
+						// $html .= '<div class="input-container exhibit" id = '.$ti->id.'><input type="search" id="tour-item-search" placeholder="Search by title..." onkeydown="if (event.keyCode == 13) return false"/></div>';
 						echo $html;
 					}
 				} ?>
@@ -84,7 +96,7 @@
 </section>
 
 <script>
-	var allItems=<?php echo availableLocationItemsJSON(); //echo availableItemsJSON();?>;
+	var allItems=<?php echo availableLocationItemsJSON();?>;
 	var svg_icon='<?php echo $svg_icon;?>';
 
 	jQuery('#tour-item-search').on('focus', function() {
@@ -116,6 +128,7 @@
 			jQuery(document).on('tourItemsUpdated',function(e){
 				_UIButtons();
 				tourItems=_itemsInTour();
+				console.log(_itemsInTour);
 				jQuery('#tour_item_ids').val(tourItems);
 			});
 		})();

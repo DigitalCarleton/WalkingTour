@@ -34,7 +34,7 @@ echo flash();
 
 
     <div id="public-featured">
-      <?php if ( is_allowed('TourBuilder_Tours', 'makePublic') ): ?>
+      <?php if ( is_allowed('WalkingTourBuilder_Tours', 'makePublic') ): ?>
       <div class="checkbox">
         <label for="public">
           <?php echo __('Public'); ?>:
@@ -47,7 +47,7 @@ echo flash();
       </div>
       <?php endif; ?>
 
-      <?php if( is_allowed( 'TourBuilder_Tours', 'makeFeatured' ) ): ?>
+      <?php if( is_allowed( 'WalkingTourBuilder_Tours', 'makeFeatured' ) ): ?>
       <div class="checkbox">
         <label for="featured">
           <?php echo __('Featured'); ?>:

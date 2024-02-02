@@ -2,7 +2,7 @@
 require_once 'Tour.php';
 require_once 'TourItem.php';
 
-class MallMap_ToursController extends Omeka_Controller_AbstractActionController
+class WalkingTour_ToursController extends Omeka_Controller_AbstractActionController
 {
 	public function init()
 	{
