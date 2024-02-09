@@ -73,6 +73,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
 
   		$db->query( $tourQuery );
   		$db->query( $tourItemQuery );
+        $this->_installOptions();
   	}
 
   	public function hookUninstall()
@@ -80,6 +81,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
   		$db = $this->_db;
   		$db->query( "DROP TABLE IF EXISTS `$db->TourItem`" );
   		$db->query( "DROP TABLE IF EXISTS `$db->Tour`" );
+        $this->_uninstallOptions();
   	}
 
     public function hookUpgrade( $args )
