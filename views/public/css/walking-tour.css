@@ -117,6 +117,15 @@ div[role="main"] {
     border-radius: 3px;
 }
 
+a.button{
+    background-color: #3d3d3d;
+    color: #fff;
+    padding: 0.75em;
+    border-radius: 3px;
+    border-radius: 3px;
+    border-radius: 3px;
+}
+
 #marker-count { 
 }
 
