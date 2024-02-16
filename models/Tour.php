@@ -14,7 +14,7 @@ class Tour extends Omeka_Record_AbstractRecord
 	public $featured = 0;
 	public $public = 0;
 	public $postscript_text;
-	public $color;
+	public $color = "#000000";
 
 	protected $_related = array( 'Items' => 'getItems','Image' => 'getImage' );
 

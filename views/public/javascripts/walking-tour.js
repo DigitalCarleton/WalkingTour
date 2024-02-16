@@ -3,9 +3,9 @@ $(document).ready(function () {
 });
 
 function walkingTourJs() {
-    $.getScript("https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js");
+    // $.getScript("https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js");
+    // imported.src = "/cgmrdev/plugins/WalkingTour/views/public/javascripts/new_markercluster_src.js";
     var imported = document.createElement("script");
-    imported.src = "/cgmrdev/plugins/WalkingTour/views/public/javascripts/new_markercluster_src.js";
     document.head.appendChild(imported);
     // Set map height to be window height minus header height.
     var windowheight = $(window).height();
@@ -38,7 +38,6 @@ function walkingTourJs() {
     }
 
     $("#first-time > div.tooltip > button").on('click', function () {
-        console.log('tes')
         $('.tooltip').fadeToggle();
         $('.tooltip-locate').fadeToggle();
     });
@@ -66,7 +65,6 @@ function walkingTourJs() {
 
     // Handle the filter form.
     $('#filter-button').click(function (e) {
-        console.log("here")
         e.preventDefault();
 
         // First close any popups
@@ -117,11 +115,9 @@ function walkingTourJs() {
         $('#filters').fadeToggle(200, 'linear');
 
         if (curTourSelected) {
-            console.log(curTourSelected)
             curTourSelected.Data.features.forEach(ele => {
                 itemIDList.push(ele.properties.id)
             })
-            console.log(itemIDList)
 
             $('#info-panel-container').fadeToggle(200, 'linear');
             $('#toggle-map-button + .back-button').show();
@@ -272,7 +268,6 @@ function walkingTourJs() {
     }
 
     function mapSetUp(response) {
-        console.log(response)
         MAP_MAX_ZOOM = parseInt(response['walking_tour_max_zoom'])
         MAP_MIN_ZOOM = parseInt(response['walking_tour_min_zoom'])
         MAP_CENTER = parse1DArrayPoint(response['walking_tour_center'])
@@ -321,7 +316,6 @@ function walkingTourJs() {
 
         // Handle location found.
         map.on('locationfound', function (e) {
-            console.log("here")
             // User within location bounds. Set the location marker.
             if (L.latLngBounds(LOCATE_BOUNDS).contains(e.latlng)) {
                 launchTooltip();
@@ -413,6 +407,10 @@ function walkingTourJs() {
         var css = ""
         for (const tour_id in markerData) {
             var color = markerData[tour_id]['Color']
+            // TODO Temp solution
+            if (color.length == 0){
+                color = "#000000"
+            }
             var rgb = hexToRgb(color)
             css += `#filters div label.label${tour_id}:before {
                         background-color: ${color} !important;
@@ -531,7 +529,6 @@ function walkingTourJs() {
         popupContent += '<a href="#" class="open-info-panel button">view more info</a>';
         if (!layer.getPopup()) {
             marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
-            console.log(marker)
             allMarkers[response.id] = marker;
         }
 
