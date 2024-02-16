@@ -65,9 +65,9 @@ class Tour extends Omeka_Record_AbstractRecord
 		$tourItem->tour_id = $this->id;
 		$tourItem->item_id = $item_id;
 		$tourItem->ordinal = $ordinal;
-		// if (plugin_is_active('ExhibitBuilder')){
-		// 	$tourItem->exhibit_id = 0;
-		// }
+		if (plugin_is_active('ExhibitBuilder')){
+			$tourItem->exhibit_id = 0;
+		}
 		$tourItem->save();
 	}
 

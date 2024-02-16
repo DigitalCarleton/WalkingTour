@@ -252,7 +252,7 @@ function walkingTourJs() {
     }
 
     function parse2DArrayPoint(text) {
-        ptn = text.match(/(\[[0-9]*.[0-9]*, [0-9]*.[0-9]*\])/g)
+        ptn = text.match(/(\[-?[0-9]*.[0-9]*, -?[0-9]*.[0-9]*\])/g)
         b_new = []
         ptn.forEach(ele => {
             temp_ele = ele.split(",")
@@ -565,6 +565,7 @@ function walkingTourJs() {
         }
 
         async function getOverallPath(points, key) {
+            console.log(points)
             var pointsParam = []
             points.forEach(ele => {
                 pointsParam.push([ele.lng, ele.lat])
@@ -589,6 +590,7 @@ function walkingTourJs() {
         var tourToItem = {}
         jqXhr = $.post('walking-tour/index/query', function (response) {
             markerData = response;
+            console.log(response)
             dataArray = Object.entries(markerData)
             for (const tour in markerData) {
                 itemArray = itemArray.concat(markerData[tour]['Data']['features'])
@@ -648,6 +650,7 @@ function walkingTourJs() {
                     markerData[tourId].geoJson = geoJsonLayer;
                     var walkingPath = [];
                     var json_content = response.features;
+                    console.log(json_content)
                     var pointList = [];
                     for (var i = 0; i < json_content.length; i++) {
                         lat = json_content[i].geometry.coordinates[1];
@@ -655,6 +658,7 @@ function walkingTourJs() {
                         var point = new L.LatLng(lat, lng);
                         pointList[i] = point;
                     }
+                    console.log(pointList)
                     getOverallPath(pointList, key).then((data) => {
                         var path = data["features"][0]["geometry"]["coordinates"];
                         path = orderCoords(path);

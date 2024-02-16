@@ -67,6 +67,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
               `tour_id` INT( 10 ) UNSIGNED NOT NULL,
               `ordinal` INT NOT NULL,
               `item_id` INT( 10 ) UNSIGNED NOT NULL,
+              `exhibit_id` INT( 10 ) UNSIGNED NOT NULL,
               PRIMARY KEY( `id` ),
               KEY `tour` ( `tour_id` )
            ) ENGINE=InnoDB ";
