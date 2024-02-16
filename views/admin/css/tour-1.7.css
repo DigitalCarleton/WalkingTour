@@ -49,6 +49,9 @@
 	padding: 1em !important;
 	box-sizing: border-box;
 }
+.exhibit{
+	margin-left: 4rem;
+}
 .remove{
 	cursor: pointer;
 }

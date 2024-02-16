@@ -81,7 +81,9 @@
 					foreach($tourItems as $ti){
 						$html  = '<li data-id="'.$ti->id.'" class="ui-state-default">';
 						$html .= '<span>'.$svg_icon.metadata($ti,array('Dublin Core','Title')).'</span>';
-						$html .= '<span class="remove">Remove</span></li>';
+						// $html .= '<span class="remove" id = "item_'.$ti->id. '">Link Exhibit &nbsp</span>';
+						$html .= '<span class="remove">&nbsp Remove</span></li>';
+						// $html .= '<div class="input-container exhibit" id = '.$ti->id.'><input type="search" id="tour-item-search" placeholder="Search by title..." onkeydown="if (event.keyCode == 13) return false"/></div>';
 						echo $html;
 					}
 				} ?>
@@ -126,6 +128,7 @@
 			jQuery(document).on('tourItemsUpdated',function(e){
 				_UIButtons();
 				tourItems=_itemsInTour();
+				console.log(_itemsInTour);
 				jQuery('#tour_item_ids').val(tourItems);
 			});
 		})();

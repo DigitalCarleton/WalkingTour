@@ -24,6 +24,7 @@ class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
         'install',
         'uninstall',
         'define_acl',
+        'upgrade',
         'define_routes',
         'config',
         'config_form',
@@ -81,6 +82,14 @@ class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
   		$db->query( "DROP TABLE IF EXISTS `$db->Tour`" );
   	}
 
+    public function hookUpgrade( $args )
+    {
+        if (version_compare($args['old_version'], '0.1-dev', "<")){
+            $sql = "ALTER TABLE `{$db->prefix}tour_items` ADD COLUMN `exhibit_id` INT( 10 ) UNSIGNED NOT NULL AFTER `item_id`";
+            $this->_db->query($sql);
+        }
+    }
+
   	public function hookDefineAcl( $args )
   	{
   		$acl = $args['acl'];
@@ -112,6 +121,13 @@ class MallMapPlugin extends Omeka_Plugin_AbstractPlugin
     {
         set_option('mall_map_filter_tooltip', $_POST['mall_map_filter_tooltip']);
         set_option('mall_map_tooltip_button', $_POST['mall_map_tooltip_button']);
+        set_option('mall_map_center', $_POST['mall_map_center']);
+        set_option('mall_map_default_zoom', $_POST['mall_map_default_zoom']);
+        set_option('mall_map_max_zoom', $_POST['mall_map_max_zoom']);
+        set_option('mall_map_min_zoom', $_POST['mall_map_min_zoom']);
+        set_option('mall_map_max_bounds', $_POST['mall_map_max_bounds']);
+        set_option('mall_map_locate_bounds', $_POST['mall_map_locate_bounds']);
+        set_option('mall_map_max_locate_meters', $_POST['mall_map_max_locate_meters']);
     }
 
     public function hookDefineRoutes($args)
