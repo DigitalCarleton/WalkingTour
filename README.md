@@ -49,7 +49,7 @@ One annoying issue we found is that there is some coupling between the MallMap t
 ## How to Debug for PHP
 
 - For view, use `d($var)` to overlay the debug information on the screen
-- For controllers, use `_log($var)` to write the debug information on the `errors.log` in site applicartion folder
+- For controllers, use `_log($var)` to write the debug information on the `errors.log` in site application folder
 
 ## TODO
 
