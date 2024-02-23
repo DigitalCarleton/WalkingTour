@@ -329,7 +329,7 @@ function walkingTourJs() {
                 locationMarker = L.marker(e.latlng, {
                     icon: L.icon({
                         iconUrl: 'plugins/WalkingTour/views/public/images/location.png',
-                        iconSize: [50, 50]
+                        iconSize: [25, 25]
                     })
                 });
                 locationMarker.addTo(map).
