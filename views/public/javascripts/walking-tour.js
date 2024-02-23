@@ -318,7 +318,6 @@ function walkingTourJs() {
         map.on('locationfound', function (e) {
             // User within location bounds. Set the location marker.
             if (L.latLngBounds(LOCATE_BOUNDS).contains(e.latlng)) {
-                launchTooltip();
                 if (locationMarker) {
                     // Remove the existing location marker before adding to map.
                     map.removeLayer(locationMarker);
