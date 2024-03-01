@@ -126,6 +126,17 @@ a.button{
     border-radius: 3px;
 }
 
+a {
+    text-decoration: none;
+    font-weight: bold;
+  }
+  a:link {
+    color: #3d5a80;
+  }
+  a:visited {
+    color: #426393;
+  }
+
 #marker-count { 
 }
 
