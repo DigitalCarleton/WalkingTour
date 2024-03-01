@@ -460,7 +460,7 @@ function walkingTourJs() {
     function populatePopup(itemIDList, value, response, numPopup) {
         var numPopup = itemIDList.findIndex((ele) => ele == response.id);
         var coor = value.Data.features[numPopup].geometry.coordinates;
-        map.flyTo([coor[1], coor[0]], 16);
+        map.flyTo([coor[1], coor[0]], MAP_MAX_ZOOM);
 
         $('.next-button').unbind("click");
         $('.prev-button').unbind("click");
@@ -622,7 +622,7 @@ function walkingTourJs() {
                         onEachFeature: function (feature, layer) {
                             layer.on('click', function (e) {
                                 // center click location
-                                map.flyTo(e.latlng, 16);
+                                map.flyTo(e.latlng,MAP_MAX_ZOOM);
                                 // Close the filerting
                                 var filterButton = $('filter-button');
                                 filterButton.removeClass('on').
