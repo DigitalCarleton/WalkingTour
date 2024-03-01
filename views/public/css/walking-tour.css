@@ -131,10 +131,10 @@ a {
     font-weight: bold;
   }
   a:link {
-    color: #3d5a80;
+    color: #3d5a80 !important;
   }
   a:visited {
-    color: #426393;
+    color: #426393 !important;
   }
 
 #marker-count { 
