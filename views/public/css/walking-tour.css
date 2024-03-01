@@ -126,16 +126,6 @@ a.button{
     border-radius: 3px;
 }
 
-a {
-    text-decoration: none;
-    font-weight: bold;
-  }
-  a:link {
-    color: #3d5a80 !important;
-  }
-  a:visited {
-    color: #426393 !important;
-  }
 
 #marker-count { 
 }
@@ -591,6 +581,10 @@ h2.credits{
 
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {
     border-radius: 0;
+}
+
+.leaflet-control-zoom a:link {
+    color: #3d5a80;
 }
 
 .leaflet-container a.leaflet-popup-close-button {

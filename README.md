@@ -58,3 +58,5 @@ One annoying issue we found is that there is some coupling between the MallMap t
 - [x] Make the tour `getItemAction` not require abstract --> abstract needs `Dublin core extended`
 - [x] Font resources
 - [x] use leaflet watch
+
+- [x] map zoom css
