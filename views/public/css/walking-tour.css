@@ -27,7 +27,9 @@ a#locate-button:before, #filter-button:before,
     line-height: 1;
     -webkit-font-smoothing: antialiased;
 }
-
+a:visited {
+    color: black;
+}
 html, body {
     height: 100%;
 }
