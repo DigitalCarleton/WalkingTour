@@ -81,27 +81,3 @@
         </div>
     </div>
 </div>
-
-<div class="field">
-    <div class="two columns alpha">
-        <label for="walking_tour_locate_bounds"><?php echo __('Map Locate Bounds'); ?></label>    
-    </div>    
-    <div class="inputs five columns omega">
-        <p class="explanation"><?php echo __('Controls the locate bounds of the map.'); ?></p>
-        <div class="input-block">        
-            <input type="text" name="walking_tour_locate_bounds" id="walking_tour_locate_bounds" value="<?php echo get_option('walking_tour_locate_bounds'); ?>" />
-        </div>
-    </div>
-</div>
-
-<div class="field">
-    <div class="two columns alpha">
-        <label for="walking_tour_max_locate_meters"><?php echo __('Map Max Locate Meters'); ?></label>    
-    </div>    
-    <div class="inputs five columns omega">
-        <p class="explanation"><?php echo __('Controls the max locate meter of the map.'); ?></p>
-        <div class="input-block">        
-            <input type="text" name="walking_tour_max_locate_meters" id="walking_tour_max_locate_meters" value="<?php echo get_option('walking_tour_max_locate_meters'); ?>" />
-        </div>
-    </div>
-</div>

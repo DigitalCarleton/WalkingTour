@@ -129,8 +129,6 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
         set_option('walking_tour_max_zoom', $_POST['walking_tour_max_zoom']);
         set_option('walking_tour_min_zoom', $_POST['walking_tour_min_zoom']);
         set_option('walking_tour_max_bounds', $_POST['walking_tour_max_bounds']);
-        set_option('walking_tour_locate_bounds', $_POST['walking_tour_locate_bounds']);
-        set_option('walking_tour_max_locate_meters', $_POST['walking_tour_max_locate_meters']);
     }
 
     public function hookDefineRoutes($args)
