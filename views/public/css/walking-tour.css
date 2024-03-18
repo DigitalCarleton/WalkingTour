@@ -27,7 +27,7 @@ a#locate-button:before, #filter-button:before,
     line-height: 1;
     -webkit-font-smoothing: antialiased;
 }
-a:visited {
+a{
     color: black;
 }
 html, body {
@@ -587,6 +587,14 @@ h2.credits{
 
 .leaflet-control-zoom a:link {
     color: #3d5a80;
+}
+
+.leaflet-control-zoom a{
+    color: black !important;
+}
+
+.leaflet-bar a.leaflet-disabled{
+    color: #bbb !important;
 }
 
 .leaflet-container a.leaflet-popup-close-button {
