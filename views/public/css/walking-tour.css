@@ -27,7 +27,9 @@ a#locate-button:before, #filter-button:before,
     line-height: 1;
     -webkit-font-smoothing: antialiased;
 }
-
+a{
+    color: black;
+}
 html, body {
     height: 100%;
 }
@@ -116,6 +118,16 @@ div[role="main"] {
     text-decoration: none;
     border-radius: 3px;
 }
+
+a.button{
+    background-color: #3d3d3d;
+    color: #fff;
+    padding: 0.75em;
+    border-radius: 3px;
+    border-radius: 3px;
+    border-radius: 3px;
+}
+
 
 #marker-count { 
 }
@@ -571,6 +583,18 @@ h2.credits{
 
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {
     border-radius: 0;
+}
+
+.leaflet-control-zoom a:link {
+    color: #3d5a80;
+}
+
+.leaflet-control-zoom a{
+    color: black !important;
+}
+
+.leaflet-bar a.leaflet-disabled{
+    color: #bbb !important;
 }
 
 .leaflet-container a.leaflet-popup-close-button {

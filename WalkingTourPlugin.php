@@ -67,12 +67,14 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
               `tour_id` INT( 10 ) UNSIGNED NOT NULL,
               `ordinal` INT NOT NULL,
               `item_id` INT( 10 ) UNSIGNED NOT NULL,
+              `exhibit_id` INT( 10 ) UNSIGNED NOT NULL,
               PRIMARY KEY( `id` ),
               KEY `tour` ( `tour_id` )
            ) ENGINE=InnoDB ";
 
   		$db->query( $tourQuery );
   		$db->query( $tourItemQuery );
+        $this->_installOptions();
   	}
 
   	public function hookUninstall()
@@ -80,6 +82,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
   		$db = $this->_db;
   		$db->query( "DROP TABLE IF EXISTS `$db->TourItem`" );
   		$db->query( "DROP TABLE IF EXISTS `$db->Tour`" );
+        $this->_uninstallOptions();
   	}
 
     public function hookUpgrade( $args )
@@ -126,8 +129,6 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
         set_option('walking_tour_max_zoom', $_POST['walking_tour_max_zoom']);
         set_option('walking_tour_min_zoom', $_POST['walking_tour_min_zoom']);
         set_option('walking_tour_max_bounds', $_POST['walking_tour_max_bounds']);
-        set_option('walking_tour_locate_bounds', $_POST['walking_tour_locate_bounds']);
-        set_option('walking_tour_max_locate_meters', $_POST['walking_tour_max_locate_meters']);
     }
 
     public function hookDefineRoutes($args)
@@ -153,15 +154,17 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
     }
 
     public function filterAdminDashboardStats( $stats )
-  	{
-  		if( is_allowed( 'WalkingTourBuilder_Tours', 'browse' ) )
-  		{
-  			$stats[] = array( link_to( 'tours', array(),
-  					total_records( 'Tours' ) ),
-  				__('tours') );
-  		}
-  		return $stats;
-  	}
+    {
+        if( is_allowed( 'WalkingTourBuilder_Tours', 'browse' ) )
+        {
+            if(version_compare(OMEKA_VERSION,'3.1') >= 0){
+                $stats['tours'] = array(total_records( 'Tours' ), __('tours') );
+            }else{
+                $stats[] = array( link_to( 'tours', array(), total_records( 'Tours' ) ), __('tours') );
+            }
+        }
+        return $stats;
+    }
 
   	public function hookAdminDashboard()
   	{
@@ -187,11 +190,11 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
   			}
   		}
 
-  		$html .= '<section class="five columns alpha"><div class="panel">';
+  		$html .= '<section class="five columns alpha panel">';
   		$html .= '<h2>'.__('Recent Tours').'</h2>';
   		$html .= ''.$tourItems.'';
   		$html .= '<p><a class="add-new-item green button" href="'.html_escape(url('tours/add/')).'">'.__('Add a new tour').'</a></p>';
-  		$html .= '</div></section>';
+  		$html .= '</section>';
 
   		echo $html;
   	}

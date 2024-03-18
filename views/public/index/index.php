@@ -1,9 +1,3 @@
-<?php queue_js_file('leaflet.markercluster'); ?>
-<?php queue_js_string('
-        var hackRemember = L.DomUtil.TRANSITION;
-        L.DomUtil.TRANSITION = false;
-        L.DomUtil.TRANSITION = hackRemember;
-'); ?>
 <?php echo head(array('bodyclass' => 'map')); ?>
     <?php echo link_to_home_page('<span class="screen-reader-text">Home</span>', array('id' => 'home-button')); ?>
     <div id="dialog"></div>

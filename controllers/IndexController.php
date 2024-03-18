@@ -30,7 +30,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         // Build an array with 
         $_tourTypes = array('id' => array(), 'color' => array());
         foreach ($results as $tour){
-          if($tour['public']==1){
+          if($tour['public']==1 || current_user()->role == "super"){
             $_tourTypes['id'][$tour['id']] = $tour['title'];
             $_tourTypes['color'][$tour['id']] = $tour['color'];
             $_tourTypes['description'][$tour['id']] = $tour['description'];
@@ -54,14 +54,14 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             ->appendFile('//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js')
             ->appendFile('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js')
             ->appendFile(src('jquery.cookie', 'javascripts', 'js'))
-            ->appendFile('//cdn.leafletjs.com/leaflet-0.7/leaflet.js')
+            // ->appendFile('//cdn.leafletjs.com/leaflet-0.7/leaflet.js')
             ->appendFile(src('modernizr.custom.63332', 'javascripts', 'js'))
             ->appendFile(src('Polyline.encoded', 'javascripts', 'js'))
             ->appendFile(src('walking-tour', 'javascripts', 'js'));
         $this->view->headLink()
             ->appendStylesheet('//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css', 'all')
-            ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.css', 'all')
-            ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.ie.css', 'all', 'lte IE 8')
+            // ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.css', 'all')
+            // ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.ie.css', 'all', 'lte IE 8')
             ->appendStylesheet(src('walking-tour', 'css', 'css'));
     }
 
@@ -184,7 +184,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             'id' => $item->id,
             'title' => metadata($item, array('Dublin Core', 'Title')),
             'description' => metadata($item, array('Dublin Core', 'Description'), array('no-escape' => true)),
-            'abstract' => metadata($item, array('Dublin Core', 'Abstract'), array('no-escape' => true)),
+            // 'abstract' => metadata($item, array('Dublin Core', 'Abstract'), array('no-escape' => true)),
             'date' => metadata($item, array('Dublin Core', 'Date'), array('all' => true)),
             'thumbnail' => item_image('square_thumbnail', array(), 0, $item),
             'fullsize' => item_image('fullsize', array('style' => 'max-width: 100%; height: auto;'), 0, $item),
@@ -194,6 +194,9 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
                                'id' => $item['id']),
                          'id'),
         );
+        if (plugin_is_active('DublinCoreExtended')) {
+            $data['abstract'] = metadata($item, array('Dublin Core', 'Abstract'), array('no-escape' => true));
+        }
         $this->_helper->json($data);
     }
 }

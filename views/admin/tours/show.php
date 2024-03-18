@@ -81,7 +81,7 @@ if( $tour->getItems() ): ?>
     </a>
     <?php endif; ?>
 
-    <a href="<?php echo html_escape( public_url( 'tours/show/' . $tour->id ) ); ?>"
+    <a href="<?php echo html_escape( public_url( 'walking-tour' ) ); ?>"
        class="big blue button" target="_blank">
       <?php echo __('View Public Page'); ?>
     </a>

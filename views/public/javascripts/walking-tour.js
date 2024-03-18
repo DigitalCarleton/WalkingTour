@@ -3,9 +3,9 @@ $(document).ready(function () {
 });
 
 function walkingTourJs() {
-    $.getScript("https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js");
+    // $.getScript("https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js");
+    // imported.src = "/cgmrdev/plugins/WalkingTour/views/public/javascripts/new_markercluster_src.js";
     var imported = document.createElement("script");
-    imported.src = "/cgmrdev/plugins/WalkingTour/views/public/javascripts/new_markercluster_src.js";
     document.head.appendChild(imported);
     // Set map height to be window height minus header height.
     var windowheight = $(window).height();
@@ -19,7 +19,6 @@ function walkingTourJs() {
     var MAP_MAX_ZOOM;
     var MAP_MAX_BOUNDS;  // MAP_MAX_BOUNDS controls the boundaries of the map
     var LOCATE_BOUNDS;
-    var MAX_LOCATE_METERS;
 
     var map;
     var historicMapLayer;
@@ -38,7 +37,6 @@ function walkingTourJs() {
     }
 
     $("#first-time > div.tooltip > button").on('click', function () {
-        console.log('tes')
         $('.tooltip').fadeToggle();
         $('.tooltip-locate').fadeToggle();
     });
@@ -66,7 +64,6 @@ function walkingTourJs() {
 
     // Handle the filter form.
     $('#filter-button').click(function (e) {
-        console.log("here")
         e.preventDefault();
 
         // First close any popups
@@ -117,11 +114,9 @@ function walkingTourJs() {
         $('#filters').fadeToggle(200, 'linear');
 
         if (curTourSelected) {
-            console.log(curTourSelected)
             curTourSelected.Data.features.forEach(ele => {
                 itemIDList.push(ele.properties.id)
             })
-            console.log(itemIDList)
 
             $('#info-panel-container').fadeToggle(200, 'linear');
             $('#toggle-map-button + .back-button').show();
@@ -256,7 +251,7 @@ function walkingTourJs() {
     }
 
     function parse2DArrayPoint(text) {
-        ptn = text.match(/(\[[0-9]*.[0-9]*, [0-9]*.[0-9]*\])/g)
+        ptn = text.match(/(\[-?[0-9]*.[0-9]*, -?[0-9]*.[0-9]*\])/g)
         b_new = []
         ptn.forEach(ele => {
             temp_ele = ele.split(",")
@@ -272,14 +267,12 @@ function walkingTourJs() {
     }
 
     function mapSetUp(response) {
-        console.log(response)
         MAP_MAX_ZOOM = parseInt(response['walking_tour_max_zoom'])
         MAP_MIN_ZOOM = parseInt(response['walking_tour_min_zoom'])
         MAP_CENTER = parse1DArrayPoint(response['walking_tour_center'])
         MAP_ZOOM = parseInt(response["walking_tour_default_zoom"])
         MAP_MAX_BOUNDS = parse2DArrayPoint(response["walking_tour_max_bounds"])
-        LOCATE_BOUNDS = parse2DArrayPoint(response['walking_tour_locate_bounds'])
-        MAX_LOCATE_METERS = parseInt(response["walking_tour_max_locate_meters"])
+        LOCATE_BOUNDS = MAP_MAX_BOUNDS
         // Set the base map layer.
         map = L.map('map', {
             center: MAP_CENTER,
@@ -321,10 +314,8 @@ function walkingTourJs() {
 
         // Handle location found.
         map.on('locationfound', function (e) {
-            console.log("here")
             // User within location bounds. Set the location marker.
             if (L.latLngBounds(LOCATE_BOUNDS).contains(e.latlng)) {
-                launchTooltip();
                 if (locationMarker) {
                     // Remove the existing location marker before adding to map.
                     map.removeLayer(locationMarker);
@@ -335,23 +326,17 @@ function walkingTourJs() {
                 locationMarker = L.marker(e.latlng, {
                     icon: L.icon({
                         iconUrl: 'plugins/WalkingTour/views/public/images/location.png',
-                        iconSize: [50, 50]
+                        iconSize: [25, 25]
                     })
                 });
                 locationMarker.addTo(map).
                     bindPopup("You are within " + e.accuracy / 2 + " meters from this point");
                 // User outside location bounds.
             } else {
-                map.stopLocate();
                 var locateMeters = e.latlng.distanceTo(map.options.center);
-                // Show out of bounds message only if within a certain distance.
-                if (MAX_LOCATE_METERS > locateMeters) {
-                    var locateMiles = Math.ceil((locateMeters * 0.000621371) * 100) / 100;
-                    // $('#dialog').text('You are ' + locateMiles + ' miles from the National Mall.').
-                    //     dialog('option', 'title', 'Not Quite on the Mall').
-                    //     dialog('open');
-                }
-
+                var locateMiles = Math.ceil((locateMeters * 0.000621371) * 100) / 100;
+                alert('Cannot locate your location. You are ' + locateMiles + ' miles from the map bounds.');
+                map.stopLocate();
             }
         });
 
@@ -413,6 +398,10 @@ function walkingTourJs() {
         var css = ""
         for (const tour_id in markerData) {
             var color = markerData[tour_id]['Color']
+            // TODO Temp solution
+            if (color.length == 0){
+                color = "#000000"
+            }
             var rgb = hexToRgb(color)
             css += `#filters div label.label${tour_id}:before {
                         background-color: ${color} !important;
@@ -463,7 +452,7 @@ function walkingTourJs() {
     function populatePopup(itemIDList, value, response, numPopup) {
         var numPopup = itemIDList.findIndex((ele) => ele == response.id);
         var coor = value.Data.features[numPopup].geometry.coordinates;
-        map.flyTo([coor[1], coor[0]], 16);
+        map.flyTo([coor[1], coor[0]], MAP_MAX_ZOOM);
 
         $('.next-button').unbind("click");
         $('.prev-button').unbind("click");
@@ -531,7 +520,6 @@ function walkingTourJs() {
         popupContent += '<a href="#" class="open-info-panel button">view more info</a>';
         if (!layer.getPopup()) {
             marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
-            console.log(marker)
             allMarkers[response.id] = marker;
         }
 
@@ -624,7 +612,7 @@ function walkingTourJs() {
                         onEachFeature: function (feature, layer) {
                             layer.on('click', function (e) {
                                 // center click location
-                                map.flyTo(e.latlng, 16);
+                                map.flyTo(e.latlng,MAP_MAX_ZOOM);
                                 // Close the filerting
                                 var filterButton = $('filter-button');
                                 filterButton.removeClass('on').
