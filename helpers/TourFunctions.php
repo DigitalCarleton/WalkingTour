@@ -24,6 +24,16 @@ function availableLocationItemsJSON() {
 		}
 }
 
+function availableExhibit() {
+	$db = get_db();
+	$prefix=$db->prefix;
+	$exhibitTable = $db->getTable( 'Exhibit' );
+	if ($exhibitTable){
+		$items = $exhibitTable->fetchObjects( "SELECT * FROM ".$prefix."exhibits ORDER BY id DESC" );
+		return json_encode($items);
+	}
+}
+
 function has_tours()
 {
 	return( total_tours() > 0 );

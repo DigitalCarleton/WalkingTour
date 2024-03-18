@@ -47,5 +47,9 @@ class TourItem extends Omeka_Record_AbstractRecord
 		if( ! is_numeric( $this->ordinal ) ) {
 			$this->addError( 'ordinal', 'Order must be numeric' );
 		}
+
+		if( ! is_numeric( $this->exhibit_id ) ) {
+			$this->addError( 'exhibit_id', 'Exhibit must be numeric id' );
+		}
 	}
 }

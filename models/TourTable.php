@@ -14,7 +14,7 @@ class TourTable extends Omeka_Db_Table
 		$select->where( 'ti.tour_id = ?', array( $tour_id ) );
 		$select->order( 'ti.ordinal ASC' );
 
-		$items = $itemTable->fetchObjects( "SELECT i.*, ti.ordinal
+		$items = $itemTable->fetchObjects( "SELECT i.*, ti.ordinal, ti.exhibit_id
          FROM ".$prefix."items i LEFT JOIN ".$prefix."tour_items ti
          ON i.id = ti.item_id
          WHERE ti.tour_id = ?

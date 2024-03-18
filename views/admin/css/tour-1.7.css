@@ -37,7 +37,7 @@
 	min-height: 600px;		
 	min-height: 90vh;
 }
-#tour-item-search{
+#tour-item-search, #tour-item-exhibit-search{
     padding: 10px;
     width: 100%;
     box-sizing: border-box;	
@@ -49,8 +49,13 @@
 	padding: 1em !important;
 	box-sizing: border-box;
 }
-.exhibit{
+.exhibit-input-container{
 	margin-left: 4rem;
+	border: 1px solid #D6D5C2;
+	box-sizing: border-box;
+}
+.exhibit{
+	cursor: pointer;
 }
 .remove{
 	cursor: pointer;
