@@ -179,7 +179,20 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         if (!$this->_request->isXmlHttpRequest()) {
             throw new Omeka_Controller_Exception_403;
         }
-        $item = get_record_by_id('item', $this->_request->getParam('id'));
+        $item_id = $this->_request->getParam('id');
+        $tour_id = $this->_request->getParam('tour');
+
+        $db = $this->_helper->db->getDb();
+        $tourItemTable = $db->getTable( 'TourItem' );
+        $prefix=$db->prefix;
+
+
+        $tourItem = $tourItemTable->fetchObjects( "SELECT * FROM ".$prefix."tour_items 
+                                                            WHERE tour_id = $tour_id AND item_id = $item_id" );
+
+        $exhibit_id = $tourItem[0]["exhibit_id"];
+
+        $item = get_record_by_id('item', $item_id);
         $data = array(
             'id' => $item->id,
             'title' => metadata($item, array('Dublin Core', 'Title')),
@@ -193,9 +206,16 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
                                'action' => 'show',
                                'id' => $item['id']),
                          'id'),
+            "exhibitUrl" => ""
         );
         if (plugin_is_active('DublinCoreExtended')) {
             $data['abstract'] = metadata($item, array('Dublin Core', 'Abstract'), array('no-escape' => true));
+        }
+        if (plugin_is_active('ExhibitBuilder')){
+            $exhibit = get_records('Exhibit', array('id' => $exhibit_id));
+            if ($exhibit && count($exhibit) == 1){
+                $data["exhibitUrl"] = exhibit_builder_exhibit_uri($exhibit[0]);
+            }
         }
         $this->_helper->json($data);
     }

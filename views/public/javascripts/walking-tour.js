@@ -95,9 +95,11 @@ function walkingTourJs() {
         var tourTypeCheck = $('input[name=place-type]:checked')
         var curTourSelected;
         var itemIDList = [];
+        var tour_id;
 
         if (tourTypeCheck.length) {
             tourTypeCheck.each(function () {
+                tour_id = this.value;
                 tourSelected.push(markerData[this.value].walkingPath);
                 curTourSelected = markerData[this.value];
             });
@@ -120,7 +122,7 @@ function walkingTourJs() {
 
             $('#info-panel-container').fadeToggle(200, 'linear');
             $('#toggle-map-button + .back-button').show();
-            populateTourIntroPopup(itemIDList, curTourSelected);
+            populateTourIntroPopup(itemIDList, curTourSelected, tour_id);
         }
         let polylineGroup = L.featureGroup(tourSelected);
         let bounds = polylineGroup.getBounds();
@@ -347,7 +349,7 @@ function walkingTourJs() {
         });
     }
 
-    function populateTourIntroPopup(itemIDList, value) {
+    function populateTourIntroPopup(itemIDList, value, tour_id) {
         $('.next-button').unbind("click");
         $('.prev-button').unbind("click");
 
@@ -376,7 +378,7 @@ function walkingTourJs() {
         window.setTimeout(function () {
             $('#start-tour').click(function (e) {
                 var newId = itemIDList[0]
-                popupButtonEvent(e, newId, itemIDList, value);
+                popupButtonEvent(e, newId, itemIDList, value, tour_id);
             })
         }, 500)
         infoContent += '<div class = "content-container"> <div class ="article">' + rightContent + '</div></div>';
@@ -436,20 +438,20 @@ function walkingTourJs() {
         return markerHtmlStyles;
     }
 
-    function popupButtonEvent(e, id, itemIDList, value) {
+    function popupButtonEvent(e, id, itemIDList, value, tour_id) {
         e.preventDefault();
         var response = allItems[id]
         if (response == undefined) {
-            $.post('walking-tour/index/get-item', { id: id }, function (response) {
+            $.post('walking-tour/index/get-item', { id: id, tour: tour_id }, function (response) {
                 allItems[id] = response;
-                populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id));
+                populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id), tour_id);
             })
         } else {
-            populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id))
+            populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id), tour_id)
         }
     }
 
-    function populatePopup(itemIDList, value, response, numPopup) {
+    function populatePopup(itemIDList, value, response, numPopup, tour_id) {
         var numPopup = itemIDList.findIndex((ele) => ele == response.id);
         var coor = value.Data.features[numPopup].geometry.coordinates;
         map.flyTo([coor[1], coor[0]], MAP_MAX_ZOOM);
@@ -466,7 +468,7 @@ function walkingTourJs() {
                 $('.next-button').click(function (e) {
                     var newId = itemIDList[numPopup + 1]
                     // value.allMarker[numPopup].closePopup();
-                    popupButtonEvent(e, newId, itemIDList, value);
+                    popupButtonEvent(e, newId, itemIDList, value, tour_id);
                 })
             }, 500)
         }
@@ -479,7 +481,7 @@ function walkingTourJs() {
                 $('.prev-button').click(function (e) {
                     var newId = itemIDList[numPopup - 1]
                     // value.allMarker[numPopup].closePopup();
-                    popupButtonEvent(e, newId, itemIDList, value);
+                    popupButtonEvent(e, newId, itemIDList, value, tour_id);
                 })
             }, 500)
         }
@@ -488,6 +490,8 @@ function walkingTourJs() {
         $('.panel-title').css("backgroundColor", value['Color'])
         var content = $('#info-panel-content');
         content.empty();
+
+        console.log(response)
 
         var infoContent = ""
         var leftContent = "";
@@ -506,13 +510,18 @@ function walkingTourJs() {
         } else {
             rightContent += '<p>No descriptions available.</p>';
         }
-        rightContent += '<p><a href="' + response.url + '" class="button" target="_blank">See Full Details</a></p>';
+        rightContent += '<div class = "popupButton">'
+        rightContent += '<a href="' + response.url + '" class="button" target="_blank">Full Details</a>';
+        if (response.exhibitUrl != ""){
+            rightContent += '<a href="' + response.exhibitUrl + '" class="button" target="_blank">Linked Exhibit</a>';
+        }
+        rightContent += '</div>'
         infoContent += '<div class = "content-container"> <div class ="article">' + rightContent + '</div></div>';
 
         content.append('<div class = "info-content">' + infoContent + '</div>')
     }
 
-    function featureOnclickAction(response, layer, marker, itemIDList, value) {
+    function featureOnclickAction(response, layer, marker, itemIDList, value, tourId) {
         var popupContent = '<h3>' + response.title + '</h3>';
         if (response.thumbnail) {
             popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
@@ -534,7 +543,7 @@ function walkingTourJs() {
         }, 500);
 
         // Populate the item info panel.
-        populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id));
+        populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id), tourId);
     }
 
     function doQuery() {
@@ -623,12 +632,12 @@ function walkingTourJs() {
                                 var marker = this;
                                 response = allItems[feature.properties.id]
                                 if (response == undefined) {
-                                    $.post('walking-tour/index/get-item', { id: feature.properties.id }, function (response) {
+                                    $.post('walking-tour/index/get-item', { id: feature.properties.id, tour: tourId }, function (response) {
                                         allItems[feature.properties.id] = response;
-                                        featureOnclickAction(response, layer, marker, itemIDList, value);
+                                        featureOnclickAction(response, layer, marker, itemIDList, value, tourId);
                                     })
                                 } else {
-                                    featureOnclickAction(response, layer, marker, itemIDList, value);
+                                    featureOnclickAction(response, layer, marker, itemIDList, value, tourId);
                                 }
 
                             });

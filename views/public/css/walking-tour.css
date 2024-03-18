@@ -449,6 +449,15 @@ a#locate-button {
     overflow: hidden;
 }
 
+.popupButton{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    font-size: 0.5rem;
+    gap: 20px;
+}
+
 @media screen and (max-width: 958px) {
     .tour-filter #tour-confirm-button {
         margin: 0;
