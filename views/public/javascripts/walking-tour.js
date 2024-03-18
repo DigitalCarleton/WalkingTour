@@ -19,7 +19,6 @@ function walkingTourJs() {
     var MAP_MAX_ZOOM;
     var MAP_MAX_BOUNDS;  // MAP_MAX_BOUNDS controls the boundaries of the map
     var LOCATE_BOUNDS;
-    var MAX_LOCATE_METERS;
 
     var map;
     var historicMapLayer;
@@ -273,8 +272,7 @@ function walkingTourJs() {
         MAP_CENTER = parse1DArrayPoint(response['walking_tour_center'])
         MAP_ZOOM = parseInt(response["walking_tour_default_zoom"])
         MAP_MAX_BOUNDS = parse2DArrayPoint(response["walking_tour_max_bounds"])
-        LOCATE_BOUNDS = parse2DArrayPoint(response['walking_tour_locate_bounds'])
-        MAX_LOCATE_METERS = parseInt(response["walking_tour_max_locate_meters"])
+        LOCATE_BOUNDS = MAP_MAX_BOUNDS
         // Set the base map layer.
         map = L.map('map', {
             center: MAP_CENTER,
@@ -335,16 +333,10 @@ function walkingTourJs() {
                     bindPopup("You are within " + e.accuracy / 2 + " meters from this point");
                 // User outside location bounds.
             } else {
-                map.stopLocate();
                 var locateMeters = e.latlng.distanceTo(map.options.center);
-                // Show out of bounds message only if within a certain distance.
-                if (MAX_LOCATE_METERS > locateMeters) {
-                    var locateMiles = Math.ceil((locateMeters * 0.000621371) * 100) / 100;
-                    // $('#dialog').text('You are ' + locateMiles + ' miles from the National Mall.').
-                    //     dialog('option', 'title', 'Not Quite on the Mall').
-                    //     dialog('open');
-                }
-
+                var locateMiles = Math.ceil((locateMeters * 0.000621371) * 100) / 100;
+                alert('Cannot locate your location. You are ' + locateMiles + ' miles from the map bounds.');
+                map.stopLocate();
             }
         });
 
@@ -564,7 +556,6 @@ function walkingTourJs() {
         }
 
         async function getOverallPath(points, key) {
-            console.log(points)
             var pointsParam = []
             points.forEach(ele => {
                 pointsParam.push([ele.lng, ele.lat])
@@ -589,7 +580,6 @@ function walkingTourJs() {
         var tourToItem = {}
         jqXhr = $.post('walking-tour/index/query', function (response) {
             markerData = response;
-            console.log(response)
             dataArray = Object.entries(markerData)
             for (const tour in markerData) {
                 itemArray = itemArray.concat(markerData[tour]['Data']['features'])
@@ -649,7 +639,6 @@ function walkingTourJs() {
                     markerData[tourId].geoJson = geoJsonLayer;
                     var walkingPath = [];
                     var json_content = response.features;
-                    console.log(json_content)
                     var pointList = [];
                     for (var i = 0; i < json_content.length; i++) {
                         lat = json_content[i].geometry.coordinates[1];
@@ -657,7 +646,6 @@ function walkingTourJs() {
                         var point = new L.LatLng(lat, lng);
                         pointList[i] = point;
                     }
-                    console.log(pointList)
                     getOverallPath(pointList, key).then((data) => {
                         var path = data["features"][0]["geometry"]["coordinates"];
                         path = orderCoords(path);
