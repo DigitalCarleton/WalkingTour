@@ -81,13 +81,37 @@
 					$tourItems = $tour->getItems();
 					foreach($tourItems as $ti){
 						$html  = '<li data-id="'.$ti->id.'" class="ui-state-default">';
-						$html .= '<span>'.$svg_icon.metadata($ti,array('Dublin Core','Title')).'</span>';
+
 						if (plugin_is_active('ExhibitBuilder')){
+							$exhibit = get_records('Exhibit', array('id' => $ti->exhibit_id));
+							if ($exhibit && count($exhibit) == 1){
+								$exhibitName = $exhibit[0]["title"];
+							} else{
+								$exhibitName = "None";
+							}
+
+							$html .= 
+								'<div class="tour-item-ui">
+									<span class="tour-item-header">'.
+									$svg_icon.
+									'<div class="tour-item-title">'.
+										'<p>'.metadata($ti,array('Dublin Core','Title')).'</p>'.
+										'<p class="exhibit-name" id="item'.$ti->id.'-exhibit-name">Linked Exhibit: '.$exhibitName.'</p>'.
+									'</div>'.
+								'</span>';
 							$html .= '<span class="exhibit" id="'.$ti->id.'" data-id="'.$ti->exhibit_id.'">Link Exhibit &nbsp</span>';
-							$html .= '<span class="remove">&nbsp Remove</span></li>';
-							$html .= '<div class="exhibit-input-container" id="'.$ti->id.'"><input type="search" id="tour-item-exhibit-search" data-id="'.$ti->id.'" placeholder="Search exhibit by title..." onkeydown="if (event.keyCode == 13) return false"/></div>';
+							$html .= '<span class="remove">&nbsp Remove</span></div>';
+							$html .= '<div class="exhibit-input-container" id="'.$ti->id.'"><input type="search" id="tour-item-exhibit-search" data-id="'.$ti->id.'" placeholder="Search exhibit by title..." onkeydown="if (event.keyCode == 13) return false"/></div> </li>';
 						} else {
-							$html .= '<span class="remove">&nbsp Remove</span></li>';
+							
+							$html .= 
+								'<div class="tour-item-ui">
+									<span>'.
+										$svg_icon.metadata($ti,array('Dublin Core','Title')).
+									'</span>'.
+									'<span class="remove">&nbsp Remove</span>
+								</div>
+							</li>';
 						}
 						echo $html;
 					}
@@ -104,8 +128,16 @@
 	var allItems=<?php echo availableLocationItemsJSON();?>;
 	var allExhibits =<?php echo availableExhibit();?>;
 	var svg_icon='<?php echo $svg_icon;?>';
+	var hasExhibitBuilder = <?php echo plugin_is_active('ExhibitBuilder');?>;
 
-	jQuery('#tour-item-search').on('focus', function() {
+	allExhibits.forEach(ele => ele["label"] = ele["title"])
+
+	jQuery('#sortable').on('focus','#tour-item-search', function() {
+		// give user some vertical space for autosuggest dropdown
+	    jQuery("html, body").animate({ scrollTop: jQuery('#tour-items-picker').position().top }, 'slow');
+	});
+
+	jQuery('#sortable').on('focus', 'tour-item-exhibit-search', function() {
 		// give user some vertical space for autosuggest dropdown
 	    jQuery("html, body").animate({ scrollTop: jQuery('#tour-items-picker').position().top }, 'slow');
 	});
@@ -115,7 +147,7 @@
 	jQuery( function() {
 
 		jQuery.formCanSubmit = false;
-
+		exhibitAutoComplete();
 		var tourItems=_itemsInTour();
 		jQuery('#tour_item_ids').val(tourItems.item_id);
 		jQuery('#tour_item_exhibit_ids').val(tourItems.exhibit_id);
@@ -128,7 +160,6 @@
 				var exhibit_id = parseInt(jQuery(`#sortable #${item_id}.exhibit`).attr('data-id'));
 				inTour.push(item_id);
 				inTourExhibit.push(exhibit_id);
-				console.log(exhibit_id)
 			});
 			return {
 				item_id: inTour,
@@ -136,25 +167,26 @@
 			};
 		}
 
-			jQuery('#sortable').on('click', ".remove", function(){
-				jQuery(this).parent().fadeOut(400,function(){
-					jQuery(this).remove();
-					var id = jQuery(this).attr('data-id')
-					jQuery(`#${id}.exhibit-input-container`).remove();
-					// update list on remove
-					jQuery(document).trigger('tourItemsUpdated');
-				});
+		jQuery('#sortable').on('click', ".remove", function(){
+			jQuery(this).parent().fadeOut(400,function(){
+				jQuery(this).remove();
+				var id = jQuery(this).attr('data-id')
+				jQuery(`#${id}.exhibit-input-container`).remove();
+				// update list on remove
+				jQuery(document).trigger('tourItemsUpdated');
 			});
+		});
 
-			jQuery("#sortable").on('click', ".exhibit", function(){
-				var id = jQuery(this).attr('id')
-				jQuery(`#${id}.exhibit-input-container`).fadeToggle(200, 'linear', function(){
-					jQuery(document).trigger('tourItemsUpdated');
-				});
-			})
+		jQuery("#sortable").on('click', ".exhibit", function(){
+			var id = jQuery(this).attr('id')
+			jQuery(`#${id}.exhibit-input-container`).fadeToggle(200, 'linear', function(){
+				jQuery(document).trigger('tourItemsUpdated');
+			});
+		})
 
 
 		jQuery(document).on('tourItemsUpdated',function(e){
+			exhibitAutoComplete();
 			tourItems=_itemsInTour();
 			jQuery('#tour_item_ids').val(tourItems.item_id);
 			jQuery('#tour_item_exhibit_ids').val(tourItems.exhibit_id);
@@ -177,16 +209,45 @@
 			if(jQuery.inArray(id, _itemsInTour().item_id,0) >= 0){
 				alert('The item "' +label+ '" has already been added to the tour.');
 			}else{
-				var html = `<span> ${svg_icon}${label}</span>\
-				<span class="exhibit" id = "${id}" data-id=1>Link Exhibit &nbsp</span>\
-				<span class="remove">Remove</span>`
+				if (hasExhibitBuilder){
+					var html = 
+					`<div class="tour-item-ui">\
+						<span class="tour-item-header">\
+							${svg_icon}\
+							<div class="tour-item-title">\
+								<p> ${label} </p>\
+								<p class="exhibit-name" id="item${id}-exhibit-name">Linked Exhibit: None</p>\
+							</div>
+						</span>\
+						<span class="exhibit" id = "${id}" data-id=0>Link Exhibit &nbsp</span>\
+						<span class="remove">Remove</span>\
+					</div>\
+					<div class="exhibit-input-container" id = "${id}">\
+						<input type="search" id="tour-item-exhibit-search" data-id="${id}" placeholder="Search exhibit by title..." onkeydown="if (event.keyCode == 13) return false"/>\
+					</div>`
+				} else {
+					var html = 
+					`<div class="tour-item-ui">\
+						<span> ${svg_icon}${label}</span>\
+						<span class="remove">Remove</span>\
+					</div>`
+				}
 
-				jQuery(`<div class="exhibit-input-container" id = "${id}"><input type="search" id="tour-item-search" placeholder="Search exhibit by title..." onkeydown="if (event.keyCode == 13) return false"/></div>`).prependTo( "#sortable" )
 				jQuery( '<li data-id="' + id + '" class="ui-state-highlight">' ).html( html ).prependTo( "#sortable" );
 				jQuery('.exhibit-input-container').hide();
 				jQuery( "#sortable" ).scrollTop( 0 );
 				// update list on add
 				jQuery(document).trigger('tourItemsUpdated');
+			}
+		}
+		
+		function addExhibit( itemId, exhibitId, exhibitLabel ) {
+			var curExhibitId = jQuery(`#sortable #${itemId}.exhibit`).attr('data-id')
+			if (curExhibitId == exhibitId){
+				alert('Exhibit "' +exhibitLabel+ '" has already been added to this item.');
+			} else {
+				jQuery(`#sortable #${itemId}.exhibit`).attr('data-id', exhibitId);
+				console.log(jQuery(`#sortable #item${itemId}-exhibit-name`).text(`Linked Exhibit: ${exhibitLabel}`));
 			}
 		}
 
@@ -207,6 +268,29 @@
 		    .append( "<div>" + item.label + "</div>" )
 		    .appendTo( ul );
 		};
+
+		function exhibitAutoComplete() {
+			jQuery( "#sortable #tour-item-exhibit-search" ).autocomplete({
+			minLength: 2,
+			source: allExhibits,
+			select: function( event, ui ) {
+				var itemId = parseInt(jQuery(this).attr('data-id'));
+				addExhibit(itemId, ui.item.id, ui.item.label);
+				console.log(parseInt(jQuery(`#sortable #${itemId}.exhibit`).attr('data-id')))
+				jQuery('.exhibit-input-container').hide();
+				// clear the form
+				jQuery( "#tour-item-exhibit-search" ).val('');
+				// update list on select
+				jQuery(document).trigger('tourItemsUpdated');
+				return false;
+			},
+			})
+			.autocomplete( "instance" )._renderItem = function( ul, item ) {
+			return jQuery( "<li>" )
+				.append( "<div>" + item.label + "</div>" )
+				.appendTo( ul );
+			};
+		}
 
 	});
 </script>

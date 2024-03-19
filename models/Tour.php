@@ -93,7 +93,6 @@ class Tour extends Omeka_Record_AbstractRecord
 	
     protected function afterSave($args)
     {        
-		_log(json_encode($args));
 	    $post=$args['post'];
         if($post && !$args['insert']){ 
 	        $this->removeAllItems();
