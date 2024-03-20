@@ -3,8 +3,6 @@ $(document).ready(function () {
 });
 
 function walkingTourJs() {
-    // $.getScript("https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js");
-    // imported.src = "/cgmrdev/plugins/WalkingTour/views/public/javascripts/new_markercluster_src.js";
     var imported = document.createElement("script");
     document.head.appendChild(imported);
     // Set map height to be window height minus header height.
@@ -400,10 +398,11 @@ function walkingTourJs() {
         var css = ""
         for (const tour_id in markerData) {
             var color = markerData[tour_id]['Color']
-            // TODO Temp solution
+
             if (color.length == 0){
                 color = "#000000"
             }
+            
             var rgb = hexToRgb(color)
             css += `#filters div label.label${tour_id}:before {
                         background-color: ${color} !important;
@@ -491,8 +490,6 @@ function walkingTourJs() {
         var content = $('#info-panel-content');
         content.empty();
 
-        console.log(response)
-
         var infoContent = ""
         var leftContent = "";
         var rightContent = "";
@@ -526,7 +523,7 @@ function walkingTourJs() {
         if (response.thumbnail) {
             popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
         }
-        popupContent += '<a href="#" class="open-info-panel button">view more info</a>';
+        popupContent += '<a href="#" class="open-info-panel button">View More Info</a>';
         if (!layer.getPopup()) {
             marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
             allMarkers[response.id] = marker;
@@ -607,7 +604,6 @@ function walkingTourJs() {
                     var geoJsonLayer = L.geoJson(response.features, {
                         // adds the correct number to each marker based on order of tour
                         pointToLayer: function (feature, latlng) {
-                            myCustomColour = feature.properties["marker-color"];
                             var numberIcon = L.divIcon({
                                 className: "my-custom-pin",
                                 iconSize: [25, 41],
@@ -622,7 +618,7 @@ function walkingTourJs() {
                             layer.on('click', function (e) {
                                 // center click location
                                 map.flyTo(e.latlng,MAP_MAX_ZOOM);
-                                // Close the filerting
+                                // Close the filtering
                                 var filterButton = $('filter-button');
                                 filterButton.removeClass('on').
                                     find('.screen-reader-text').
@@ -726,7 +722,7 @@ function walkingTourJs() {
             markers = new L.layerGroup();
         }
         catch (err) {
-
+            console.log(err)
         }
 
         markerLayers.forEach(ele => {
