@@ -99,8 +99,8 @@
 										'<p class="exhibit-name" id="item'.$ti->id.'-exhibit-name">Linked Exhibit: '.$exhibitName.'</p>'.
 									'</div>'.
 								'</span>';
-							$html .= '<span class="exhibit" id="'.$ti->id.'" data-id="'.$ti->exhibit_id.'">Link Exhibit &nbsp</span>';
-							$html .= '<span class="remove">&nbsp Remove</span></div>';
+							$html .= '<span class="exhibit" id="'.$ti->id.'" data-id="'.$ti->exhibit_id.'">Link Exhibit</span>';
+							$html .= '<span class="remove">Remove</span></div>';
 							$html .= '<div class="exhibit-input-container" id="'.$ti->id.'"><input type="search" id="tour-item-exhibit-search" data-id="'.$ti->id.'" placeholder="Search exhibit by title..." onkeydown="if (event.keyCode == 13) return false"/></div> </li>';
 						} else {
 							
@@ -109,7 +109,7 @@
 									<span>'.
 										$svg_icon.metadata($ti,array('Dublin Core','Title')).
 									'</span>'.
-									'<span class="remove">&nbsp Remove</span>
+									'<span class="remove">Remove</span>
 								</div>
 							</li>';
 						}
@@ -219,7 +219,7 @@
 								<p class="exhibit-name" id="item${id}-exhibit-name">Linked Exhibit: None</p>\
 							</div>
 						</span>\
-						<span class="exhibit" id = "${id}" data-id=0>Link Exhibit &nbsp</span>\
+						<span class="exhibit" id = "${id}" data-id=0>Link Exhibit</span>\
 						<span class="remove">Remove</span>\
 					</div>\
 					<div class="exhibit-input-container" id = "${id}">\

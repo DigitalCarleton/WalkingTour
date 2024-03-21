@@ -56,9 +56,12 @@
 }
 .exhibit{
 	cursor: pointer;
+    margin: 0 1em;
+    flex: 0 0 80px;
 }
 .remove{
 	cursor: pointer;
+	flex: 0 0;
 }
 .tour-item-ui{
 	display: flex;
