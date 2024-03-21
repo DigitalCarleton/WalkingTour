@@ -99,7 +99,8 @@
 										'<p class="exhibit-name" id="item'.$ti->id.'-exhibit-name">Linked Exhibit: '.$exhibitName.'</p>'.
 									'</div>'.
 								'</span>';
-							$html .= '<span class="exhibit" id="'.$ti->id.'" data-id="'.$ti->exhibit_id.'">Link Exhibit</span>';
+							$exhibitAction = ($exhibitName == "None") ? "Link Exhibit" : "Clear Exhibit";
+							$html .= '<span class="exhibit" id="'.$ti->id.'" data-id="'.$ti->exhibit_id.'">'.$exhibitAction.'</span>';
 							$html .= '<span class="remove">Remove</span></div>';
 							$html .= '<div class="exhibit-input-container" id="'.$ti->id.'"><input type="search" id="tour-item-exhibit-search" data-id="'.$ti->id.'" placeholder="Search exhibit by title..." onkeydown="if (event.keyCode == 13) return false"/></div> </li>';
 						} else {
@@ -168,10 +169,8 @@
 		}
 
 		jQuery('#sortable').on('click', ".remove", function(){
-			jQuery(this).parent().fadeOut(400,function(){
+			jQuery(this).parent().parent().fadeOut(400,function(){
 				jQuery(this).remove();
-				var id = jQuery(this).attr('data-id')
-				jQuery(`#${id}.exhibit-input-container`).remove();
 				// update list on remove
 				jQuery(document).trigger('tourItemsUpdated');
 			});
@@ -179,9 +178,13 @@
 
 		jQuery("#sortable").on('click', ".exhibit", function(){
 			var id = jQuery(this).attr('id')
-			jQuery(`#${id}.exhibit-input-container`).fadeToggle(200, 'linear', function(){
-				jQuery(document).trigger('tourItemsUpdated');
-			});
+			var data_id = jQuery(this).attr('data-id')
+			if (data_id == 0){
+				jQuery(`#${id}.exhibit-input-container`).fadeToggle(200, 'linear');
+			}else {
+				clearExhibit(id);
+			}
+			jQuery(document).trigger('tourItemsUpdated');
 		})
 
 
@@ -233,7 +236,7 @@
 					</div>`
 				}
 
-				jQuery( '<li data-id="' + id + '" class="ui-state-highlight">' ).html( html ).prependTo( "#sortable" );
+				jQuery( `<li data-id="${id}" id="${id}" class="ui-state-highlight">` ).html( html ).prependTo( "#sortable" );
 				jQuery('.exhibit-input-container').hide();
 				jQuery( "#sortable" ).scrollTop( 0 );
 				// update list on add
@@ -247,8 +250,15 @@
 				alert('Exhibit "' +exhibitLabel+ '" has already been added to this item.');
 			} else {
 				jQuery(`#sortable #${itemId}.exhibit`).attr('data-id', exhibitId);
-				console.log(jQuery(`#sortable #item${itemId}-exhibit-name`).text(`Linked Exhibit: ${exhibitLabel}`));
+				jQuery(`#sortable #item${itemId}-exhibit-name`).text(`Linked Exhibit: ${exhibitLabel}`)
+				jQuery(`#sortable #${itemId}.exhibit`).text("Clear Exhibit")
 			}
+		}
+
+		function clearExhibit( itemId ) {
+			jQuery(`#sortable #${itemId}.exhibit`).attr('data-id', 0);
+			jQuery(`#sortable #item${itemId}-exhibit-name`).text(`Linked Exhibit: None`)
+			jQuery(`#sortable #${itemId}.exhibit`).text("Link Exhibit")
 		}
 
 		jQuery( "#tour-item-search" ).autocomplete({
@@ -276,7 +286,6 @@
 			select: function( event, ui ) {
 				var itemId = parseInt(jQuery(this).attr('data-id'));
 				addExhibit(itemId, ui.item.id, ui.item.label);
-				console.log(parseInt(jQuery(`#sortable #${itemId}.exhibit`).attr('data-id')))
 				jQuery('.exhibit-input-container').hide();
 				// clear the form
 				jQuery( "#tour-item-exhibit-search" ).val('');
