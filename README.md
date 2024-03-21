@@ -63,7 +63,7 @@ One annoying issue we found is that there is some coupling between the MallMap t
 - [x] clean up config form
 - [x] remove locate bound, set it as map bound
 - [x] Alert outside locate bound
-- [ ] leaflet get bound method
-- [ ] reformat walking tour js
+- [x] leaflet get bound method
+- [x] reformat walking tour js
 
 - [ ] Representation for no exhibit for tour item
