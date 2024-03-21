@@ -80,7 +80,7 @@
 				<?php if($tour->id){
 					$tourItems = $tour->getItems();
 					foreach($tourItems as $ti){
-						$html  = '<li data-id="'.$ti->id.'" class="ui-state-default">';
+						$html  = '<li data-id="'.$ti->id.'" id="'.$ti->id.'" class="ui-state-default">';
 
 						if (plugin_is_active('ExhibitBuilder')){
 							$exhibit = get_records('Exhibit', array('id' => $ti->exhibit_id));
@@ -101,7 +101,7 @@
 								'</span>';
 							$exhibitAction = ($exhibitName == "None") ? "Link Exhibit" : "Clear Exhibit";
 							$html .= '<span class="exhibit" id="'.$ti->id.'" data-id="'.$ti->exhibit_id.'">'.$exhibitAction.'</span>';
-							$html .= '<span class="remove">Remove</span></div>';
+							$html .= '<span class="remove" id="'.$ti->id.'">Remove</span></div>';
 							$html .= '<div class="exhibit-input-container" id="'.$ti->id.'"><input type="search" id="tour-item-exhibit-search" data-id="'.$ti->id.'" placeholder="Search exhibit by title..." onkeydown="if (event.keyCode == 13) return false"/></div> </li>';
 						} else {
 							
@@ -110,7 +110,7 @@
 									<span>'.
 										$svg_icon.metadata($ti,array('Dublin Core','Title')).
 									'</span>'.
-									'<span class="remove">Remove</span>
+									'<span class="remove" id="'.$ti->id.'">Remove</span>
 								</div>
 							</li>';
 						}
@@ -169,7 +169,8 @@
 		}
 
 		jQuery('#sortable').on('click', ".remove", function(){
-			jQuery(this).parent().parent().fadeOut(400,function(){
+			var id = jQuery(this).attr('id')
+			jQuery(`li#${id}`).fadeOut(400,function(){
 				jQuery(this).remove();
 				// update list on remove
 				jQuery(document).trigger('tourItemsUpdated');
@@ -223,7 +224,7 @@
 							</div>
 						</span>\
 						<span class="exhibit" id = "${id}" data-id=0>Link Exhibit</span>\
-						<span class="remove">Remove</span>\
+						<span class="remove" id = "${id}">Remove</span>\
 					</div>\
 					<div class="exhibit-input-container" id = "${id}">\
 						<input type="search" id="tour-item-exhibit-search" data-id="${id}" placeholder="Search exhibit by title..." onkeydown="if (event.keyCode == 13) return false"/>\
@@ -232,7 +233,7 @@
 					var html = 
 					`<div class="tour-item-ui">\
 						<span> ${svg_icon}${label}</span>\
-						<span class="remove">Remove</span>\
+						<span class="remove" id = "${id}">Remove</span>\
 					</div>`
 				}
 
