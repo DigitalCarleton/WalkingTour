@@ -67,7 +67,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
               `tour_id` INT( 10 ) UNSIGNED NOT NULL,
               `ordinal` INT NOT NULL,
               `item_id` INT( 10 ) UNSIGNED NOT NULL,
-              `exhibit_id` INT( 10 ) UNSIGNED NOT NULL,
+              `exhibit_id` INT NOT NULL,
               PRIMARY KEY( `id` ),
               KEY `tour` ( `tour_id` )
            ) ENGINE=InnoDB ";
@@ -88,7 +88,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
     public function hookUpgrade( $args )
     {
         if (version_compare($args['old_version'], '0.1-dev', "<")){
-            $sql = "ALTER TABLE `{$db->prefix}tour_items` ADD COLUMN `exhibit_id` INT( 10 ) UNSIGNED NOT NULL AFTER `item_id`";
+            $sql = "ALTER TABLE `{$db->prefix}tour_items` MODIFY COLUMN `exhibit_id` INT NOT NULL;";
             $this->_db->query($sql);
         }
     }

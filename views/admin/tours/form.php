@@ -180,7 +180,7 @@
 		jQuery("#sortable").on('click', ".exhibit", function(){
 			var id = jQuery(this).attr('id')
 			var data_id = jQuery(this).attr('data-id')
-			if (data_id == 0){
+			if (data_id == -1){
 				jQuery(`#${id}.exhibit-input-container`).fadeToggle(200, 'linear');
 			}else {
 				clearExhibit(id);
@@ -223,7 +223,7 @@
 								<p class="exhibit-name" id="item${id}-exhibit-name">Linked Exhibit: None</p>\
 							</div>
 						</span>\
-						<span class="exhibit" id = "${id}" data-id=0>Link Exhibit</span>\
+						<span class="exhibit" id = "${id}" data-id=-1>Link Exhibit</span>\
 						<span class="remove" id = "${id}">Remove</span>\
 					</div>\
 					<div class="exhibit-input-container" id = "${id}">\
@@ -257,7 +257,7 @@
 		}
 
 		function clearExhibit( itemId ) {
-			jQuery(`#sortable #${itemId}.exhibit`).attr('data-id', 0);
+			jQuery(`#sortable #${itemId}.exhibit`).attr('data-id', -1);
 			jQuery(`#sortable #item${itemId}-exhibit-name`).text(`Linked Exhibit: None`)
 			jQuery(`#sortable #${itemId}.exhibit`).text("Link Exhibit")
 		}

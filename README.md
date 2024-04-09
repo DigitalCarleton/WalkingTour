@@ -66,4 +66,6 @@ One annoying issue we found is that there is some coupling between the MallMap t
 - [x] leaflet get bound method
 - [x] reformat walking tour js
 
-- [ ] Representation for no exhibit for tour item
+- [x] Representation for no exhibit for tour item
+- [ ] Padding on the dropdown menu
+- [ ] Historical Map

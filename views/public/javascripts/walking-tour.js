@@ -292,6 +292,10 @@ function walkingTourJs() {
         map.addControl(new extentControl());
         map.attributionControl.setPrefix('Tiles &copy; Esri');
 
+        // const annotationUrl = 'https://annotations.allmaps.org/manifests/47574ee029cca631'
+        // const warpedMapLayer = new Allmaps.WarpedMapLayer(annotationUrl)
+        // map.addLayer(warpedMapLayer);
+
         map.on('zoomend', function () {
             if (map.getZoom() == MAP_MIN_ZOOM) {
                 $('#extent-control').addClass('extentControl-disabled')
