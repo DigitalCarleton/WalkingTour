@@ -36,7 +36,6 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform) {
     var historicMapLayer;
     var markers;
     var jqXhr;
-    var transformer;
     var locationMarker;
     var markerData;
     var allItems = {};
@@ -268,14 +267,13 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform) {
                 })
                 .then(data => {
                     const maps = allmapsAnnotation.parseAnnotation(data)
-                    transformer = new allmapsTransform.GcpTransformer(maps[0].gcps);
+                    const transformer = new allmapsTransform.GcpTransformer(maps[0].gcps);
+                    doQuery(transformer);
                 })
                 .catch(error => {
                     // Handle any errors that occurred during the fetch
                     console.error('Fetch error:', error);
                 });
-
-            doQuery();
         })
     };
 
@@ -376,7 +374,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform) {
      *
      * Call only once during set up
      */
-    function doQuery() {
+    function doQuery(transformer) {
         const markerFontHtmlStyles = `
         transform: rotate(-45deg);
         color:white;
@@ -431,10 +429,10 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform) {
                     console.log(transformer)
                     console.log(response.features)
 
-                    response.features.forEach(ele => {
-                        const test = transformer.transformForwardAsGeojson(
+                    response.features.map(ele => {
+                        const test = transformer.transformBackward(
                             ele.geometry
-                          )
+                        )
                         console.log(test)
                         itemIDList.push(ele.properties.id)
                         return {
