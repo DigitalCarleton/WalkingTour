@@ -29,13 +29,13 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $results = $tour_table->fetchObjects($select);
         // Build an array with 
         $_tourTypes = array('id' => array(), 'color' => array());
-        foreach ($results as $tour){
-          if($tour['public']==1 || current_user()->role == "super"){
-            $_tourTypes['id'][$tour['id']] = $tour['title'];
-            $_tourTypes['color'][$tour['id']] = $tour['color'];
-            $_tourTypes['description'][$tour['id']] = $tour['description'];
-            $_tourTypes['credits'][$tour['id']] = $tour['credits'];
-          }
+        foreach ($results as $tour) {
+            if ($tour['public'] == 1 || current_user()->role == "super") {
+                $_tourTypes['id'][$tour['id']] = $tour['title'];
+                $_tourTypes['color'][$tour['id']] = $tour['color'];
+                $_tourTypes['description'][$tour['id']] = $tour['description'];
+                $_tourTypes['credits'][$tour['id']] = $tour['credits'];
+            }
         }
 
         return $_tourTypes;
@@ -66,7 +66,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             ->appendStylesheet(src('walking-tour', 'css', 'css'));
     }
 
-    public function mapConfigAction() 
+    public function mapConfigAction()
     {
         // Process only AJAX requests.
         if (!$this->_request->isXmlHttpRequest()) {
@@ -86,8 +86,8 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
     }
 
     /* 
-    *  Beginning to separate tours into separate features
-    */
+     *  Beginning to separate tours into separate features
+     */
     public function queryAction()
     {
         // Process only AJAX requests.
@@ -98,29 +98,29 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $db = $this->_helper->db->getDb();
         $joins = array("$db->Item AS items ON items.id = locations.item_id");
         $wheres = array("items.public = 1");
-        $prefix=$db->prefix;
+        $prefix = $db->prefix;
 
         // Filter public tours' items
         $request_tour_id = $this->publicTours();
         $colorArray = array();
 
-        $tourItemTable = $db->getTable( 'TourItem' );
+        $tourItemTable = $db->getTable('TourItem');
         $tourItemsIDs = array();
         $returnArray = array();
-        foreach($request_tour_id['id'] as $tour_id => $tour_title){
-            if($tour_id != 0){
-                $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM ".$prefix."tour_items 
+        foreach ($request_tour_id['id'] as $tour_id => $tour_title) {
+            if ($tour_id != 0) {
+                $tourItemsDat = $tourItemTable->fetchObjects("SELECT item_id FROM " . $prefix . "tour_items 
                                                             WHERE tour_id = $tour_id");
             } else {
-                $tourItemsDat = $tourItemTable->fetchObjects( "SELECT item_id FROM ".$prefix."tour_items");
+                $tourItemsDat = $tourItemTable->fetchObjects("SELECT item_id FROM " . $prefix . "tour_items");
             }
             $tourItemsIDs[$tour_id] = array();
-            foreach ($tourItemsDat as $dat){
+            foreach ($tourItemsDat as $dat) {
                 array_push($tourItemsIDs[$tour_id], (int) $dat["item_id"]);
             }
         }
 
-        foreach($tourItemsIDs as $tour_id => $item_array){
+        foreach ($tourItemsIDs as $tour_id => $item_array) {
 
             $tourItemsID = implode(", ", $item_array);
             $wheres = array("items.public = 1");
@@ -143,7 +143,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             for ($i = 0; $i < count($item_array); $i++) {
                 for ($j = 0; $j < count($dbItems); $j++) {
                     if ($item_array[$i] == $dbItems[$j]['id']) {
-                        array_push( $orderedItems, $dbItems[$j] );
+                        array_push($orderedItems, $dbItems[$j]);
                     }
                 }
             }
@@ -158,7 +158,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
                     ),
                     'properties' => array(
                         'id' => $row['id'],
-                        "marker-color"=> $request_tour_id['color'][$tour_id]
+                        "marker-color" => $request_tour_id['color'][$tour_id]
                     ),
                 );
             }
@@ -168,7 +168,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             $returnArray[$tour_id]["Credits"] = $request_tour_id['credits'][$tour_id];
         }
         $this->_helper->json($returnArray);
-        
+
     }
 
     /**
@@ -184,12 +184,12 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $tour_id = $this->_request->getParam('tour');
 
         $db = $this->_helper->db->getDb();
-        $tourItemTable = $db->getTable( 'TourItem' );
-        $prefix=$db->prefix;
+        $tourItemTable = $db->getTable('TourItem');
+        $prefix = $db->prefix;
 
 
-        $tourItem = $tourItemTable->fetchObjects( "SELECT * FROM ".$prefix."tour_items 
-                                                            WHERE tour_id = $tour_id AND item_id = $item_id" );
+        $tourItem = $tourItemTable->fetchObjects("SELECT * FROM " . $prefix . "tour_items 
+                                                            WHERE tour_id = $tour_id AND item_id = $item_id");
 
         $exhibit_id = $tourItem[0]["exhibit_id"];
 
@@ -202,19 +202,23 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             'date' => metadata($item, array('Dublin Core', 'Date'), array('all' => true)),
             'thumbnail' => item_image('square_thumbnail', array(), 0, $item),
             'fullsize' => item_image('fullsize', array('style' => 'max-width: 100%; height: auto;'), 0, $item),
-            'url' => url(array('module' => 'default',
-                               'controller' => 'items',
-                               'action' => 'show',
-                               'id' => $item['id']),
-                         'id'),
+            'url' => url(
+                array(
+                    'module' => 'default',
+                    'controller' => 'items',
+                    'action' => 'show',
+                    'id' => $item['id']
+                ),
+                'id'
+            ),
             "exhibitUrl" => ""
         );
         if (plugin_is_active('DublinCoreExtended')) {
             $data['abstract'] = metadata($item, array('Dublin Core', 'Abstract'), array('no-escape' => true));
         }
-        if (plugin_is_active('ExhibitBuilder')){
+        if (plugin_is_active('ExhibitBuilder')) {
             $exhibit = get_records('Exhibit', array('id' => $exhibit_id));
-            if ($exhibit && count($exhibit) == 1){
+            if ($exhibit && count($exhibit) == 1) {
                 $data["exhibitUrl"] = exhibit_builder_exhibit_uri($exhibit[0]);
             }
         }

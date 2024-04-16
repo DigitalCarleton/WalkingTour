@@ -1,8 +1,21 @@
-$(document).ready(function () {
-    walkingTourJs()
-});
+const allmapsAnnotation = import("https://unpkg.com/@allmaps/annotation?module")
+const allmapsTransform = import("https://unpkg.com/@allmaps/transform?module")
 
-function walkingTourJs() {
+Promise.all([allmapsAnnotation, allmapsTransform ])
+  .then(([allmapsAnnotation, allmapsTransform]) => {
+    // Both modules loaded successfully
+    // Use the imported modules
+    $(document).ready(function () {
+        walkingTourJs(allmapsAnnotation, allmapsTransform)
+    });
+  })
+  .catch((error) => {
+    // An error occurred while loading one of the modules
+    console.error('Error loading modules:', error);
+  });
+
+
+function walkingTourJs(allmapsAnnotation, allmapsTransform) {
     var imported = document.createElement("script");
     document.head.appendChild(imported);
     // Set map height to be window height minus header height.
@@ -10,6 +23,7 @@ function walkingTourJs() {
     $('#map').css('height', windowheight - 54);
 
     var MAP_URL_TEMPLATE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
+    const annotationUrl = 'https://annotations.allmaps.org/manifests/47574ee029cca631'
 
     var MAP_CENTER;
     var MAP_ZOOM;  // MAP_ZOOM controls the default zoom of the map
@@ -22,6 +36,7 @@ function walkingTourJs() {
     var historicMapLayer;
     var markers;
     var jqXhr;
+    var transformer;
     var locationMarker;
     var markerData;
     var allItems = {};
@@ -242,6 +257,24 @@ function walkingTourJs() {
     window.onload = function () {
         jqXhr = $.post('walking-tour/index/map-config', function (response) {
             mapSetUp(response);
+            fetch(annotationUrl)
+                .then(response => {
+                    // Check if the request was successful
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    // Parse the response as JSON
+                    return response.json();
+                })
+                .then(data => {
+                    const maps = allmapsAnnotation.parseAnnotation(data)
+                    transformer = new allmapsTransform.GcpTransformer(maps[0].gcps);
+                })
+                .catch(error => {
+                    // Handle any errors that occurred during the fetch
+                    console.error('Fetch error:', error);
+                });
+
             doQuery();
         })
     };
@@ -292,9 +325,8 @@ function walkingTourJs() {
         map.addControl(new extentControl());
         map.attributionControl.setPrefix('Tiles &copy; Esri');
 
-        // const annotationUrl = 'https://annotations.allmaps.org/manifests/47574ee029cca631'
-        // const warpedMapLayer = new Allmaps.WarpedMapLayer(annotationUrl)
-        // map.addLayer(warpedMapLayer);
+        const warpedMapLayer = new Allmaps.WarpedMapLayer(annotationUrl)
+        map.addLayer(warpedMapLayer);
 
         map.on('zoomend', function () {
             if (map.getZoom() == MAP_MIN_ZOOM) {
@@ -396,10 +428,21 @@ function walkingTourJs() {
                     var numMarker = 1;
                     var response = value["Data"];
                     var itemIDList = [];
+                    console.log(transformer)
+                    console.log(response.features)
 
                     response.features.forEach(ele => {
+                        const test = transformer.transformForwardAsGeojson(
+                            ele.geometry
+                          )
+                        console.log(test)
                         itemIDList.push(ele.properties.id)
+                        return {
+                            ...ele,
+                            geometry: test
+                        }
                     })
+                    console.log(response.features)
                     tourToItem[tourId] = itemIDList;
                     markerList = []
                     var geoJsonLayer = L.geoJson(response.features, {
