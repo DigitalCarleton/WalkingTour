@@ -14,7 +14,7 @@ class Tour extends Omeka_Record_AbstractRecord
 	public $featured = 0;
 	public $public = 0;
 	public $postscript_text;
-	public $color;
+	public $color = "#000000";
 
 	protected $_related = array( 'Items' => 'getItems','Image' => 'getImage' );
 
@@ -45,7 +45,7 @@ class Tour extends Omeka_Record_AbstractRecord
 		}
 	}
 
-	public function addItem( $item_id, $ordinal = null )
+	public function addItem( $item_id, $exhibit_id = 0 , $ordinal = null )
 	{
 		if( !is_numeric( $item_id ) ) {
 			$item_id = $item_id->id;
@@ -65,7 +65,9 @@ class Tour extends Omeka_Record_AbstractRecord
 		$tourItem->tour_id = $this->id;
 		$tourItem->item_id = $item_id;
 		$tourItem->ordinal = $ordinal;
-		$tourItem->exhibit_id = 0;
+		if (plugin_is_active('ExhibitBuilder')){
+			$tourItem->exhibit_id = $exhibit_id;
+		}
 		$tourItem->save();
 	}
 
@@ -99,15 +101,21 @@ class Tour extends Omeka_Record_AbstractRecord
 		// Get item IDs from $_POST and save to tour items table
 		$tour_item_ids=trim( $post['tour_item_ids'] );
 		$item_ids=explode( ',', $tour_item_ids );
+
+		$tour_item_exhibit_ids=trim( $post['tour_item_exhibit_ids'] );
+		$item_exhibit_ids=explode( ',', $tour_item_exhibit_ids );
 		$i=0;
+		$index = 0;
 		
 			
 		foreach($item_ids as $item_id){
 			$item_id=intval($item_id);
+			$exhibit_id = intval($item_exhibit_ids[$index]);
 			if($item_id){
-				$this->addItem( $item_id, $i);
+				$this->addItem( $item_id, $exhibit_id, $i);
 				$i++;
 			}
+			$index++;
 		}
 		
 		// Add tour to search index

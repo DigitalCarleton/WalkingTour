@@ -1,9 +1,3 @@
-<?php queue_js_file('leaflet.markercluster'); ?>
-<?php queue_js_string('
-        var hackRemember = L.DomUtil.TRANSITION;
-        L.DomUtil.TRANSITION = false;
-        L.DomUtil.TRANSITION = hackRemember;
-'); ?>
 <?php echo head(array('bodyclass' => 'map')); ?>
     <?php echo link_to_home_page('<span class="screen-reader-text">Home</span>', array('id' => 'home-button')); ?>
     <div id="dialog"></div>
@@ -24,23 +18,16 @@
                 <label class="label<?php echo $tour_type_id ?>"><input type="checkbox" name="place-type" value="<?php echo $tour_type_id; ?>"/> <?php echo $tour_type; ?></label>
                 <?php endforeach; ?>
             </div>
-            <div id="event-type-div" style="display: none;">
-                <p>Event Types</p>
-                <label class="on"><input type="checkbox" name="event-type-all" value="0" checked="checked"/> All Event Types</label>
-                <?php foreach ($this->event_types as $event_type): ?>
-                <label><input type="checkbox" name="event-type" value="<?php echo htmlspecialchars($event_type); ?>" /> <?php echo $event_type; ?></label>
-                <?php endforeach; ?>
-            </div>
         </div>
         <div id="first-time">
             <div class="overlay"></div>
             <div class="tooltip">
-                <p><?php echo get_option('mall_map_filter_tooltip'); ?></p>
-                <button class="button"><?php echo get_option('mall_map_tooltip_button'); ?></button>
+                <p><?php echo get_option('walking_tour_filter_tooltip'); ?></p>
+                <button class="button"><?php echo get_option('walking_tour_tooltip_button'); ?></button>
             </div>
             <div class="tooltip-locate">
                 <p>Click here to see your position if you are on location.</p>
-                <button class="button"><?php echo get_option('mall_map_tooltip_button'); ?></button>
+                <button class="button"><?php echo get_option('walking_tour_tooltip_button'); ?></button>
             </div>
         </div>
 

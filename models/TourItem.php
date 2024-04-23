@@ -9,7 +9,7 @@ class TourItem extends Omeka_Record_AbstractRecord
 	public $tour_id;
 	public $item_id;
 	public $ordinal = 0;
-	public $exhibit_id;
+	public $exhibit_id = -1;
 
 	protected $_related = array(
 		'Tour' => 'getTour',
@@ -46,6 +46,10 @@ class TourItem extends Omeka_Record_AbstractRecord
 
 		if( ! is_numeric( $this->ordinal ) ) {
 			$this->addError( 'ordinal', 'Order must be numeric' );
+		}
+
+		if( ! is_numeric( $this->exhibit_id ) ) {
+			$this->addError( 'exhibit_id', 'Exhibit must be numeric id' );
 		}
 	}
 }
