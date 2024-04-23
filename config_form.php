@@ -31,10 +31,10 @@
         <label for="walking_tour_detail_button"><?php echo __('Exhibit Button Text'); ?></label>
     </div>
     <div class="inputs five columns omega">
-        <p class="explanation"><?php echo __('The text that appears on the button to view the exhibit.'); ?></p>
+        <p class="explanation"><?php echo __('The text that appears on the button to view item details.'); ?></p>
         <div class="input-block">
             <input type="text" name="walking_tour_detail_button" id="walking_tour_detail_button"
-                placeholder="Full Details" value="<?php echo get_option('walking_tour_detail_button'); ?>" />
+                value="<?php echo get_option('walking_tour_detail_button'); ?>" />
         </div>
     </div>
 </div>
@@ -48,7 +48,7 @@
             <p class="explanation"><?php echo __('The text that appears on the button to view the exhibit.'); ?></p>
             <div class="input-block">
                 <input type="text" name="walking_tour_exhibit_button" id="walking_tour_exhibit_button"
-                    placeholder="See Exhibit" value="<?php echo get_option('walking_tour_exhibit_button'); ?>" />
+                    value="<?php echo get_option('walking_tour_exhibit_button'); ?>" />
             </div>
         </div>
     </div>
