@@ -170,8 +170,15 @@ a#locate-button:before {
     border-radius: 7px;
 }
 
-a#locate-button {
+a#locate-button.loading:before { 
+    content: url(loading-gif.gif);
+    transform: scale(0.1) translateY(-300%) translateX(-300%);
+}
+
+a#locate-button, a#locate-button.loading {
     position: absolute;
+    height: 35px;
+    width: 35px;
     bottom: 11px;
     z-index: 100000;
     text-decoration: none;
