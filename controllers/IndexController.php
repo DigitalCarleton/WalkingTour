@@ -79,8 +79,8 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $returnArray['walking_tour_max_zoom'] = get_option('walking_tour_max_zoom');
         $returnArray['walking_tour_min_zoom'] = get_option('walking_tour_min_zoom');
         $returnArray['walking_tour_max_bounds'] = get_option('walking_tour_max_bounds');
-        $returnArray['walking_tour_locate_bounds'] = get_option('walking_tour_locate_bounds');
-        $returnArray['walking_tour_max_locate_meters'] = get_option('walking_tour_max_locate_meters');
+        $returnArray['walking_tour_exhibit_button'] = get_option('walking_tour_exhibit_button');
+        $returnArray['walking_tour_detail_button'] = get_option('walking_tour_detail_button');
 
         $this->_helper->json($returnArray);
     }

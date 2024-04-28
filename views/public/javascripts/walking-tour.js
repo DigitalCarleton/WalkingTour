@@ -31,6 +31,8 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform) {
     var MAP_MAX_ZOOM;
     var MAP_MAX_BOUNDS;  // MAP_MAX_BOUNDS controls the boundaries of the map
     var LOCATE_BOUNDS;
+    var EXHIBIT_BUTTON_TEXT;
+    var DETAIL_BUTTON_TEXT;
 
     var map;
     var historicMapLayer;
@@ -146,6 +148,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform) {
     // Handle locate button.
     $('#locate-button').click(function (e) {
         e.preventDefault();
+        $(this).toggleClass('loading');
         if (locationMarker) {
             map.removeLayer(locationMarker)
             locationMarker = null;
@@ -286,21 +289,25 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform) {
      * Call only once during set up
      */
     function mapSetUp(response) {
+        EXHIBIT_BUTTON_TEXT = response['walking_tour_exhibit_button']
+        DETAIL_BUTTON_TEXT = response['walking_tour_detail_button']
         MAP_MAX_ZOOM = parseInt(response['walking_tour_max_zoom'])
         MAP_MIN_ZOOM = parseInt(response['walking_tour_min_zoom'])
         MAP_CENTER = parse1DArrayPoint(response['walking_tour_center'])
         MAP_ZOOM = parseInt(response["walking_tour_default_zoom"])
         MAP_MAX_BOUNDS = parse2DArrayPoint(response["walking_tour_max_bounds"])
-        LOCATE_BOUNDS = MAP_MAX_BOUNDS
         // Set the base map layer.
         map = L.map('map', {
             center: MAP_CENTER,
-            zoom: MAP_ZOOM,
+            zoom: MAP_MIN_ZOOM,
             minZoom: MAP_MIN_ZOOM,
             maxZoom: MAP_MAX_ZOOM,
-            maxBounds: MAP_MAX_BOUNDS,
+            // maxBounds: MAP_MAX_BOUNDS,
             zoomControl: false
         });
+        LOCATE_BOUNDS = map.getBounds();
+        map.setZoom(MAP_ZOOM);
+
         map.addLayer(L.tileLayer(MAP_URL_TEMPLATE));
         map.addControl(L.control.zoom({ position: 'topleft' }));
         var extentControl = L.Control.extend({
@@ -308,14 +315,13 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform) {
                 position: 'topleft'
             },
             onAdd: function (map) {
-                var llBounds = map.getBounds();
                 var container = L.DomUtil.create('div', 'extentControl');
                 $(container).attr('id', 'extent-control');
                 $(container).css('width', '26px').css('height', '26px').css('outline', '1px black');
                 $(container).addClass('extentControl-disabled')
                 $(container).addClass('leaflet-bar')
                 $(container).on('click', function () {
-                    map.fitBounds(llBounds);
+                    map.flyTo(MAP_CENTER, MAP_ZOOM);
                 });
                 return container;
             }
@@ -336,6 +342,9 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform) {
 
         // Handle location found.
         map.on('locationfound', function (e) {
+            if (!locationMarker) {
+                $("#locate-button").toggleClass('loading');
+            }
             // User within location bounds. Set the location marker.
             if (L.latLngBounds(LOCATE_BOUNDS).contains(e.latlng)) {
                 if (locationMarker) {
@@ -351,8 +360,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform) {
                         iconSize: [25, 25]
                     })
                 });
-                locationMarker.addTo(map).
-                    bindPopup("You are within " + e.accuracy / 2 + " meters from this point");
+                locationMarker.addTo(map).bindPopup("You are within " + e.accuracy / 2 + " meters from this point");
                 // User outside location bounds.
             } else {
                 var locateMeters = e.latlng.distanceTo(map.options.center);
@@ -364,7 +372,9 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform) {
 
         // Handle location error.
         map.on('locationerror', function () {
+            $("#locate-button").toggleClass('loading');
             map.stopLocate();
+            alert('Location Error, Please try again.');
             console.log('location error')
         });
     }
@@ -730,9 +740,9 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform) {
             rightContent += '<p>No descriptions available.</p>';
         }
         rightContent += '<div class = "popupButton">'
-        rightContent += '<a href="' + response.url + '" class="button" target="_blank">Full Details</a>';
+        rightContent += '<a href="' + response.url + '" class="button" target="_blank">'+ DETAIL_BUTTON_TEXT +'</a>';
         if (response.exhibitUrl != ""){
-            rightContent += '<a href="' + response.exhibitUrl + '" class="button" target="_blank">Linked Exhibit</a>';
+            rightContent += '<a href="' + response.exhibitUrl + '" class="button" target="_blank">'+ EXHIBIT_BUTTON_TEXT +'</a>';
         }
         rightContent += '</div>'
         infoContent += '<div class = "content-container"> <div class ="article">' + rightContent + '</div></div>';
