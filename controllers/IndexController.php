@@ -58,6 +58,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             ->appendFile(src('modernizr.custom.63332', 'javascripts', 'js'))
             ->appendFile(src('Polyline.encoded', 'javascripts', 'js'))
             ->appendFile('//cdn.jsdelivr.net/npm/@allmaps/leaflet/dist/bundled/allmaps-leaflet-1.9.umd.js')
+            ->appendFile(src('leaflet-iiif', 'javascripts', 'js'))
             ->appendFile(src('walking-tour', 'javascripts', 'js'));
         $this->view->headLink()
             ->appendStylesheet('//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css', 'all')

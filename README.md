@@ -69,3 +69,9 @@ One annoying issue we found is that there is some coupling between the MallMap t
 - [x] Representation for no exhibit for tour item
 - [ ] Padding on the dropdown menu
 - [ ] Historical Map
+
+### Allmaps References
+
+Leaflet without geographic coordinates: https://leafletjs.com/examples/crs-simple/crs-simple.html
+https://observablehq.com/d/7db1214479eeeee0
+https://observablehq.com/@allmaps/using-allmaps-to-draw-geojson-on-a-iiif-image
