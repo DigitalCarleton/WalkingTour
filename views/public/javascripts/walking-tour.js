@@ -551,7 +551,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
             const transformer = new allmapsTransform.GcpTransformer(maps[0].gcps);
             console.log(maps)
             mapSetUp(maps)
-            // doQuery(transformer, maps);
+            doQuery(transformer, maps);
         })
         .catch(error => {
             // Handle any errors that occurred during the fetch
@@ -732,7 +732,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
                         const test = transformer.transformBackward(
                             ele.geometry
                         )
-                        // console.log(test)
+                        console.log(test)
                         itemIDList.push(ele.properties.id)
                         return {
                             ...ele,
