@@ -280,7 +280,8 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
     $('#map').css('height', windowheight - 54);
 
     var MAP_URL_TEMPLATE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
-    const annotationUrl = 'https://annotations.allmaps.org/manifests/47574ee029cca631'
+    // const annotationUrl = 'https://annotations.allmaps.org/manifests/47574ee029cca631'
+    const annotationUrl = "https://annotations.allmaps.org/manifests/c047e9dd35f2d377"
 
     var MAP_CENTER;
     var MAP_ZOOM;  // MAP_ZOOM controls the default zoom of the map
@@ -596,8 +597,9 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
         //     fitBounds: true,
         //     setMaxBounds: true,
         // }).addTo(map)
-        var image = L.imageOverlay('https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:ht250943q/full/'+ maps.resource.width +',/0/default.jpg', bounds).addTo(map);
-
+        console.log(maps.resource.id +'/full/'+ maps.resource.width +',/0/default.jpg')
+        var image = L.imageOverlay(maps.resource.id +'/full/'+ $('#map').width() +',/0/default.jpg', bounds).addTo(map);
+          console.log(image)
         // console.log(iiif_layer)
         // console.log(iiif_layer._getImageSize())
         // const imageSize = iiif_layer._imageSizes.map(ele => {
