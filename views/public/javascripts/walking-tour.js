@@ -100,7 +100,6 @@ const Iiif = L.TileLayer.extend({
       var sw = _this._map.options.crs.pointToLatLng(L.point(0, imageSize.y), initialZoom);
       var ne = _this._map.options.crs.pointToLatLng(L.point(imageSize.x, 0), initialZoom);
       var bounds = L.latLngBounds(sw, ne);
-  
       _this._map.fitBounds(bounds, true);
     },
     _getInfo: function() {
@@ -234,6 +233,9 @@ const Iiif = L.TileLayer.extend({
       }
       // return a default zoom
       return 2;
+    },
+    _getImageSize: function() {
+        return this._imageSizes;
     }
   });
   
@@ -297,6 +299,17 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
     var markerData;
     var allItems = {};
     var allMarkers = {};
+
+    var imageZoom;
+
+    var yx = L.latLng;
+
+    var xy = function(x, y) {
+        if (Array.isArray(x)) {    // When doing xy([x, y]);
+            return yx(x[1], x[0]);
+        }
+        return yx(y, x);  // When doing xy(x, y);
+    };
 
  
  
@@ -550,6 +563,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
             const maps = allmapsAnnotation.parseAnnotation(data)
             const transformer = new allmapsTransform.GcpTransformer(maps[0].gcps);
             console.log(maps)
+            imageZoom = maps[0].resource.height / $('#map').height()
             mapSetUp(maps[0])
             doQuery(transformer, maps);
         })
@@ -567,19 +581,29 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
      * Call only once during set up
      */
     function mapSetUp(maps) {
-        console.log(maps.resource.height)
-        console.log( $('#map').height())
-        var zoom = maps.resource.height / $('#map').height()
-        console.log(zoom)
+        var bounds = [[0,0], [6950/imageZoom, 9428/imageZoom]];
+        var center = [(bounds[1][0] - bounds[0][0])/ 2, (bounds[1][1] - bounds[0][1])/ 2]
         map = L.map('map', {
-            center: [0, 0],
+            center: center,
             crs: L.CRS.Simple,
-            zoom: 0
+            zoom: 0,
+            maxBounds: bounds
           });
-        iiif(maps.resource.id+'/info.json', {
-            fitBounds: true,
-            setMaxBounds: true
-        }).addTo(map)
+
+          console.log(map.getSize())
+
+        // const iiif_layer = iiif(maps.resource.id+'/info.json', {
+        //     fitBounds: true,
+        //     setMaxBounds: true,
+        // }).addTo(map)
+        var bounds = [[0,0], [6950/imageZoom, 9428/imageZoom]];
+        var image = L.imageOverlay('https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:ht250943q/full/9428,/0/default.jpg', bounds).addTo(map);
+
+        // console.log(iiif_layer)
+        // console.log(iiif_layer._getImageSize())
+        // const imageSize = iiif_layer._imageSizes.map(ele => {
+        //     return xy(ele[0], ele[1])
+        // })
 
         map.on('zoomend', function() {
             console.log(map.getZoom())
@@ -589,10 +613,8 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
         
         // console.log(bounds)
         // map.fitBounds(bounds)
-        console.log(map.getBounds(), map.getZoom())
-        console.log(L.CRS.Simple.latLngToPoint(map.getBounds(), 0))
-        map.onZoom
-        // var rect = L.rectangle(map.getBounds(), {color: 'blue', weight: 1}).on('click', function (e) {
+        // console.log(map.getBounds(), map.getZoom())
+        // var rect = L.rectangle(imageSize, {color: 'blue', weight: 1}).on('click', function (e) {
         //     // There event is event object
         //     // there e.type === 'click'
         //     // there e.lanlng === L.LatLng on map
@@ -764,7 +786,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
                         var test = transformer.transformBackward(
                             ele.geometry
                         )
-                        test = test.map(ele => {return ele/7})
+                        test = test.map(ele => {return ele/imageZoom})
                         // console.log(test)
                         itemIDList.push(ele.properties.id)
                         return({
@@ -789,7 +811,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
                         var marker = L.marker(xy(feature.geometry[0], feature.geometry[1]), { icon: numberIcon });
                         marker.on('click', function (e) {
                             // center click location
-                            map.flyTo(e.latlng, 0);
+                            map.flyTo(e.latlng, 4);
                             // Close the filtering
                             var filterButton = $('filter-button');
                             filterButton.removeClass('on').
@@ -809,7 +831,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
                                     if (response.thumbnail) {
                                         popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
                                     }
-                                    popupContent += '<a href="#" class="open-info-panel button">View More Info</a>';
+                                    popupContent += '<a href="' + response.url + '" class="open-info-panel button">View More Info</a>';
                                     if (!marker.getPopup()) {
                                         marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
                                         allMarkers[response.id] = marker;
@@ -820,7 +842,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
                                 if (response.thumbnail) {
                                     popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
                                 }
-                                popupContent += '<a href="#" class="open-info-panel button">View More Info</a>';
+                                popupContent += '<a href="' + response.url + '" class="open-info-panel button">View More Info</a>';
                                 if (!marker.getPopup()) {
                                     marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
                                     allMarkers[response.id] = marker;
