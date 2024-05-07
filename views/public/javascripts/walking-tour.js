@@ -581,23 +581,22 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
      * Call only once during set up
      */
     function mapSetUp(maps) {
-        var bounds = [[0,0], [6950/imageZoom, 9428/imageZoom]];
+        var mapHeight = maps.resource.height / imageZoom
+        var mapWidth = maps.resource.width / imageZoom
+        var bounds = [[0,0], [mapHeight, mapWidth]];
         var center = [(bounds[1][0] - bounds[0][0])/ 2, (bounds[1][1] - bounds[0][1])/ 2]
         map = L.map('map', {
             center: center,
             crs: L.CRS.Simple,
-            zoom: 0,
+            zoom: -1,
             maxBounds: bounds
           });
-
-          console.log(map.getSize())
 
         // const iiif_layer = iiif(maps.resource.id+'/info.json', {
         //     fitBounds: true,
         //     setMaxBounds: true,
         // }).addTo(map)
-        var bounds = [[0,0], [6950/imageZoom, 9428/imageZoom]];
-        var image = L.imageOverlay('https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:ht250943q/full/9428,/0/default.jpg', bounds).addTo(map);
+        var image = L.imageOverlay('https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:ht250943q/full/'+ maps.resource.width +',/0/default.jpg', bounds).addTo(map);
 
         // console.log(iiif_layer)
         // console.log(iiif_layer._getImageSize())
