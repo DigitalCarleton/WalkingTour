@@ -39,8 +39,14 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
     );
 
     protected $_options = array(
-        'walking_tour_filter_tooltip' => '',
-        'walking_tour_tooltip_button' => 'OK'
+        'walking_tour_filter_tooltip' => 'Click here to choose a walking tour.',
+        'walking_tour_center' => '',
+        'walking_tour_default_zoom' => '15',
+        'walking_tour_max_zoom' => '17',
+        'walking_tour_min_zoom' => '14',
+        'walking_tour_exhibit_button' => 'See Exhibit',
+        'walking_tour_detail_button' => 'Full Details',
+        'walking_tour_tooltip_button' => 'Next'
     );
 
     public function hookInstall()

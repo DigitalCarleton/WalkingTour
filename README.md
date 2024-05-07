@@ -67,5 +67,13 @@ One annoying issue we found is that there is some coupling between the MallMap t
 - [x] reformat walking tour js
 
 - [x] Representation for no exhibit for tour item
-- [ ] Padding on the dropdown menu
+- [x] Padding on the dropdown menu
 - [ ] Historical Map
+
+IF HAVE TIME
+
+- [ ] Auto set map center based on points and display
+<https://github.com/omeka/plugin-Geolocation/blob/master/views/shared/javascripts/map.js>
+- [ ] Allow user to select map center
+ELSE
+- [ ] Default lat and long separate
