@@ -74,6 +74,8 @@ IF HAVE TIME
 
 - [ ] Auto set map center based on points and display
 <https://github.com/omeka/plugin-Geolocation/blob/master/views/shared/javascripts/map.js>
-- [ ] Allow user to select map center
-ELSE
-- [ ] Default lat and long separate
+- [x] Allow user to select map center
+
+- [ ] Concat Map Center Coordinates & Find a Location by Address and change it to default center
+- [ ] Auto fit zoom and center
+- [ ] Change max and min zoom as stops
