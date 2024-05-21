@@ -15,10 +15,10 @@ function walkingTourJs() {
     var MAP_ZOOM;  // MAP_ZOOM controls the default zoom of the map
     var MAP_MIN_ZOOM;
     var MAP_MAX_ZOOM;
-    var MAP_MAX_BOUNDS;  // MAP_MAX_BOUNDS controls the boundaries of the map
     var LOCATE_BOUNDS;
     var EXHIBIT_BUTTON_TEXT;
     var DETAIL_BUTTON_TEXT;
+    var IS_AUTO_FIT;
 
     var map;
     var historicMapLayer;
@@ -252,6 +252,10 @@ function walkingTourJs() {
     // Retain previous form state, if needed.
     retainFormState();
 
+    function mapLocateCenter(map){
+        map.flyTo(MAP_CENTER, MAP_ZOOM);
+    }
+
     /*
      * Setup map layer
      *
@@ -260,18 +264,17 @@ function walkingTourJs() {
     function mapSetUp(response) {
         EXHIBIT_BUTTON_TEXT = response['walking_tour_exhibit_button']
         DETAIL_BUTTON_TEXT = response['walking_tour_detail_button']
-        MAP_MAX_ZOOM = parseInt(response['walking_tour_max_zoom'])
-        MAP_MIN_ZOOM = parseInt(response['walking_tour_min_zoom'])
-        MAP_CENTER = parse1DArrayPoint(response['walking_tour_center'])
         MAP_ZOOM = parseInt(response["walking_tour_default_zoom"])
-        MAP_MAX_BOUNDS = parse2DArrayPoint(response["walking_tour_max_bounds"])
+        MAP_MAX_ZOOM = MAP_ZOOM + parseInt(response['walking_tour_max_zoom'])
+        MAP_MIN_ZOOM = MAP_ZOOM - parseInt(response['walking_tour_min_zoom'])
+        MAP_CENTER = parse1DArrayPoint(response['walking_tour_center'])
+        IS_AUTO_FIT = response["walking_tour_auto_fit"] == '1'
         // Set the base map layer.
         map = L.map('map', {
             center: MAP_CENTER,
             zoom: MAP_MIN_ZOOM,
             minZoom: MAP_MIN_ZOOM,
             maxZoom: MAP_MAX_ZOOM,
-            // maxBounds: MAP_MAX_BOUNDS,
             zoomControl: false
         });
         LOCATE_BOUNDS = map.getBounds();
@@ -290,17 +293,13 @@ function walkingTourJs() {
                 $(container).addClass('extentControl-disabled')
                 $(container).addClass('leaflet-bar')
                 $(container).on('click', function () {
-                    map.flyTo(MAP_CENTER, MAP_ZOOM);
+                    mapLocateCenter(map);
                 });
                 return container;
             }
         })
         map.addControl(new extentControl());
         map.attributionControl.setPrefix('Tiles &copy; Esri');
-
-        // const annotationUrl = 'https://annotations.allmaps.org/manifests/47574ee029cca631'
-        // const warpedMapLayer = new Allmaps.WarpedMapLayer(annotationUrl)
-        // map.addLayer(warpedMapLayer);
 
         map.on('zoomend', function () {
             if (map.getZoom() == MAP_MIN_ZOOM) {
@@ -395,6 +394,7 @@ function walkingTourJs() {
         var url;
         var itemArray = []
         var tourToItem = {}
+        var markerBounds = L.latLngBounds();
         jqXhr = $.post('walking-tour/index/query', function (response) {
             markerData = response;
             dataArray = Object.entries(markerData)
@@ -423,6 +423,7 @@ function walkingTourJs() {
                                 html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > <p style="${markerFontHtmlStyles}"> ${numMarker} </p> </spam>`
                             });
                             numMarker++;
+                            markerBounds.extend(latlng);
                             return L.marker(latlng, { icon: numberIcon });
                         },
                         onEachFeature: function (feature, layer) {
@@ -481,6 +482,12 @@ function walkingTourJs() {
             })
             Promise.all(requests).then(() => {
                 createCustomCSS();
+                if (IS_AUTO_FIT){
+                    map.fitBounds(markerBounds, {padding: [10, 10]})
+                    mapLocateCenter = function(map) {
+                        map.fitBounds(markerBounds, {padding: [10, 10]})
+                    } 
+                }
                 doFilters();
             });
         });

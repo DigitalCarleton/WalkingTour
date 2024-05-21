@@ -76,6 +76,6 @@ IF HAVE TIME
 <https://github.com/omeka/plugin-Geolocation/blob/master/views/shared/javascripts/map.js>
 - [x] Allow user to select map center
 
-- [ ] Concat Map Center Coordinates & Find a Location by Address and change it to default center
-- [ ] Auto fit zoom and center
-- [ ] Change max and min zoom as stops
+- [x] Concat Map Center Coordinates & Find a Location by Address and change it to default center
+- [x] Auto fit zoom and center
+- [x] Change max and min zoom as stops

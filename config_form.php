@@ -1,4 +1,4 @@
-<?php $address = ''; ?>
+<?php $view = get_view(); ?>
 <fieldset>
     <legend><?php echo __('Text'); ?></legend>
     <div class="field">
@@ -61,30 +61,22 @@
 <fieldset>
     <legend><?php echo __('Map Settings'); ?></legend>
 
-    <div class="field">
-        <div class="two columns alpha">
-            <label for="walking_tour_center"><?php echo __('Map Center Coordinates'); ?></label>
-        </div>
-        <div class="inputs five columns omega">
-            <p class="explanation"><?php echo __('Controls the default starting place.'); ?></p>
-            <div class="input-block">
-                <input type="text" name="walking_tour_center" id="walking_tour_center"
-                    value="<?php echo get_option('walking_tour_center'); ?>" />
-            </div>
-        </div>
-    </div>
 
     <div class="field">
         <div id="location_form" class="two columns alpha">
-            <label for="geolocation_address"><?php echo __('Find a Location by Address:'); ?></label>
+            <label for="walking_tour_center"><?php echo __('Default Map Center Coordinates'); ?></label>
         </div>
         <div class="inputs five columns omega">
-            <input type="text" name="geolocation[address]" id="geolocation_address" value="<?php echo $address; ?>">
-            <button type="button" name="geolocation_find_location_by_address"
-                id="geolocation_find_location_by_address"><?php echo __('Find'); ?></button>
+            <p class="explanation"><?php echo __('Controls the default starting place.'); ?></p>
+            <div style="display: flex; column-gap: 5px;">
+                <input type="text" name="walking_tour_center" id="walking_tour_center"
+                    value="<?php echo get_option('walking_tour_center'); ?>" />
+                <button type="button" name="geolocation_find_location_by_address"
+                    id="geolocation_find_location_by_address"><?php echo __('Find'); ?></button>
+            </div>
         </div>
     </div>
-    <div id="omeka-map-form" class="geolocation-map"></div>
+    <div id="omeka-map-form" class="geolocation-map" style="margin-bottom: 20px;"></div>
 
     <div class="field">
         <div class="two columns alpha">
@@ -112,8 +104,13 @@
                 ?>
             </p>
             <div class="input-block">
-                <input type="checkbox" name="walking_tour_auto_fit" id="walking_tour_auto_fit"
-                    value="<?php echo get_option('walking_tour_auto_fit'); ?>" />
+                <?php
+                echo $view->formCheckbox(
+                    'walking_tour_auto_fit',
+                    true,
+                    array('checked' => (boolean) get_option('walking_tour_auto_fit'))
+                );
+                ?>
             </div>
         </div>
     </div>
@@ -123,25 +120,20 @@
             <label for="walking_tour_min_zoom"><?php echo __('Map Min Zoom'); ?></label>
         </div>
         <div class="inputs five columns omega">
-            <p class="explanation"><?php echo __('Controls the min zoom of the map.'); ?></p>
+            <p class="explanation"><?php echo __('Controls the min stop zoom of the map.'); ?></p>
             <div class="input-block">
                 <input type="text" name="walking_tour_min_zoom" id="walking_tour_min_zoom"
                     value="<?php echo get_option('walking_tour_min_zoom'); ?>" />
             </div>
         </div>
     </div>
-    <!-- [41.9001702, 12.4698422] -->
-    <input type="hidden" name="geolocation[latitude]" value="<?php echo $lat; ?>">
-    <input type="hidden" name="geolocation[longitude]" value="<?php echo $lng; ?>">
-    <input type="hidden" name="geolocation[zoom_level]" value="<?php echo $zoom; ?>">
-    <input type="hidden" name="geolocation[map_type]" value="Leaflet">
 
     <div class="field">
         <div class="two columns alpha">
             <label for="walking_tour_max_zoom"><?php echo __('Map Max Zoom'); ?></label>
         </div>
         <div class="inputs five columns omega">
-            <p class="explanation"><?php echo __('Controls the max zoom of the map.'); ?></p>
+            <p class="explanation"><?php echo __('Controls the max stop zoom of the map.'); ?></p>
             <div class="input-block">
                 <input type="text" name="walking_tour_max_zoom" id="walking_tour_max_zoom"
                     value="<?php echo get_option('walking_tour_max_zoom'); ?>" />
@@ -149,11 +141,19 @@
         </div>
     </div>
 
+    <!-- [41.9001702, 12.4698422] -->
+    <input type="hidden" name="geolocation[latitude]" value="<?php echo $lat; ?>">
+    <input type="hidden" name="geolocation[longitude]" value="<?php echo $lng; ?>">
+    <input type="hidden" name="geolocation[zoom_level]" value="<?php echo $zoom; ?>">
+    <input type="hidden" name="geolocation[map_type]" value="Leaflet">
+
 </fieldset>
+
 <?php
 echo js_tag('geocoder');
 $geocoder = json_encode(get_option('geolocation_geocoder'));
 ?>
+
 <script>
     var omekaGeolocationForm = new OmekaMapForm('omeka-map-form', { latitude: 41.9001702, longitude: 12.4698422, zoomLevel: 14 }, { "basemap": "<?php echo get_option('geolocation_basemap'); ?>", "form": { "id": "location_form", "posted": false }, 'confirmLocationChange': true });
     var geocoder = new OmekaGeocoder(<?php echo $geocoder; ?>);
@@ -178,15 +178,15 @@ $geocoder = json_encode(get_option('geolocation_geocoder'));
         // Make the Find By Address button lookup the geocode of an address and add a marker.
         jQuery('#geolocation_find_location_by_address').on('click', function (event) {
             event.preventDefault();
-            var address = jQuery('#geolocation_address').val();
+            var address = jQuery('#walking_tour_center').val();
             geocoder.geocode(address).then(function (coords) {
                 var point = L.latLng(coords);
                 console.log(point)
                 // jQuery('#walking_tour_center').val(`[${point.lat}, ${point.lng}]`);
                 var marker = omekaGeolocationForm.setMarker(point);
                 if (marker === false) {
-                    jQuery('#geolocation_address').val('');
-                    jQuery('#geolocation_address').focus();
+                    jQuery('#walking_tour_center').val('');
+                    jQuery('#walking_tour_center').focus();
                 }
                 jQuery('#walking_tour_center').val(`[${point.lat}, ${point.lng}]`);
             }, function () {
@@ -195,7 +195,7 @@ $geocoder = json_encode(get_option('geolocation_geocoder'));
         });
 
         // Make the return key in the geolocation address input box click the button to find the address.
-        jQuery('#geolocation_address').on('keydown', function (event) {
+        jQuery('#walking_tour_center').on('keydown', function (event) {
             if (event.which == 13) {
                 event.preventDefault();
                 jQuery('#geolocation_find_location_by_address').click();
