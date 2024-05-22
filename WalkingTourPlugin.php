@@ -46,7 +46,6 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
         'walking_tour_min_zoom' => '14',
         'walking_tour_exhibit_button' => 'See Exhibit',
         'walking_tour_detail_button' => 'Full Details',
-        'walking_tour_tooltip_button' => 'Next',
         'walking_tour_auto_fit' => '0'
     );
 
@@ -129,7 +128,6 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
     public function hookConfig()
     {
         set_option('walking_tour_filter_tooltip', $_POST['walking_tour_filter_tooltip']);
-        set_option('walking_tour_tooltip_button', $_POST['walking_tour_tooltip_button']);
         set_option('walking_tour_center', $_POST['walking_tour_center']);
         set_option('walking_tour_default_zoom', $_POST['walking_tour_default_zoom']);
         set_option('walking_tour_max_zoom', $_POST['walking_tour_max_zoom']);
