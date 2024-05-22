@@ -70,9 +70,7 @@ One annoying issue we found is that there is some coupling between the MallMap t
 - [x] Padding on the dropdown menu
 - [ ] Historical Map
 
-IF HAVE TIME
-
-- [ ] Auto set map center based on points and display
+- [x] Auto set map center based on points and display
 <https://github.com/omeka/plugin-Geolocation/blob/master/views/shared/javascripts/map.js>
 - [x] Allow user to select map center
 
