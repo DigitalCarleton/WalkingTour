@@ -67,5 +67,13 @@ One annoying issue we found is that there is some coupling between the MallMap t
 - [x] reformat walking tour js
 
 - [x] Representation for no exhibit for tour item
-- [ ] Padding on the dropdown menu
+- [x] Padding on the dropdown menu
 - [ ] Historical Map
+
+- [x] Auto set map center based on points and display
+<https://github.com/omeka/plugin-Geolocation/blob/master/views/shared/javascripts/map.js>
+- [x] Allow user to select map center
+
+- [x] Concat Map Center Coordinates & Find a Location by Address and change it to default center
+- [x] Auto fit zoom and center
+- [x] Change max and min zoom as stops
