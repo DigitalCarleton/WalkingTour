@@ -1,79 +1,104 @@
-# CGMRStreetMap
+# Walking Tour
 
-A fork of the Omeka team's MallMap plugin to be used for the Carleton Guide to Medieval Rome project.
+## Summary
 
-## Configuration
+This plugin allows you to create interactive walking tours directly within your Omeka website. Leverage your existing collections of geolocated items to build engaging experiences for visitors to explore your local history, art, architecture, or anything else you can map!
 
-This section describes the process of getting the **original Omeka** version to work on your own Omeka site. It was a roadblock when we developed this version of the plugin, so we're documenting the process here. In a future stable release of our version, we'd like to make it a bit easier to use the plugin.
+### A Walking tour
 
-(We're not entirely sure how necessary it is to follow these instructions to the letter--we haven't tested precisely which of these configurations are absolutely necessary. Follow these instructions if you want to configure the plugin the same way the original MallMap creators configured theirs.)
+![Display Example](https://github.com/DigitalCarleton/WalkingTour/blob/11-feature-embed-exhibit-into-walking-tour-item/images/walkingTourImg.png)
 
-If you clone the plugin directly into the `/plugins` folder in your Omeka project, you won't see any items on your map until you've properly configured a few things:
+## Installation and Configuration
 
-### Simple Vocab
+1. Make sure you have Geolocation installed in your Omeka site before installing this plugin.
+    * The plugin ExhibitBuilder allows you to link to exhibits within a walking tour; however, ExhibitBuilder is not required for the installation or usage of this plugin.
 
-A number of Simple Vocab terms need to be configured in order for the map to render any items
+2. Install the Walking Tour plugin
 
-- Coverage (Dublin Core)
-  - The coverage field needs to be populated with a simple vocab definition. The original mallhistory.org site uses 20-year time slices as its definition for this field. You can see this under the filter dropdown as the "Map eras" option.
-- Type (Dublin Core)
-  - The type field needs to be populated as well. For the original Mall Map site, these options are visible under the "Item type" dropdown.
+3. The center of the map will be automatically calculated to fit your geolocated items. If you wish to change it you can either use the map to select a new center or type the longitude and latitude value of the center you want separated by a comma, i.e. "longitude, latitude”.
 
-In addition to vocabularies for the above terms, you also need to add new item types (this config form is available in the left sidebar of your Omeka admin page.) These types are Event and Place.
+# Use Instructions
 
-- Event
-  - In the configuration of the new "Event" type, add an element called "Event Type"
-- Place
-  - In the configuration of the new "Place" type, add an element called "Type"
+### 1. Create a Walking Tour:
+   
+a. Navigate to the "Walking Tour" tab on the left menu. Then select "Add a Tour". 
 
-Finally, we need Simple Vocab definitions for the new Event::Event Type and Place::Type terms. For both of these, add a Simple Vocab definition, and a list of event and place types. You can see these on the mallhistory.org site if you select the item type dropdown, and within the dropdown, select either event or place--this will render a new dropdown where the event and place types can be seen.
+![Walking Tour](https://github.com/DigitalCarleton/WalkingTour/blob/master/images/WakingTourTab.png)
 
-### Item type IDs and Element IDs
+b. Fill in the relevant information fields.
 
-In `MallMap/controllers/IndexController.php`, there are a number of `const` definitions at the top of the file, which are in charge of linking to your database. These numbers may be different from server to server, depending on which plugins you've installed (among other things).
+c.  If you would like to see this walking tour on your site you musth check the "Public" checkbox. Finally, click "Save Changes".
 
-In the original MallMap version, these are customized for the MallMap server, so you need to go into your database and find the IDs for all of the item types and event types.
+![Add a Tour](https://github.com/DigitalCarleton/WalkingTour/blob/master/images/AddATour.png)
 
-Note that some of the Dublin Core types are likely to be standard across many people's sites--for us, we only needed to edit the `ITEM_TYPE_ID_PLACE` , `ELEMENT_ID_MAP_COVERAGE`, and `ELEMENT_ID_PLACE_TYPE` (because these are the new parameters added for this plugin).
+### 2. Adding and Removing Items from a Walking Tour:
+Note that you may only add an item to a walking tour if the items has been geolocated using the GeoLocation Plugin.
 
-### Geolocation
+a. If adding items to an existent walking tour, navigate to the "Walking Tour" tab, find the desired tour and click "edit". If adding items to a walking tour you are currently setting up proceed to the next step.
 
-If you want an item to render to the map, you need to GeoLocate it. Go to an Item Edit page, and select the Map tab to add a Geolocation to an item.
+![Edit a Tour](https://github.com/DigitalCarleton/WalkingTour/blob/master/images/EditTour.png)
 
-**Note:** Items must be public in order to render to the map.
+b. Scroll down to the "Tour Item" fields. Use the search bar to find the previusly geolocated item(s) you would like to add. Furthermore, note that items will only be visible on your site if the items are public.
 
-### Filter theming issues
+c. In order to remove an item click the "remove" button to the right of the item name.
 
-One annoying issue we found is that there is some coupling between the MallMap theme and the MallMap plugin. One such issue causes the button which opens the dropdown to be the exact shade of white as the background theme, making it seem like something's gone wrong. In reality, it rendered correctly for us, but it was invisible! It's slightly above the map window, on the right side of the div. Hover your mouse around until it becomes a pointer--we promise, it's there!
+![Remove Item](https://github.com/DigitalCarleton/WalkingTour/blob/master/images/RemoveItem.png)
 
-## How to Debug for PHP
+d. Once you have added and removed all the desired items, select "Save Changes".
 
-- For view, use `d($var)` to overlay the debug information on the screen
-- For controllers, use `_log($var)` to write the debug information on the `errors.log` in site application folder
+### 3. Configure a Walking Tour:
+  
+a. Reorder the Items in a tour: 
+    
+    1. Navigate to the Walking Tour tab and click "edit" on the tour you wish to reorder.
 
-## TODO
+    2. Tour items will be connected in the order they were added. In order to change, hold click over the item and drag it to the desired position.
 
-- [x] items and tour must be public --> check user role
-- [x] Default color value
-- [x] Make the tour `getItemAction` not require abstract --> abstract needs `Dublin core extended`
-- [x] Font resources
-- [x] use leaflet watch
-- [x] map zoom css
+    3. Click "Save Changes".
 
-- [x] clean up config form
-- [x] remove locate bound, set it as map bound
-- [x] Alert outside locate bound
-- [x] leaflet get bound method
-- [x] reformat walking tour js
+b. Change the Color of the Path:
+    1. Navigate to the Walking Tour tab and click "edit" on the tour you wish to recolor.
 
-- [x] Representation for no exhibit for tour item
-- [x] Padding on the dropdown menu
-- [ ] Historical Map
+    2. In the "Color" field enter the hexadecimal code of the desired color.
 
-- [x] Auto set map center based on points and display
-<https://github.com/omeka/plugin-Geolocation/blob/master/views/shared/javascripts/map.js>
-- [x] Allow user to select map center
+![Change Color](https://github.com/DigitalCarleton/WalkingTour/blob/master/images/ChangeColor.png)
 
-- [x] Concat Map Center Coordinates & Find a Location by Address and change it to default center
-- [x] Auto fit zoom and center
-- [x] Change max and min zoom as stops
+    3. Click "Save Changes".
+
+c. Link an Exhibit to an Item:
+    1. Navigate to the Walking Tour tab and click "edit" on the tour you wish to link an exhibit to.
+
+    2. Scroll to the Tour Items field and click on the "Link Exhibit" button to the right of the item you wish to link the exhibit to.
+
+![Link Exhibit](https://github.com/DigitalCarleton/WalkingTour/blob/master/images/LinkEhibit.png)
+
+    3. Click "Save Changes".
+
+    4. To see the effects of this, navigate to the walking tour site and select the object. A new button will appear (It will read what was input in the field of "Exhibit Button" during plugin configuration) which will link to the exhibit.
+
+![View Exhibit](https://github.com/DigitalCarleton/WalkingTour/blob/master/images/ViewExhibit.png)   
+
+## License
+
+This plugin is published under [GNU/GPL](https://www.gnu.org/licenses/gpl-3.0.html).
+
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+## Contact
+
+Maintained by [Digital Humanities @ Carleton College](https://www.carleton.edu/digital-humanities/)
+
+ 
+## Acknowledgements
+This plugin was built on the work of previously created plugins. Thus, we would like to thank the following people:
+
+1. Jim Safley, Kim Nguyen, and John Flatness for their work in [Mall Map](https://github.com/omeka/MallMap.git)
+2. Kim Nguyen and Sheila Brennan for their work in [Mall Theme](https://github.com/chnm/mall-theme.git)
+3. Erin Bell, Greyson, Eli Pousson, and jbretmaney for their work in [Tour Builder](https://github.com/CPHDH/Curatescape/tree/master/plugins/TourBuilder)
+
+
+
