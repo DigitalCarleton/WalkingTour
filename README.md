@@ -21,17 +21,17 @@ This plugin allows you to create interactive walking tours directly within your 
 
 ### 1. Create a Walking Tour:
    
-a. Navigate to the "Walking Tour" tab on the left menu. Then select "Add a Tour". 
+1. Navigate to the "Walking Tour" tab on the left menu. Then select "Add a Tour". 
 
 ![Walking Tour](https://github.com/DigitalCarleton/WalkingTour/blob/3-update-readme-to-reflect-latest-functionality/images/WakingTourTab.png)
 
-b. Fill in the relevant information fields.
+2. Fill in the relevant information fields.
 
-c.  If you would like to see this walking tour on your site you must check the "Public" checkbox. Finally, click "Save Changes".
+3.  If you would like to see this walking tour on your site you must check the "Public" checkbox. Finally, click "Save Changes".
 
 ![Add a Tour](https://github.com/DigitalCarleton/WalkingTour/blob/3-update-readme-to-reflect-latest-functionality/images/AddATour.png)
 
-### 2. Adding and Removing Items from a Walking Tour:
+### Adding and Removing Items from a Walking Tour:
 Note that you may only add an item to a walking tour if the item has been geolocated using the GeoLocation Plugin.
 
 a. Navigate to the "edit" page for the desired walking tour.
@@ -45,37 +45,37 @@ c. In order to remove an item click the "remove" button to the right of the item
 
 d. Once you have added and removed all the desired items, select "Save Changes".
 
-### 3. Configure a Walking Tour:
+### Configure a Walking Tour:
   
-a. Reorder the Items in a tour: 
+1. Reorder the Items in a tour: 
     
-1. Navigate to the Walking Tour tab and click "edit" on the tour you wish to reorder.
+    1. Navigate to the Walking Tour tab and click "edit" on the tour you wish to reorder.
 
-2. Tour items will be connected in the order they were added. In order to change, hold click over the item and drag it to the desired position.
+    2. Tour items will be connected in the order they were added. In order to change, hold click over the item and drag it to the desired position.
 
-3. Click "Save Changes".
+    3. Click "Save Changes".
 
-b. Change the Color of the Path:
-1. Navigate to the Walking Tour tab and click "edit" on the tour you wish to recolor.
+2. Change the Color of the Path:
+    1. Navigate to the Walking Tour tab and click "edit" on the tour you wish to recolor.
 
-2. In the "Color" field enter the hexadecimal code of the desired color.
+    2. In the "Color" field enter the hexadecimal code of the desired color.
 
-![Change Color](https://github.com/DigitalCarleton/WalkingTour/blob/3-update-readme-to-reflect-latest-functionality/images/ChangeColor.png)
+    ![Change Color](https://github.com/DigitalCarleton/WalkingTour/blob/11-feature-embed-exhibit-into-walking-tour-item/images/ChangeColor.png)
 
-3. Click "Save Changes".
+    3. Click "Save Changes".
 
-c. Link an Exhibit to an Item:
-1. Navigate to the Walking Tour tab and click "edit" on the tour you wish to link an exhibit to.
+3. Link an Exhibit to an Item:
+    1. Navigate to the Walking Tour tab and click "edit" on the tour you wish to link an exhibit to.
 
-2. Scroll to the Tour Items field and click on the "Link Exhibit" button to the right of the item you wish to link the exhibit to.
+    2. Scroll to the Tour Items field and click on the "Link Exhibit" button to the right of the item you wish to link the exhibit to.
 
-![Link Exhibit](https://github.com/DigitalCarleton/WalkingTour/blob/3-update-readme-to-reflect-latest-functionality/images/LinkEhibit.png)
+    ![Link Exhibit](https://github.com/DigitalCarleton/WalkingTour/blob/11-feature-embed-exhibit-into-walking-tour-item/images/LinkExhibit.png)
 
     3. Click "Save Changes".
 
     4. To see the effects of this, navigate to the walking tour site and select the object. A new button will appear (It will read what was input in the field of "Exhibit Button" during plugin configuration) which will link to the exhibit.
 
-![View Exhibit](https://github.com/DigitalCarleton/WalkingTour/blob/3-update-readme-to-reflect-latest-functionality/images/ViewExhibit.png)   
+    ![View Exhibit](https://github.com/DigitalCarleton/WalkingTour/blob/11-feature-embed-exhibit-into-walking-tour-item/images/ViewExhibit.png) 
 
 ## License
 
