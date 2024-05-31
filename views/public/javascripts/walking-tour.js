@@ -245,7 +245,7 @@ return new Iiif(url, options);
 
 const getPackages = async function() {
     const allmapsAnnotation = await import("https://unpkg.com/@allmaps/annotation?module")
-    const allmapsTransform = await import("https://unpkg.com/@allmaps/transform?module")
+    const allmapsTransform = await import("https://unpkg.com/@allmaps/transform@1.0.0-beta.37/dist/bundled/index.es.js?module")
     
     return [allmapsAnnotation, allmapsTransform]
 }
@@ -280,8 +280,8 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
     $('#map').css('height', windowheight - 54);
 
     var MAP_URL_TEMPLATE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
-    // const annotationUrl = 'https://annotations.allmaps.org/manifests/47574ee029cca631'
-    const annotationUrl = "https://annotations.allmaps.org/manifests/c047e9dd35f2d377"
+    const annotationUrl = 'https://annotations.allmaps.org/manifests/47574ee029cca631'
+    // const annotationUrl = "https://annotations.allmaps.org/manifests/c047e9dd35f2d377"
 
     var MAP_CENTER;
     var MAP_ZOOM;  // MAP_ZOOM controls the default zoom of the map
