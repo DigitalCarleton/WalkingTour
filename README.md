@@ -2,26 +2,28 @@
 
 ## Summary
 
-This plugin allows you to create interactive walking tours directly within your Omeka website. Leverage your existing collections of geolocated items to build engaging experiences for visitors to explore your local history, art, architecture, or anything else you can map!
+This plugin allows you to create interactive walking tours directly within an Omeka Classic project. Leverage your existing collections of geolocated items to build engaging experiences for visitors to explore your local history, art, architecture, or anything else you can map!
 
-### A Walking tour
+With the [Geolocation plugin](https://omeka.org/classic/plugins/Geolocation/) installed, any item that has been geolocated can be added to a walking tour, and the plugin will build line features plotting foot walking routes between tour stops using the [Openrouteservice Directions API](https://openrouteservice.org/dev/#/api-docs/directions%20service). Users on site can enable location on the map and view their position as they follow the routes between locations.
+
+### A Sample Walking Tour
 
 ![Display Example](https://github.com/DigitalCarleton/WalkingTour/raw/master/images/walkingTourImg.png)
 
 ## Installation and Configuration
 
-1. Make sure you have Geolocation installed in your Omeka site before installing this plugin.
-    * The plugin ExhibitBuilder allows you to link to exhibits within a walking tour; however, ExhibitBuilder is not required for the installation or usage of this plugin.
+1. Make sure you have [Geolocation](https://omeka.org/classic/plugins/Geolocation/) installed in your Omeka site before installing this plugin.
+    * Optionally, with [ExhibitBuilder](https://omeka.org/classic/docs/Plugins/ExhibitBuilder/) enabled, you can link to exhibits from walking tour stops, e.g. to highlight features inside a location.
 
-2. Install the Walking Tour plugin with the standard Omeka procedure.
+2. Install the Walking Tour plugin with the standard [Omeka plugin installation procedure](https://omeka.org/classic/docs/Admin/Adding_and_Managing_Plugins/#installing-a-plugin).
 
-3. Configure the map settings by using the interactive map to select a new center or type the longitude and latitude value of the center you want separated by a comma, i.e. "longitude, latitude”. If you want the center of the map to be automatically calculated based off all geolocated items that have been added to walking tours, check the Auto-fit to Locations checkbox.
+3. Use the plugin Configuration Settings to set the help text and map default options. If you want the center of the map to be automatically calculated based off all geolocated items that have been added to walking tours, check the Auto-fit to Locations checkbox.
 
 # Use Instructions
 
 ### 1. Create a Walking Tour:
    
-1. Navigate to the "Walking Tour" tab on the left menu. Then select "Add a Tour". 
+1. Navigate to the "Walking Tour" tab in the left menu. Then select "Add a Tour". 
 
 ![Walking Tour](https://github.com/DigitalCarleton/WalkingTour/raw/master/images/WakingTourTab.png)
 
