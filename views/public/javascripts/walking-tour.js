@@ -489,15 +489,10 @@ function walkingTourJs() {
                     mapLocateCenter = function(map) {
                         map.fitBounds(markerBounds, {padding: [10, 10]})
                     } 
-                    console.log(map)
                     var curZoom = map._zoom;
                     map.setMaxZoom( curZoom + MAP_MAX_ZOOM_STOP);
                     map.setMinZoom( curZoom - MAP_MIN_ZOOM_STOP);
-                        // map["options"]["minZoom"] = curZoom - MAP_MIN_ZOOM_STOP
-
-                    console.log(MAP_MAX_ZOOM_STOP, MAP_MIN_ZOOM_STOP )
-                    console.log(map)
-                   
+                        // map["options"]["minZoom"] = curZoom - MAP_MIN_ZOOM_STOP                   
                 }
                 doFilters();
             });
