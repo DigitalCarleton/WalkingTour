@@ -333,6 +333,10 @@ a#locate-button {
     cursor: default;
 }
 
+#info-panel a {
+    border: none;
+}
+
 #tour-type-div p{
     margin: 0;
     font-size: 20px;
