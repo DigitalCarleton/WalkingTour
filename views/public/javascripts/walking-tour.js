@@ -466,6 +466,9 @@ function walkingTourJs() {
                         pointList[i] = point;
                     }
                     getOverallPath(pointList, key).then((data) => {
+                        var distance = data["features"][0]["properties"]["summary"]["distance"];
+                        var duration = data["features"][0]["properties"]["summary"]["duration"];
+
                         var path = data["features"][0]["geometry"]["coordinates"];
                         path = orderCoords(path);
                         for (var p of path) {
@@ -477,7 +480,25 @@ function walkingTourJs() {
                             opacity: 1,
                             smoothFactor: 1
                         });
+
                         markerData[tourId].walkingPath = tourPolyline;
+                        
+                        tourPolyline.bindPopup(duration + " minutes, " + distance + " meters");
+                        //polylines.on('popupopen', function (e) {
+                        //    var popup = e.popup;
+                        //    popup.setContent('Coordinates');
+                        //});
+                        //tourPolyline.on('mouseover', function (e) {
+                        //    this.openPopup();
+                        //});
+                        //tourPolyline.on('mouseout', function (e) {
+                        //    this.closePopup();
+                        //});
+
+                        markerData[tourId].walkingPath.on('click', function (e) {
+                            console.log('test');
+                        });
+
                         resolve()
                     });
                 });
@@ -537,6 +558,7 @@ function walkingTourJs() {
             numMarkers += markerData[ele].Data.features.length;
             markerLayers.push(markerData[ele].geoJson);
             pathToPlot.push(markerData[ele].walkingPath);
+            markerData[ele].walkingPath.openPopup();
         });
         //response is an array of coordinate;
         var item = (1 == numMarkers) ? 'item' : 'items';
