@@ -484,16 +484,16 @@ function walkingTourJs() {
                         markerData[tourId].walkingPath = tourPolyline;
                         
                         tourPolyline.bindPopup(duration + " minutes, " + distance + " meters");
-                        //polylines.on('popupopen', function (e) {
-                        //    var popup = e.popup;
-                        //    popup.setContent('Coordinates');
-                        //});
-                        //tourPolyline.on('mouseover', function (e) {
-                        //    this.openPopup();
-                        //});
-                        //tourPolyline.on('mouseout', function (e) {
-                        //    this.closePopup();
-                        //});
+                        polylines.on('popupopen', function (e) {
+                            var popup = e.popup;
+                            popup.setContent('Coordinates');
+                        });
+                        tourPolyline.on('mouseover', function (e) {
+                            this.openPopup();
+                        });
+                        tourPolyline.on('mouseout', function (e) {
+                            this.closePopup();
+                        });
 
                         markerData[tourId].walkingPath.on('click', function (e) {
                             console.log('test');
