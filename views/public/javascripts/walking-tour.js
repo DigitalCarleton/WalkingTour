@@ -483,7 +483,7 @@ function walkingTourJs() {
 
                         markerData[tourId].walkingPath = tourPolyline;
                         
-                        tourPolyline.bindPopup(duration + " minutes, " + distance + " meters");
+                        tourPolyline.bindPopup(duration + " Minutes, " + distance + " Meters");
                         polylines.on('popupopen', function (e) {
                             var popup = e.popup;
                             popup.setContent('Coordinates');
