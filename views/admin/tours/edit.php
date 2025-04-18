@@ -13,7 +13,6 @@ echo flash();
 ?>
 
 <form method="post" enctype="multipart/form-data" id="tour-form" action="">
-
   <?php include "form.php" ?>
 
   <section class="three columns omega" id="tour-editor-control-panel">

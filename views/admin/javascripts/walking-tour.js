@@ -1,13 +1,5 @@
-$(document).ready(function () {
-    walkingTourJs()
-});
-
-function walkingTourJs() {
-    var imported = document.createElement("script");
-    document.head.appendChild(imported);
-    // Set map height to be window height minus header height.
-    var windowheight = $(window).height();
-    $('#map').css('height', windowheight - 54);
+jQuery(document).ready(function ($) {
+    $('#map').css('height', 500);
 
     var MAP_URL_TEMPLATE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
 
@@ -242,12 +234,11 @@ function walkingTourJs() {
      * Query backend
      */
 
-    window.onload = function () {
-        jqXhr = $.post('walking-tour/index/map-config', function (response) {
-            mapSetUp(response);
-            doQuery();
-        })
-    };
+    
+    jqXhr = $.post('https://omeka-dev.carleton.edu/cgmrdev/walking-tour/index/map-config', function (response) {
+        mapSetUp(response);
+        doQuery();
+    })
 
     // Retain previous form state, if needed.
     retainFormState();
@@ -397,7 +388,7 @@ function walkingTourJs() {
         var itemArray = []
         var tourToItem = {}
         var markerBounds = L.latLngBounds();
-        jqXhr = $.post('walking-tour/index/query', function (response) {
+        jqXhr = $.post('https://omeka-dev.carleton.edu/cgmrdev/walking-tour/index/query', function (response) {
             markerData = response;
             dataArray = Object.entries(markerData)
             for (const tour in markerData) {
@@ -442,7 +433,7 @@ function walkingTourJs() {
                                 var marker = this;
                                 response = allItems[`${tourId}:${feature.properties.id}`]
                                 if (response == undefined) {
-                                    $.post('walking-tour/index/get-item', { id: feature.properties.id, tour: tourId }, function (response) {
+                                    $.post('https://omeka-dev.carleton.edu/cgmrdev/walking-tour//index/get-item', { id: feature.properties.id, tour: tourId }, function (response) {
                                         allItems[`${tourId}:${feature.properties.id}`] = response;
                                         featureOnclickAction(response, layer, marker, itemIDList, value, tourId);
                                     })
@@ -746,7 +737,7 @@ function walkingTourJs() {
         e.preventDefault();
         var response = allItems[`${tour_id}:${id}`]
         if (response == undefined) {
-            $.post('walking-tour/index/get-item', { id: id, tour: tour_id }, function (response) {
+            $.post('https://omeka-dev.carleton.edu/cgmrdev/walking-tour/index/get-item', { id: id, tour: tour_id }, function (response) {
                 allItems[`${tour_id}:${id}`] = response;
                 populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id), tour_id);
             })
@@ -762,7 +753,7 @@ function walkingTourJs() {
     function addHistoricMapLayer() {
         // Get the historic map data
         var getData = { 'text': $('#map-coverage').val() };
-        $.get('walking-tour/index/historic-map-data', getData, function (response) {
+        $.get('https://omeka-dev.carleton.edu/cgmrdev/walking-tour/index/historic-map-data', getData, function (response) {
             historicMapLayer = L.tileLayer(
                 response.url,
                 { tms: true, opacity: 1.00 }
@@ -925,4 +916,13 @@ function walkingTourJs() {
             $('#event-type-div').show({ duration: 'fast' });
         }
     }
-}
+
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : null;
+      }
+});

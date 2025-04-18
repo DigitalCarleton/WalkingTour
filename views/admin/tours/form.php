@@ -61,6 +61,14 @@
 			</div>
 
 		</fieldset>
+		
+		<div>
+			<h2>Tour Preview</h2>
+			<div id="map">
+        	</div>
+		</div>
+		<?php echo js_tag('jquery.cookie');?>
+		<?php echo js_tag('walking-tour');?>
 
 		<fieldset id="tour-items-picker">
 
