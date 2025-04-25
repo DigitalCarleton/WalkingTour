@@ -67,6 +67,9 @@
 			<div id="map">
         	</div>
 		</div>
+		<script>
+			var currentTour = <?php echo $tour->id?>;
+		</script>
 		<?php echo js_tag('jquery.cookie');?>
 		<?php echo js_tag('walking-tour');?>
 
@@ -87,11 +90,13 @@
 			<ul id="sortable">
 				<?php if($tour->id){
 					$tourItems = $tour->getItems();
+					$counter = 1;
 					foreach($tourItems as $ti){
 						$html  = '<li data-id="'.$ti->id.'" id="'.$ti->id.'" class="ui-state-default">';
 
 						if (plugin_is_active('ExhibitBuilder')){
 							$exhibit = get_records('Exhibit', array('id' => $ti->exhibit_id));
+
 							if ($exhibit && count($exhibit) == 1){
 								$exhibitName = $exhibit[0]["title"];
 							} else{
@@ -103,7 +108,7 @@
 									<span class="tour-item-header">'.
 									$svg_icon.
 									'<div class="tour-item-title">'.
-										'<p>'.metadata($ti,array('Dublin Core','Title')).'</p>'.
+										'<p><strong>#'.$counter.'</strong> - '.metadata($ti,array('Dublin Core','Title')).'</p>'.
 										'<p class="exhibit-name" id="item'.$ti->id.'-exhibit-name">Linked Exhibit: '.$exhibitName.'</p>'.
 									'</div>'.
 								'</span>';
@@ -123,6 +128,7 @@
 							</li>';
 						}
 						echo $html;
+						$counter++;
 					}
 				} ?>
 			</ul>
