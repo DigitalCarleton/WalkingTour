@@ -166,7 +166,7 @@ a#locate-button:before {
     width: 100%;
     height: 100%;
     display: block;
-    padding: 7px;
+    padding: 4px;
     border-radius: 7px;
 }
 
@@ -754,7 +754,7 @@ h2.credits{
     }
 
     #map {
-        height: 40em;
+        height: 30em;
     }
 }
 
@@ -764,6 +764,6 @@ h2.credits{
     }
 
     .map #map {
-        min-height: 60em;
+        min-height: 30em;
     }
 }
