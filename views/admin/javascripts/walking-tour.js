@@ -20,8 +20,6 @@ jQuery(document).ready(function ($) {
     var markerData;
     var allItems = {};
     var allMarkers = {};
-
- 
  
     /*
      * JQuery Setup
@@ -391,10 +389,12 @@ jQuery(document).ready(function ($) {
         jqXhr = $.post('https://omeka-dev.carleton.edu/cgmrdev/walking-tour/index/query', function (response) {
             markerData = response;
             dataArray = Object.entries(markerData)
+            console.log(dataArray);
             for (const tour in markerData) {
                 itemArray = itemArray.concat(markerData[tour]['Data']['features'])
             }
             let requests = dataArray.map(([tourId, value]) => {
+                if (tourId != currentTour) return Promise.resolve();
                 return new Promise((resolve) => {
                     var numMarker = 1;
                     var response = value["Data"];
@@ -509,20 +509,13 @@ jQuery(document).ready(function ($) {
         var mapCoverage = $('#map-coverage');
         var tourTypeCheck = $('input[name=place-type]:checked')
 
-        var toursToPlot = [];
         var mapToPlot;
         // Handle each filter
         if ('0' != mapCoverage.val()) {
             mapToPlot = mapCoverage.val();
         }
 
-        if (tourTypeCheck.length) {
-            tourTypeCheck.each(function () {
-                toursToPlot.push(this.value);
-            });
-        } else {
-            toursToPlot = Object.keys(markerData);
-        }
+        var toursToPlot = [currentTour];
 
         var pathToPlot = [];
         var markerLayers = [];
