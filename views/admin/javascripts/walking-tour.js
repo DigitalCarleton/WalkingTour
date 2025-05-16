@@ -1,3 +1,8 @@
+var markers;
+var map;
+var markerData;
+var key = "5b3ce3597851110001cf62489dde4c6690bc423bb86bd99921c5da77";
+
 jQuery(document).ready(function ($) {
     $('#map').css('height', 500);
 
@@ -12,12 +17,10 @@ jQuery(document).ready(function ($) {
     var DETAIL_BUTTON_TEXT;
     var IS_AUTO_FIT;
 
-    var map;
     var historicMapLayer;
-    var markers;
+    
     var jqXhr;
     var locationMarker;
-    var markerData;
     var allItems = {};
     var allMarkers = {};
  
@@ -381,7 +384,6 @@ jQuery(document).ready(function ($) {
             return response.json();
         }
 
-        var key = "5b3ce3597851110001cf62489dde4c6690bc423bb86bd99921c5da77";
         var url;
         var itemArray = []
         var tourToItem = {}
@@ -448,7 +450,7 @@ jQuery(document).ready(function ($) {
                     markerData[tourId].allMarker = markerList;
                     markerData[tourId].geoJson = geoJsonLayer;
                     var walkingPath = [];
-                    var json_content = response.features;
+                    var json_content = markerData[currentTour].Data.features;;
                     var pointList = [];
                     for (var i = 0; i < json_content.length; i++) {
                         lat = json_content[i].geometry.coordinates[1];
@@ -918,4 +920,76 @@ jQuery(document).ready(function ($) {
           b: parseInt(result[3], 16)
         } : null;
       }
+});
+
+jQuery(document).on('tourOrderChanged', async function (event, updatedOrder) {
+
+    async function getRouteFromOpenRouteService(points) {
+        const coordinates = points.map(point => [point[1], point[0]]); // Convert to [lng, lat] format
+        const url = "https://api.openrouteservice.org/v2/directions/foot-walking/geojson";
+    
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": key // Use the API key defined earlier
+                },
+                body: JSON.stringify({
+                    coordinates: coordinates
+                })
+            });
+    
+            if (!response.ok) {
+                console.error("OpenRouteService API error:", response.statusText);
+                return null;
+            }
+    
+            const data = await response.json();
+            const route = data.features[0].geometry.coordinates.map(coord => [coord[1], coord[0]]); // Convert back to [lat, lng]
+            return route;
+        } catch (error) {
+            console.error("Error querying OpenRouteService:", error);
+            return null;
+        }
+    }
+    
+    if (markers) {
+        map.removeLayer(markers);
+    }
+
+    // Map the updated order to coordinates
+    const reorderedPoints = updatedOrder.map(id => {
+        const feature = markerData[currentTour].Data.features.find(f => f.properties.id === id);
+        return feature ? [feature.geometry.coordinates[1], feature.geometry.coordinates[0]] : null;
+    }).filter(point => point !== null);
+
+    if (reorderedPoints.length < 2) {
+        console.error("At least two points are required to calculate a route.");
+        return;
+    }
+
+    // Query OpenRouteService for the new route
+    const route = await getRouteFromOpenRouteService(reorderedPoints);
+
+    if (!route) {
+        console.error("Failed to fetch the route from OpenRouteService.");
+        return;
+    }
+
+    // Update the map with the new route
+    const reorderedPath = L.polyline(route, {
+        color: markerData[currentTour].Color || '#000000',
+        weight: 3,
+        opacity: 1,
+        smoothFactor: 1
+    });
+
+    markers = new L.layerGroup();
+    markers.addLayer(reorderedPath);
+    map.addLayer(markers);
+
+    // Fit the map to the new bounds
+    const bounds = L.latLngBounds(route);
+    map.fitBounds(bounds);
 });
