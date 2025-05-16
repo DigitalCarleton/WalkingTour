@@ -70,8 +70,8 @@
 		<script>
 			var currentTour = <?php echo $tour->id?>;
 		</script>
-		<?php echo js_tag('jquery.cookie');?>
 		<?php echo js_tag('walking-tour');?>
+		<?php echo js_tag('jquery.cookie');?>
 
 		<fieldset id="tour-items-picker">
 
@@ -220,6 +220,19 @@
 		});
 
 		jQuery( "#sortable" ).disableSelection();
+
+		jQuery("#sortable").sortable({
+			placeholder: "ui-state-highlight",
+			stop: function (event, ui) {
+				jQuery(document).trigger('tourItemsUpdated');
+
+				const updatedOrder = [];
+				jQuery('#sortable li').each(function () {
+					updatedOrder.push(jQuery(this).data('id'));
+				});
+				jQuery(document).trigger('tourOrderChanged', [updatedOrder]);
+			}
+		});
 
 
 		// AUTOCOMPLETE
