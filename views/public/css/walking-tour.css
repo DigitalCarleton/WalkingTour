@@ -44,6 +44,7 @@ body {
     top:0; 
     bottom:0; 
     width:100%; 
+    height: 40em !important;
 }
 
 h1 { 
@@ -106,9 +107,13 @@ div[role="main"] {
     overflow: hidden;
 }
 
+:root {
+    --accent-color: #8cbcd8;
+  }
+
 .button {
     color: #fff;
-    background-color: #8cbcd8;
+    background-color: var(--accent-color);
     padding: 12px;
     font-size: 16px;
     line-height: 100%;
@@ -165,8 +170,8 @@ a#locate-button:before {
     content: "\e012";
     width: 100%;
     height: 100%;
-    display: block;
-    padding: 4px;
+    display: inline-block;
+    padding: 7px;
     border-radius: 7px;
 }
 
@@ -202,7 +207,7 @@ a#locate-button {
 
 .touch a#locate-button {
     border-radius: 10px;
-    border: 4px solid rgba(0,0,0,.3) !important;
+    /* border: 5px solid rgba(0,0,0,.3) !important; */
 }
 
 .touch a#locate-button.disabled:before {
@@ -212,7 +217,7 @@ a#locate-button {
 .map-title{
     display: flex;
     padding: 0.05em 0;
-    background-color: #8cbcd8;
+    background-color: var(--accent-color);
     color: #fff;
     font-size: 24px;
     line-height: 36px;
@@ -264,7 +269,7 @@ a#locate-button {
 }
 
 .tour-filter #tour-confirm-button {
-    background-color: #8cbcd8;
+    background-color: var(--accent-color);
     color: #fff;
     padding: 10px;
     margin-right: 1.3rem;
@@ -573,7 +578,7 @@ h2.credits{
 .panel-title{
     display: flex;
     justify-content: space-between;
-    background-color: #8cbcd8;
+    background-color: var(--accent-color);
 }
 
 /* Leaflet Overrides */
@@ -754,7 +759,7 @@ h2.credits{
     }
 
     #map {
-        height: 30em;
+        height: 40em !important;
     }
 }
 
