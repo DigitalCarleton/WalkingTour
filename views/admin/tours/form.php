@@ -73,6 +73,13 @@
 		<?php echo js_tag('walking-tour');?>
 		<?php echo js_tag('jquery.cookie');?>
 
+		<style>
+    		.highlight-green {
+        		background-color: #d4edda;
+        		transition: background-color 1s ease;
+    		}
+		</style>
+
 		<fieldset id="tour-items-picker">
 
 			<div class="field">
@@ -226,7 +233,14 @@
 			stop: function (event, ui) {
 				jQuery(document).trigger('tourItemsUpdated');
 
+				// Label to show the current order of tour stops, apply highlight-green class to the moved item
+				ui.item.addClass('highlight-green');
+				jQuery('#sortable li').each(function () {
+					jQuery(this).find('.tour-item-title p strong').text(' #'+(jQuery(this).index()+1));
+				});
+
 				const updatedOrder = [];
+				console.log(updatedOrder);
 				jQuery('#sortable li').each(function () {
 					updatedOrder.push(jQuery(this).data('id'));
 				});
