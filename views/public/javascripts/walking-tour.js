@@ -643,12 +643,13 @@ function walkingTourJs() {
         // click title to show the popup on map
         if (value.Description != "") {
             rightContent += '<p>' + value.Description + '</p>'
-            rightContent += '<div><strong>Distance:</strong> ' + Math.round(value.distance / 10) / 100 + ' km</div>'
-            rightContent += '<div><strong>Duration:</strong> ~' + Math.round(value.duration / 60) + ' min walk</div>'
-            rightContent += '<p></p>'
         } else {
             rightContent += "<p> No descriptions available. </p>"
         }
+
+        rightContent += '<div><strong>Distance:</strong> ' + Math.round(value.distance / 10) / 100 + ' km</div>'
+        rightContent += '<div><strong>Duration:</strong> ~' + Math.round(value.duration / 60) + ' min walk</div>'
+        rightContent += '<p></p>'
 
         if (value.Credits != "") {
             rightContent += "<h2 class = credits> Credits </h2>"
