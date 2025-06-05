@@ -373,25 +373,6 @@ function walkingTourJs() {
             return directions;
         }
 
-        async function getOverallPath(points, key) {
-            var pointsParam = []
-            points.forEach(ele => {
-                pointsParam.push([ele.lng, ele.lat])
-            })
-            url = "https://api.openrouteservice.org/v2/directions/foot-walking/geojson"
-            const response = await fetch(url, {
-                method: "POST", // *GET, POST, PUT, DELETE, etc.
-                headers: {
-                    'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
-                    "Content-Type": "application/json",
-                    'Authorization': key
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `{"coordinates": ${JSON.stringify(pointsParam)}}`, // body data type must match "Content-Type" header
-            })
-            return response.json();
-        }
-
         var key = "5b3ce3597851110001cf62489dde4c6690bc423bb86bd99921c5da77";
         var url;
         var itemArray = []
@@ -456,38 +437,19 @@ function walkingTourJs() {
                     });
                     markerData[tourId].allMarker = markerList;
                     markerData[tourId].geoJson = geoJsonLayer;
-                    var walkingPath = [];
-                    var json_content = response.features;
-                    var pointList = [];
-                    for (var i = 0; i < json_content.length; i++) {
-                        lat = json_content[i].geometry.coordinates[1];
-                        lng = json_content[i].geometry.coordinates[0];
-                        var point = new L.LatLng(lat, lng);
-                        pointList[i] = point;
-                    }
-                    getOverallPath(pointList, key).then((data) => {
-                        var distance = data["features"][0]["properties"]["summary"]["distance"];
-                        var duration = data["features"][0]["properties"]["summary"]["duration"];
 
-                        markerData[tourId].distance = distance;
-                        markerData[tourId].duration = duration;
+                    const path = JSON.parse(value.Route);
+                    const route = path.features[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);;
 
-                        var path = data["features"][0]["geometry"]["coordinates"];
-                        path = orderCoords(path);
-                        for (var p of path) {
-                            walkingPath.push(p);
-                        }
-                        var tourPolyline = new L.Polyline(walkingPath, {
-                            color: value["Color"],
-                            weight: 3,
-                            opacity: 1,
-                            smoothFactor: 1
-                        });
-
-                        markerData[tourId].walkingPath = tourPolyline;
-                        tourPolyline.bindPopup(duration + " Minutes, " + distance + " Meters");
-                        resolve()
+                    var tourPolyline = new L.Polyline(route, {
+                        color: value["Color"],
+                        weight: 3,
+                        opacity: 1,
+                        smoothFactor: 1
                     });
+                    
+                    markerData[tourId].walkingPath = tourPolyline;
+                    resolve();
                 });
             })
             Promise.all(requests).then(() => {
@@ -545,7 +507,6 @@ function walkingTourJs() {
             numMarkers += markerData[ele].Data.features.length;
             markerLayers.push(markerData[ele].geoJson);
             pathToPlot.push(markerData[ele].walkingPath);
-            markerData[ele].walkingPath.openPopup();
         });
         //response is an array of coordinate;
         var item = (1 == numMarkers) ? 'item' : 'items';
@@ -647,8 +608,12 @@ function walkingTourJs() {
             rightContent += "<p> No descriptions available. </p>"
         }
 
-        rightContent += '<div><strong>Distance:</strong> ' + Math.round(value.distance / 10) / 100 + ' km</div>'
-        rightContent += '<div><strong>Duration:</strong> ~' + Math.round(value.duration / 60) + ' min walk</div>'
+        route = JSON.parse(value.Route);
+        var distance = route.features[0].properties.summary.distance;
+        var duration = route.features[0].properties.summary.duration;
+
+        rightContent += '<div><strong>Distance:</strong> ' + Math.round(distance / 10) / 100 + ' km</div>'
+        rightContent += '<div><strong>Duration:</strong> ~' + Math.round(duration / 60) + ' min walk</div>'
         rightContent += '<p></p>'
 
         if (value.Credits != "") {
