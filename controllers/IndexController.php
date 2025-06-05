@@ -41,6 +41,22 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         return $_tourTypes;
     }
 
+    // Save the route for a tour
+    public function saveRouteAction() {
+        $tourId = $this->getRequest()->getPost('tour_id');
+        $route = $this->getRequest()->getPost('route');
+        $db = get_db();
+        $tourTable = $db->getTable('Tour');
+        $tour = $tourTable->find($tourId);
+        if ($tour) {
+            $tour->route = $route;
+            $tour->save();
+            $this->_helper->json(array('success' => true, 'message' => 'Route saved successfully.'));
+        } else {
+            $this->_helper->json(array('success' => false, 'message' => 'Tour not found.'));
+        }
+    }
+
     /**
      * Display the map.
      */
@@ -64,6 +80,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             // ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.css', 'all')
             // ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.ie.css', 'all', 'lte IE 8')
             ->appendStylesheet(src('walking-tour', 'css', 'css'));
+            // ->appendStylesheet(src('/../../../themes/mall-theme', 'css', 'css'));
     }
 
     public function mapConfigAction()
@@ -167,6 +184,10 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             $returnArray[$tour_id]["Tour Name"] = $request_tour_id['id'][$tour_id];
             $returnArray[$tour_id]["Description"] = $request_tour_id['description'][$tour_id];
             $returnArray[$tour_id]["Credits"] = $request_tour_id['credits'][$tour_id];
+            
+            $tourTable = $db->getTable('Tour');
+            $tour = $tourTable->find($tour_id);
+            $returnArray[$tour_id]["Route"] = $tour ? $tour->route : null;
         }
         $this->_helper->json($returnArray);
 

@@ -1,16 +1,16 @@
-var markers;
-var map;
-var markerData;
-var key = "5b3ce3597851110001cf62489dde4c6690bc423bb86bd99921c5da77";
-const markerFontHtmlStyles = `
-        transform: rotate(-45deg);
-        color:white;
-        text-align: center;
-        padding: 0.2rem 0 0.18rem 0;
-        font-size: 15px;
-        `
-
 jQuery(document).ready(function ($) {
+    var markers;
+    var map;
+    var markerData;
+    var key = "5b3ce3597851110001cf62489dde4c6690bc423bb86bd99921c5da77";
+    const markerFontHtmlStyles = `
+            transform: rotate(-45deg);
+            color:white;
+            text-align: center;
+            padding: 0.2rem 0 0.18rem 0;
+            font-size: 15px;
+            `
+
     $('#map').css('height', 500);
 
     var MAP_URL_TEMPLATE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
@@ -260,9 +260,11 @@ jQuery(document).ready(function ($) {
                     console.error("OpenRouteService API error:", response.statusText);
                     return null;
                 }
-        
+    
                 const data = await response.json();
                 const route = data.features[0].geometry.coordinates.map(coord => [coord[1], coord[0]]); // Convert back to [lat, lng]
+                saveRoute(data);
+
                 return route;
             } catch (error) {
                 console.error("Error querying OpenRouteService:", error);
@@ -318,10 +320,6 @@ jQuery(document).ready(function ($) {
     
         markers.addLayer(reorderedPath);
         map.addLayer(markers);
-    
-        // Fit the map to the new bounds
-        const bounds = L.latLngBounds(route);
-        map.fitBounds(bounds);
     });
 
     /*
@@ -435,6 +433,24 @@ jQuery(document).ready(function ($) {
         });
     }
 
+    // Save the route to the database
+    function saveRoute(route) {
+        $.ajax({
+            url: 'https://omeka-dev.carleton.edu/cgmrdev/walking-tour/index/save-route',
+            method: 'POST',
+            data: {
+                tour_id: currentTour,
+                route: JSON.stringify(route)
+            },
+            success: function(response) {
+                console.log('Route saved to database');
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to save route:', error);
+            }
+        })
+    }
+
     /*
      * Query backend for tour info
      *
@@ -543,9 +559,8 @@ jQuery(document).ready(function ($) {
                         pointList[i] = point;
                     }
                     getOverallPath(pointList, key).then((data) => {
-                        var distance = data["features"][0]["properties"]["summary"]["distance"];
-                        var duration = data["features"][0]["properties"]["summary"]["duration"];
-
+                        saveRoute(data);
+                        
                         var path = data["features"][0]["geometry"]["coordinates"];
                         path = orderCoords(path);
                         for (var p of path) {
@@ -559,7 +574,6 @@ jQuery(document).ready(function ($) {
                         });
 
                         markerData[tourId].walkingPath = tourPolyline;
-                        tourPolyline.bindPopup(duration + " Minutes, " + distance + " Meters");
                         resolve()
                     });
                 });

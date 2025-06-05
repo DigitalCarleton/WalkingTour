@@ -7,7 +7,7 @@
  */
 
 /**
- * The Waling Tour plugin.
+ * The Walking Tour plugin.
  *
  * @package Omeka\Plugins\Mall
  */
@@ -58,6 +58,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
               `id` int( 10 ) unsigned NOT NULL auto_increment,
               `title` varchar( 255 ) collate utf8_unicode_ci default NULL,
               `description` text collate utf8_unicode_ci NOT NULL,
+              `route` json NOT NULL,
               `credits` text collate utf8_unicode_ci,
               `postscript_text` text collate utf8_unicode_ci,
               `featured` tinyint( 1 ) default '0',
