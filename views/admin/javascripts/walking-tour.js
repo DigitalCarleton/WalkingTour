@@ -1,13 +1,17 @@
-$(document).ready(function () {
-    walkingTourJs()
-});
+jQuery(document).ready(function ($) {
+    var markers;
+    var map;
+    var markerData;
+    var key = "5b3ce3597851110001cf62489dde4c6690bc423bb86bd99921c5da77";
+    const markerFontHtmlStyles = `
+            transform: rotate(-45deg);
+            color:white;
+            text-align: center;
+            padding: 0.2rem 0 0.18rem 0;
+            font-size: 15px;
+            `
 
-function walkingTourJs() {
-    var imported = document.createElement("script");
-    document.head.appendChild(imported);
-    // Set map height to be window height minus header height.
-    var windowheight = $(window).height();
-    $('#map').css('height', windowheight - 54);
+    $('#map').css('height', 500);
 
     var MAP_URL_TEMPLATE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
 
@@ -20,16 +24,12 @@ function walkingTourJs() {
     var DETAIL_BUTTON_TEXT;
     var IS_AUTO_FIT;
 
-    var map;
     var historicMapLayer;
-    var markers;
+    
     var jqXhr;
     var locationMarker;
-    var markerData;
     var allItems = {};
     var allMarkers = {};
-
- 
  
     /*
      * JQuery Setup
@@ -238,16 +238,99 @@ function walkingTourJs() {
         $('#info-panel-container').fadeToggle(200, 'linear');
     });
 
+    $(document).on('tourOrderChanged', async function (event, updatedOrder) {
+
+        async function getRoute(points) {
+            const coordinates = points.map(point => [point[1], point[0]]); // Convert to [lng, lat] format
+            const url = "https://api.openrouteservice.org/v2/directions/foot-walking/geojson";
+        
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": key // Use the API key defined earlier
+                    },
+                    body: JSON.stringify({
+                        coordinates: coordinates
+                    })
+                });
+        
+                if (!response.ok) {
+                    console.error("OpenRouteService API error:", response.statusText);
+                    return null;
+                }
+    
+                const data = await response.json();
+                const route = data.features[0].geometry.coordinates.map(coord => [coord[1], coord[0]]); // Convert back to [lat, lng]
+                saveRoute(data);
+
+                return route;
+            } catch (error) {
+                console.error("Error querying OpenRouteService:", error);
+                return null;
+            }
+        }
+        
+        if (markers) {
+            map.removeLayer(markers);
+        }
+    
+        // Map the updated order to coordinates
+        const reorderedPoints = updatedOrder.map((id, index) => {
+            const feature = markerData[currentTour].Data.features.find(f => f.properties.id === id);
+            if (feature) {
+                // Update the marker label to reflect the new order
+                feature.properties.order = index + 1; // New order starts from 1
+            }
+            return feature ? [feature.geometry.coordinates[1], feature.geometry.coordinates[0]] : null;
+        }).filter(point => point !== null);
+    
+        if (reorderedPoints.length < 2) {
+            console.error("At least two points are required to calculate a route.");
+            return;
+        }
+    
+        // Query OpenRouteService for the new route
+        const route = await getRoute(reorderedPoints);
+        
+        const reorderedPath = L.polyline(route, {
+            color: markerData[currentTour].Color || '#000000',
+            weight: 3,
+            opacity: 1,
+            smoothFactor: 1
+        });
+        markerData[currentTour].walkingPath = reorderedPath;
+
+        markers = new L.layerGroup();
+        markerData[currentTour].Data.features.forEach(feature => {
+            const latlng = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]];
+            const numberIcon = L.divIcon({
+                className: "my-custom-pin",
+                iconSize: [25, 41],
+                iconAnchor: [12, 40],
+                popupAnchor: [0, -5],
+                html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > 
+                        <p style="${markerFontHtmlStyles}"> ${feature.properties.order} </p> 
+                    </span>`
+            });
+            const marker = L.marker(latlng, { icon: numberIcon });
+            markers.addLayer(marker);
+        });
+    
+        markers.addLayer(reorderedPath);
+        map.addLayer(markers);
+    });
+
     /*
      * Query backend
      */
 
-    window.onload = function () {
-        jqXhr = $.post('walking-tour/index/map-config', function (response) {
-            mapSetUp(response);
-            doQuery();
-        })
-    };
+    
+    jqXhr = $.post('https://omeka-dev.carleton.edu/cgmrdev/walking-tour/index/map-config', function (response) {
+        mapSetUp(response);
+        doQuery();
+    })
 
     // Retain previous form state, if needed.
     retainFormState();
@@ -350,20 +433,30 @@ function walkingTourJs() {
         });
     }
 
+    // Save the route to the database
+    function saveRoute(route) {
+        $.ajax({
+            url: 'https://omeka-dev.carleton.edu/cgmrdev/walking-tour/index/save-route',
+            method: 'POST',
+            data: {
+                tour_id: currentTour,
+                route: JSON.stringify(route)
+            },
+            success: function(response) {
+                console.log('Route saved to database');
+            },
+            error: function(xhr, status, error) {
+                console.error('Failed to save route:', error);
+            }
+        })
+    }
+
     /*
      * Query backend for tour info
      *
      * Call only once during set up
      */
     function doQuery() {
-        const markerFontHtmlStyles = `
-        transform: rotate(-45deg);
-        color:white;
-        text-align: center;
-        padding: 0.2rem 0 0.18rem 0;
-        font-size: 15px;
-        `
-
         // correctly formats coordinates as [lat, long] (API returns [long, lat])
         function orderCoords(path) {
             var directions = [];
@@ -373,18 +466,37 @@ function walkingTourJs() {
             return directions;
         }
 
-        var key = "5b3ce3597851110001cf62489dde4c6690bc423bb86bd99921c5da77";
+        async function getOverallPath(points, key) {
+            var pointsParam = []
+            points.forEach(ele => {
+                pointsParam.push([ele.lng, ele.lat])
+            })
+            url = "https://api.openrouteservice.org/v2/directions/foot-walking/geojson"
+            const response = await fetch(url, {
+                method: "POST", // *GET, POST, PUT, DELETE, etc.
+                headers: {
+                    'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+                    "Content-Type": "application/json",
+                    'Authorization': key
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `{"coordinates": ${JSON.stringify(pointsParam)}}`, // body data type must match "Content-Type" header
+            })
+            return response.json();
+        }
+
         var url;
         var itemArray = []
         var tourToItem = {}
         var markerBounds = L.latLngBounds();
-        jqXhr = $.post('walking-tour/index/query', function (response) {
+        jqXhr = $.post('https://omeka-dev.carleton.edu/cgmrdev/walking-tour/index/query', function (response) {
             markerData = response;
             dataArray = Object.entries(markerData)
             for (const tour in markerData) {
                 itemArray = itemArray.concat(markerData[tour]['Data']['features'])
             }
             let requests = dataArray.map(([tourId, value]) => {
+                if (tourId != currentTour) return Promise.resolve();
                 return new Promise((resolve) => {
                     var numMarker = 1;
                     var response = value["Data"];
@@ -421,15 +533,15 @@ function walkingTourJs() {
                                 $('#filters').fadeOut(200, 'linear');
 
                                 var marker = this;
-                                response = allItems[`${tourId}:${feature.properties.id}`]
-                                if (response == undefined) {
-                                    $.post('walking-tour/index/get-item', { id: feature.properties.id, tour: tourId }, function (response) {
-                                        allItems[`${tourId}:${feature.properties.id}`] = response;
-                                        featureOnclickAction(response, layer, marker, itemIDList, value, tourId);
-                                    })
-                                } else {
-                                    featureOnclickAction(response, layer, marker, itemIDList, value, tourId);
-                                }
+                                //response = allItems[`${tourId}:${feature.properties.id}`]
+                                //if (response == undefined) {
+                                //    $.post('https://omeka-dev.carleton.edu/cgmrdev/walking-tour//index/get-item', { id: feature.properties.id, tour: tourId }, function (response) {
+                                //        allItems[`${tourId}:${feature.properties.id}`] = response;
+                                //        featureOnclickAction(response, layer, marker, itemIDList, value, tourId);
+                                //    })
+                                //} else {
+                                //    featureOnclickAction(response, layer, marker, itemIDList, value, tourId);
+                                //}
 
                             });
 
@@ -437,19 +549,33 @@ function walkingTourJs() {
                     });
                     markerData[tourId].allMarker = markerList;
                     markerData[tourId].geoJson = geoJsonLayer;
+                    var walkingPath = [];
+                    var json_content = markerData[currentTour].Data.features;;
+                    var pointList = [];
+                    for (var i = 0; i < json_content.length; i++) {
+                        lat = json_content[i].geometry.coordinates[1];
+                        lng = json_content[i].geometry.coordinates[0];
+                        var point = new L.LatLng(lat, lng);
+                        pointList[i] = point;
+                    }
+                    getOverallPath(pointList, key).then((data) => {
+                        saveRoute(data);
+                        
+                        var path = data["features"][0]["geometry"]["coordinates"];
+                        path = orderCoords(path);
+                        for (var p of path) {
+                            walkingPath.push(p);
+                        }
+                        var tourPolyline = new L.Polyline(walkingPath, {
+                            color: value["Color"],
+                            weight: 3,
+                            opacity: 1,
+                            smoothFactor: 1
+                        });
 
-                    const path = JSON.parse(value.Route);
-                    const route = path.features[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);;
-
-                    var tourPolyline = new L.Polyline(route, {
-                        color: value["Color"],
-                        weight: 3,
-                        opacity: 1,
-                        smoothFactor: 1
+                        markerData[tourId].walkingPath = tourPolyline;
+                        resolve()
                     });
-                    
-                    markerData[tourId].walkingPath = tourPolyline;
-                    resolve();
                 });
             })
             Promise.all(requests).then(() => {
@@ -483,20 +609,13 @@ function walkingTourJs() {
         var mapCoverage = $('#map-coverage');
         var tourTypeCheck = $('input[name=place-type]:checked')
 
-        var toursToPlot = [];
         var mapToPlot;
         // Handle each filter
         if ('0' != mapCoverage.val()) {
             mapToPlot = mapCoverage.val();
         }
 
-        if (tourTypeCheck.length) {
-            tourTypeCheck.each(function () {
-                toursToPlot.push(this.value);
-            });
-        } else {
-            toursToPlot = Object.keys(markerData);
-        }
+        var toursToPlot = [currentTour];
 
         var pathToPlot = [];
         var markerLayers = [];
@@ -507,6 +626,7 @@ function walkingTourJs() {
             numMarkers += markerData[ele].Data.features.length;
             markerLayers.push(markerData[ele].geoJson);
             pathToPlot.push(markerData[ele].walkingPath);
+            markerData[ele].walkingPath.openPopup();
         });
         //response is an array of coordinate;
         var item = (1 == numMarkers) ? 'item' : 'items';
@@ -608,14 +728,6 @@ function walkingTourJs() {
             rightContent += "<p> No descriptions available. </p>"
         }
 
-        route = JSON.parse(value.Route);
-        var distance = route.features[0].properties.summary.distance;
-        var duration = route.features[0].properties.summary.duration;
-
-        rightContent += '<div><strong>Distance:</strong> ' + Math.round(distance / 10) / 100 + ' km</div>'
-        rightContent += '<div><strong>Duration:</strong> ~' + Math.round(duration / 60) + ' min walk</div>'
-        rightContent += '<p></p>'
-
         if (value.Credits != "") {
             rightContent += "<h2 class = credits> Credits </h2>"
             rightContent += '<p>' + value.Credits + '</p>'
@@ -634,7 +746,10 @@ function walkingTourJs() {
 
     function populatePopup(itemIDList, value, response, numPopup, tour_id) {
         var numPopup = itemIDList.findIndex((ele) => ele == response.id);
-        var coor = value.Data.features[numPopup].geometry.coordinates;
+        console.log(value.Data.features);
+        console.log(itemIDList);
+        console.log(response.id);
+        var coor = value.Data.features[1].geometry.coordinates;
         map.flyTo([coor[1], coor[0]], MAP_ZOOM + MAP_MAX_ZOOM_STOP);
 
         $('.next-button').unbind("click");
@@ -718,7 +833,7 @@ function walkingTourJs() {
         e.preventDefault();
         var response = allItems[`${tour_id}:${id}`]
         if (response == undefined) {
-            $.post('walking-tour/index/get-item', { id: id, tour: tour_id }, function (response) {
+            $.post('https://omeka-dev.carleton.edu/cgmrdev/walking-tour/index/get-item', { id: id, tour: tour_id }, function (response) {
                 allItems[`${tour_id}:${id}`] = response;
                 populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id), tour_id);
             })
@@ -734,7 +849,7 @@ function walkingTourJs() {
     function addHistoricMapLayer() {
         // Get the historic map data
         var getData = { 'text': $('#map-coverage').val() };
-        $.get('walking-tour/index/historic-map-data', getData, function (response) {
+        $.get('https://omeka-dev.carleton.edu/cgmrdev/walking-tour/index/historic-map-data', getData, function (response) {
             historicMapLayer = L.tileLayer(
                 response.url,
                 { tms: true, opacity: 1.00 }
@@ -897,4 +1012,14 @@ function walkingTourJs() {
             $('#event-type-div').show({ duration: 'fast' });
         }
     }
-}
+
+    function hexToRgb(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        } : null;
+      }
+});
+

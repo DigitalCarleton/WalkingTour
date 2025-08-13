@@ -61,6 +61,24 @@
 			</div>
 
 		</fieldset>
+		
+		<div>
+			<h2>Tour Preview</h2>
+			<div id="map">
+        	</div>
+		</div>
+		<script>
+			var currentTour = <?php echo $tour->id?>;
+		</script>
+		<?php echo js_tag('walking-tour');?>
+		<?php echo js_tag('jquery.cookie');?>
+
+		<style>
+    		.highlight-green {
+        		background-color: #d4edda;
+        		transition: background-color 1s ease;
+    		}
+		</style>
 
 		<fieldset id="tour-items-picker">
 
@@ -79,11 +97,13 @@
 			<ul id="sortable">
 				<?php if($tour->id){
 					$tourItems = $tour->getItems();
+					$counter = 1;
 					foreach($tourItems as $ti){
 						$html  = '<li data-id="'.$ti->id.'" id="'.$ti->id.'" class="ui-state-default">';
 
 						if (plugin_is_active('ExhibitBuilder')){
 							$exhibit = get_records('Exhibit', array('id' => $ti->exhibit_id));
+
 							if ($exhibit && count($exhibit) == 1){
 								$exhibitName = $exhibit[0]["title"];
 							} else{
@@ -95,7 +115,7 @@
 									<span class="tour-item-header">'.
 									$svg_icon.
 									'<div class="tour-item-title">'.
-										'<p>'.metadata($ti,array('Dublin Core','Title')).'</p>'.
+										'<p><strong>#'.$counter.'</strong> - '.metadata($ti,array('Dublin Core','Title')).'</p>'.
 										'<p class="exhibit-name" id="item'.$ti->id.'-exhibit-name">Linked Exhibit: '.$exhibitName.'</p>'.
 									'</div>'.
 								'</span>';
@@ -115,6 +135,7 @@
 							</li>';
 						}
 						echo $html;
+						$counter++;
 					}
 				} ?>
 			</ul>
@@ -206,6 +227,26 @@
 		});
 
 		jQuery( "#sortable" ).disableSelection();
+
+		jQuery("#sortable").sortable({
+			placeholder: "ui-state-highlight",
+			stop: function (event, ui) {
+				jQuery(document).trigger('tourItemsUpdated');
+
+				// Label to show the current order of tour stops, apply highlight-green class to the moved item
+				ui.item.addClass('highlight-green');
+				jQuery('#sortable li').each(function () {
+					jQuery(this).find('.tour-item-title p strong').text(' #'+(jQuery(this).index()+1));
+				});
+
+				const updatedOrder = [];
+				console.log(updatedOrder);
+				jQuery('#sortable li').each(function () {
+					updatedOrder.push(jQuery(this).data('id'));
+				});
+				jQuery(document).trigger('tourOrderChanged', [updatedOrder]);
+			}
+		});
 
 
 		// AUTOCOMPLETE
