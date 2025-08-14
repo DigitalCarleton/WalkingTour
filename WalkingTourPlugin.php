@@ -93,9 +93,14 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
 
     public function hookUpgrade($args)
     {
-        if (version_compare($args['old_version'], '0.1-dev', "<")) {
+
+        $oldVersion = $args['old_version'];
+        $newVersion = $args['new_version'];
+        $db = $this->_db;
+
+        if (version_compare($oldVersion, '0.1-dev', "<")) {
             $sql = "ALTER TABLE `{$db->prefix}tour_items` MODIFY COLUMN `exhibit_id` INT NOT NULL;";
-            $this->_db->query($sql);
+            $db->query($sql);
         }
 
         if (version_compare($oldVersion, '1.0.0', '<=')) {
