@@ -30,6 +30,10 @@ jQuery(document).ready(function ($) {
     var locationMarker;
     var allItems = {};
     var allMarkers = {};
+    // base url set to handle subdirectory installations
+    var baseUrl = window.location.origin;
+    var urlpaths = window.location.pathname.split("/");
+    if (urlpaths[1] != "admin") { baseUrl += "/" + urlpaths[1] };
  
     /*
      * JQuery Setup
@@ -327,7 +331,7 @@ jQuery(document).ready(function ($) {
      */
 
     
-    jqXhr = $.post('walking-tour/index/map-config', function (response) {
+    jqXhr = $.post(baseUrl + '/walking-tour/index/map-config', function (response) {
         mapSetUp(response);
         doQuery();
     })
@@ -436,7 +440,7 @@ jQuery(document).ready(function ($) {
     // Save the route to the database
     function saveRoute(route) {
         $.ajax({
-            url: 'walking-tour/index/save-route',
+            url: baseUrl + '/walking-tour/index/save-route',
             method: 'POST',
             data: {
                 tour_id: currentTour,
@@ -489,7 +493,7 @@ jQuery(document).ready(function ($) {
         var itemArray = []
         var tourToItem = {}
         var markerBounds = L.latLngBounds();
-        jqXhr = $.post('walking-tour/index/query', function (response) {
+        jqXhr = $.post(baseUrl + '/walking-tour/index/query', function (response) {
             markerData = response;
             dataArray = Object.entries(markerData)
             for (const tour in markerData) {
@@ -535,7 +539,7 @@ jQuery(document).ready(function ($) {
                                 var marker = this;
                                 //response = allItems[`${tourId}:${feature.properties.id}`]
                                 //if (response == undefined) {
-                                //    $.post('walking-tour//index/get-item', { id: feature.properties.id, tour: tourId }, function (response) {
+                                //    $.post(baseUrl + '/walking-tour//index/get-item', { id: feature.properties.id, tour: tourId }, function (response) {
                                 //        allItems[`${tourId}:${feature.properties.id}`] = response;
                                 //        featureOnclickAction(response, layer, marker, itemIDList, value, tourId);
                                 //    })
@@ -833,7 +837,7 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         var response = allItems[`${tour_id}:${id}`]
         if (response == undefined) {
-            $.post('walking-tour/index/get-item', { id: id, tour: tour_id }, function (response) {
+            $.post(baseUrl + '/walking-tour/index/get-item', { id: id, tour: tour_id }, function (response) {
                 allItems[`${tour_id}:${id}`] = response;
                 populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id), tour_id);
             })
@@ -849,7 +853,7 @@ jQuery(document).ready(function ($) {
     function addHistoricMapLayer() {
         // Get the historic map data
         var getData = { 'text': $('#map-coverage').val() };
-        $.get('walking-tour/index/historic-map-data', getData, function (response) {
+        $.get(baseUrl + '/walking-tour/index/historic-map-data', getData, function (response) {
             historicMapLayer = L.tileLayer(
                 response.url,
                 { tms: true, opacity: 1.00 }
