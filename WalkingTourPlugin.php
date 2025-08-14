@@ -104,7 +104,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
         }
 
         if (version_compare($oldVersion, '1.0.0', '<=')) {
-            $sql = "ALTER TABLE `{$db->prefix}tour` ADD COLUMN 'route' TEXT;";
+            $sql = "ALTER TABLE `{$db->prefix}tour` ADD COLUMN `route` TEXT;";
             $db->query($sql);}
         }
 
