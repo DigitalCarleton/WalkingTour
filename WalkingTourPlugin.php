@@ -58,7 +58,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
               `id` int( 10 ) unsigned NOT NULL auto_increment,
               `title` varchar( 255 ) collate utf8_unicode_ci default NULL,
               `description` text collate utf8_unicode_ci NOT NULL,
-              `route` json NOT NULL,
+              `route` text collate utf8_unicode_ci,
               `credits` text collate utf8_unicode_ci,
               `postscript_text` text collate utf8_unicode_ci,
               `featured` tinyint( 1 ) default '0',
@@ -97,7 +97,11 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
             $sql = "ALTER TABLE `{$db->prefix}tour_items` MODIFY COLUMN `exhibit_id` INT NOT NULL;";
             $this->_db->query($sql);
         }
-    }
+
+        if (version_compare($oldVersion, '1.0.0', '<=')) {
+            $sql = "ALTER TABLE `{$db->prefix}tour` ADD COLUMN 'route' TEXT;";
+            $db->query($sql);}
+        }
 
     public function hookDefineAcl($args)
     {
