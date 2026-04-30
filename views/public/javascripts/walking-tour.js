@@ -28,7 +28,24 @@ function walkingTourJs() {
     var markerData;
     var allItems = {};
     var allMarkers = {};
-
+    function positionLocateTooltip() {
+        var tooltip = document.querySelector('#first-time .tooltip-locate');
+        var target = document.querySelector('#locate-button');
+    
+        if (!tooltip || !target) {
+            return;
+        }
+    
+        var rect = target.getBoundingClientRect();
+    
+        /*
+         * Align tooltip's left edge near the locate button.
+         * The locate button is close to the left edge, so we do not center
+         * the tooltip horizontally; otherwise it can go off screen.
+         */
+        tooltip.style.left = rect.left + 'px';
+        tooltip.style.top = rect.top + 'px';
+    }
  
  
     /*
@@ -38,17 +55,23 @@ function walkingTourJs() {
     // Check for user's first time visiting. Wait to locate the user after displaying tooltip on the first visit.
     if (!($.cookie('myCookie'))) {
         $('#first-time').show();
-        $('.tooltip-locate').toggle();
+        // $('.tooltip-locate').toggle();
+        $('.tooltip-locate').hide();
         $.cookie('myCookie', 'visited', { path: '/', expires: 10000 });
     }
 
     $("#first-time > div.tooltip > button").on('click', function () {
         $('.tooltip').fadeToggle();
+        positionLocateTooltip();
         $('.tooltip-locate').fadeToggle();
     });
 
     $("#first-time > div.tooltip-locate > button").on('click', function () {
         $('#first-time').hide();
+    });
+
+    $(window).on('resize', function () {
+        positionLocateTooltip();
     });
 
     // Set up the dialog window.

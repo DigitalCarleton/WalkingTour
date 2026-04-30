@@ -702,12 +702,13 @@ h2.credits{
     border-top: 10px solid rgba(0, 0, 0, 0);
 }
 
-#first-time .tooltip-locate {
+/* #first-time .tooltip-locate {
     background-color: #fff;
     position: absolute;
-    max-width: 50%;
-    right: 592px;
-    bottom: 8rem;
+    max-width: min(420px, calc(100% - 72px));
+    left: 56px;
+    right: auto;
+    bottom: 56px;
     padding: 0 20px;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
@@ -719,13 +720,52 @@ h2.credits{
     width: 10px;
     height: 20px;
     position: absolute;
-    top: 100px;
-    left: 0;
+    top: auto;
+    bottom: 14px;
+    left: -10px;
     transform: rotate(180deg);
     border-right: 10px solid #FFF;
     border-top: 10px solid rgba(0, 0, 0, 0);
+} */
+
+#first-time .tooltip-locate {
+    background-color: #fff;
+    position: fixed;
+
+    width: 360px;
+    max-width: calc(100vw - 32px);
+
+    padding: 18px 22px;
+    border-radius: 5px;
+
+    z-index: 10000;
+    /*
+     * JS will dynamically set left/top based on #locate-button.
+     */
+    left: 0;
+    top: 0;
+    /*
+     * Place the tooltip above the locate icon.
+     */
+    transform: translateY(calc(-100% - 16px));
 }
 
+#first-time .tooltip-locate:before {
+    content: "";
+    position: absolute;
+    /*
+     * Arrow pointing near the locate icon.
+     */
+    left: 20px;
+    bottom: -10px;
+
+    width: 0;
+    height: 0;
+
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid #fff;
+}
 #first-time button {
     border: 0;
     -webkit-border-radius: 0px;
@@ -748,19 +788,30 @@ h2.credits{
         right: 5%;
     }
 
-    #first-time .tooltip-locate {
+    /* #first-time .tooltip-locate {
         max-width: 90%;
         right: 5%;
-        /* top: 70%; */
+        /* top: 70%; 
     }
 
     #first-time .tooltip-locate::before {
         top: 124px;
+    }*/
+    #first-time .tooltip-locate {
+        width: auto;
+        max-width: calc(100vw - 32px);
+    }
+
+    #first-time .tooltip-locate::before {
+        top: auto;
+        left: 20px;
+        bottom: -10px;
+        transform: none;
     }
 
     #map {
         height: 40em !important;
-    }
+    } 
 }
 
 @media screen and (min-width: 60em) {
