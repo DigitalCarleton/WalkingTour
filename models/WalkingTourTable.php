@@ -1,6 +1,6 @@
 <?php
 
-class TourTable extends Omeka_Db_Table
+class WalkingTourTable extends Omeka_Db_Table
 {
 	public function findItemsByTourId( $tour_id )
 	{
@@ -9,7 +9,7 @@ class TourTable extends Omeka_Db_Table
 		$itemTable = $this->getTable( 'Item' );
 		$select = $itemTable->getSelect();
 		$iAlias = $itemTable->getTableAlias();
-		$select->joinInner( array( 'ti' => $db->TourItem ),
+		$select->joinInner( array( 'ti' => $db->WalkingTourItem ),
 			"ti.item_id = $iAlias.id", array() );
 		$select->where( 'ti.tour_id = ?', array( $tour_id ) );
 		$select->order( 'ti.ordinal ASC' );
@@ -31,7 +31,7 @@ class TourTable extends Omeka_Db_Table
 		$itemTable = $this->getTable( 'File' );
 		$select = $itemTable->getSelect();
 		$iAlias = $itemTable->getTableAlias();
-		$select->joinInner( array( 'ti' => $db->TourItem ),
+		$select->joinInner( array( 'ti' => $db->WalkingTourItem ),
 			"ti.item_id = $iAlias.id", array() );
 		$select->where( 'ti.tour_id = ?', array( $tour_id ) );
 		$select->order( 'ti.ordinal ASC' );
@@ -49,7 +49,7 @@ class TourTable extends Omeka_Db_Table
 
 	public function getSelect()
 	{
-		$select = parent::getSelect()->order('tours.id');
+		$select = parent::getSelect()->order('walking_tours.id');
 
 		$permissions = new Omeka_Db_Select_PublicPermissions( 'WalkingTourBuilder_Tours' );
 		$permissions->apply( $select, 'tours', null );

@@ -54,7 +54,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
         $db = $this->_db;
 
         $tourQuery = "
-           CREATE TABLE IF NOT EXISTS `$db->Tour` (
+           CREATE TABLE IF NOT EXISTS `$db->WalkingTour` (
               `id` int( 10 ) unsigned NOT NULL auto_increment,
               `title` varchar( 255 ) collate utf8_unicode_ci default NULL,
               `description` text collate utf8_unicode_ci NOT NULL,
@@ -68,7 +68,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ";
 
         $tourItemQuery = "
-           CREATE TABLE IF NOT EXISTS `$db->TourItem` (
+           CREATE TABLE IF NOT EXISTS `$db->WalkingTourItem` (
               `id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT,
               `tour_id` INT( 10 ) UNSIGNED NOT NULL,
               `ordinal` INT NOT NULL,
@@ -86,27 +86,75 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
     public function hookUninstall()
     {
         $db = $this->_db;
-        $db->query("DROP TABLE IF EXISTS `$db->TourItem`");
-        $db->query("DROP TABLE IF EXISTS `$db->Tour`");
+        $db->query("DROP TABLE IF EXISTS `$db->WalkingTourItem`");
+        $db->query("DROP TABLE IF EXISTS `$db->WalkingTour`");
         $this->_uninstallOptions();
     }
 
     public function hookUpgrade($args)
     {
-
-        $oldVersion = $args['old_version'];
-        $newVersion = $args['new_version'];
         $db = $this->_db;
+        $oldVersion = $args['old_version'];
 
-        if (version_compare($oldVersion, '0.1-dev', "<")) {
-            $sql = "ALTER TABLE `{$db->prefix}tour_items` MODIFY COLUMN `exhibit_id` INT NOT NULL;";
-            $db->query($sql);
-        }
+        $oldTourTable = "{$db->prefix}tours";
+        $newWalkingTourTable = "{$db->prefix}walking_tours";
 
-        if (version_compare($oldVersion, '1.0.0', '<=')) {
-            $sql = "ALTER TABLE `{$db->prefix}tours` ADD COLUMN `route` TEXT;";
-            $db->query($sql);}
+        $oldTourItemTable = "{$db->prefix}tour_items";
+        $newWalkingTourItemTable = "{$db->prefix}walking_tour_items";
+
+        $db->query("CREATE TABLE IF NOT EXISTS `$newWalkingTourTable` (
+            `id` int( 10 ) unsigned NOT NULL auto_increment,
+            `title` varchar( 255 ) collate utf8_unicode_ci default NULL,
+            `description` text collate utf8_unicode_ci NOT NULL,
+            `route` text collate utf8_unicode_ci,
+            `credits` text collate utf8_unicode_ci,
+            `postscript_text` text collate utf8_unicode_ci,
+            `featured` tinyint( 1 ) default '0',
+            `public` tinyint( 1 ) default '0',
+            `color` text collate utf8_unicode_ci,
+            PRIMARY KEY( `id` )
+           ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
+        );
+
+        $db->query("CREATE TABLE IF NOT EXISTS `$newWalkingTourItemTable` (
+            `id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `tour_id` INT( 10 ) UNSIGNED NOT NULL,
+            `ordinal` INT NOT NULL,
+            `item_id` INT( 10 ) UNSIGNED NOT NULL,
+            `exhibit_id` INT NOT NULL,
+            PRIMARY KEY( `id` ),
+            KEY `tour` ( `tour_id` )
+            ) ENGINE=InnoDB"
+        );
+
+        if (version_compare($oldVersion, '2.0.0', '<')) {
+            $checkOldTourTable = $db->query("SHOW TABLES LIKE '$oldTourTable'")->fetchAll();
+            
+            if (!empty($checkOldTourTable)) {
+                $migrateTourSql = "INSERT INTO `$newWalkingTourTable` (
+                        id, title, description, route, credits, postscript_text, featured, public, color) 
+                    SELECT 
+                        id, title, description, route, credits, postscript_text, featured, public, color
+                    FROM `$oldTourTable`
+                    WHERE id NOT IN (SELECT id FROM `$newWalkingTourTable`)";
+                $db->query($migrateTourSql);
+
+                // $db->query("DROP TABLE `$oldTourTable` text;");
+            }
+
+            $checkOldTourItemTable = $db->query("SHOW TABLES LIKE '$oldTourItemTable'")->fetchAll();
+            
+            if (!empty($checkOldTourItemTable)) {
+                $migrateItemSql = "INSERT INTO `$newWalkingTourItemTable` (
+                        id, tour_id, ordinal, item_id, exhibit_id) 
+                    SELECT id, tour_id, ordinal, item_id, exhibit_id
+                    FROM `$oldTourItemTable`
+                    WHERE id NOT IN (SELECT id FROM `$newWalkingTourItemTable`)";
+                $db->query($migrateItemSql);
+                // $db->query("DROP TABLE `$oldTourItemTable` text;");
+            }
         }
+    }
 
     public function hookDefineAcl($args)
     {
@@ -191,8 +239,8 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
         // Get the database.
         $db = get_db();
 
-        // Get the Tour table.
-        $table = $db->getTable('Tour');
+        // Get the Walking Tour table.
+        $table = $db->getTable('WalkingTour');
 
         // Build the select query.
         $select = $table->getSelect();
@@ -205,15 +253,15 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
 
         for ($i = 0; $i <= 5; $i++) {
             if (array_key_exists($i, $results) && is_object($results[$i])) {
-                $tourItems .= '<div class="recent-row"><p class="recent"><a href="' . html_escape(url('tours/show/')) . $results[$i]->id . '">'
-                    . $results[$i]->title . '</a></p><p class="dash-edit"><a href="' . html_escape(url('tours/edit/')) . $results[$i]->id . '">Edit</a></p></div>';
+                $tourItems .= '<div class="recent-row"><p class="recent"><a href="' . html_escape(url('walking-tours/show/')) . $results[$i]->id . '">'
+                    . $results[$i]->title . '</a></p><p class="dash-edit"><a href="' . html_escape(url('walking-tours/edit/')) . $results[$i]->id . '">Edit</a></p></div>';
             }
         }
 
         $html .= '<section class="five columns alpha panel">';
         $html .= '<h2>' . __('Recent Tours') . '</h2>';
         $html .= '' . $tourItems . '';
-        $html .= '<p><a class="add-new-item green button" href="' . html_escape(url('tours/add/')) . '">' . __('Add a new tour') . '</a></p>';
+        $html .= '<p><a class="add-new-item green button" href="' . html_escape(url('walking-tours/add/')) . '">' . __('Add a new tour') . '</a></p>';
         $html .= '</section>';
 
         echo $html;
@@ -225,7 +273,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
         $module = $request->getModuleName();
         $controller = $request->getControllerName();
 
-        if ($module == 'walking-tour' && $controller == 'tours') {
+        if ($module == 'walking-tour' && $controller == 'walking-tours') {
             queue_css_file('tour-1.7');
             queue_js_url('//code.jquery.com/jquery-migrate-3.0.0.min.js');
         }
@@ -233,23 +281,25 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
 
     public function filterPublicNavigationMain($nav)
     {
-        $nav[] = array('label' => 'Map', 'uri' => url('map'));
+        $nav[] = array(
+            'label' => 'Map', 
+            'uri' => url('map')
+        );
         return $nav;
     }
 
     public function filterSearchRecordTypes($recordTypes)
     {
-        $recordTypes['Tour'] = __('Tour');
+        $recordTypes['WalkingTour'] = __('Walking Tour');
         return $recordTypes;
     }
 
 
     public function filterAdminNavigationMain($nav)
     {
-        $nav['Tours'] = array(
+        $nav['WalkingTours'] = array(
             'label' => __('Walking Tours'),
-            'action' => 'browse',
-            'controller' => 'tours'
+            'uri' => url('walking-tours/browse')
         );
         return $nav;
     }

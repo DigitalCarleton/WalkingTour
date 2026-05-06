@@ -1,12 +1,12 @@
 <?php
 
-require_once 'TourTable.php';
+require_once 'WalkingTourTable.php';
 
 /**
- * Tour
+ * WalkingTour
  * @package: Omeka
  */
-class Tour extends Omeka_Record_AbstractRecord
+class WalkingTour extends Omeka_Record_AbstractRecord
 {
 	public $title;
 	public $description;
@@ -17,7 +17,10 @@ class Tour extends Omeka_Record_AbstractRecord
 	public $color = "#000000";
 	public $route;
 
-	protected $_related = array( 'Items' => 'getItems','Image' => 'getImage' );
+	protected $_related = array( 
+		'Items' => 'getItems', 
+		'Image' => 'getImage' 
+	);
 
     public function _initializeMixins()
     {
@@ -32,7 +35,7 @@ class Tour extends Omeka_Record_AbstractRecord
 
 	public function removeAllItems( ) {
 		$db = get_db();
-		$tiTable = $db->getTable( 'TourItem' );
+		$tiTable = $db->getTable( 'WalkingTourItem' );
 		$select = $tiTable->getSelect();
 		$select->where( 'tour_id = ?', array( $this->id ) );
 
@@ -54,7 +57,7 @@ class Tour extends Omeka_Record_AbstractRecord
 
 		# Get the next ordinal
 		$db = get_db();
-		$tiTable = $db->getTable( 'TourItem' );
+		$tiTable = $db->getTable( 'WalkingTourItem' );
 		$select = $tiTable->getSelectForCount();
 		$select->where( 'tour_id = ?', array( $this->id ) );
 		if($ordinal === null) {
@@ -62,7 +65,7 @@ class Tour extends Omeka_Record_AbstractRecord
 		}
 
 		# Create, assign, and save the new tour item connection
-		$tourItem = new TourItem;
+		$tourItem = new WalkingTourItem;
 		$tourItem->tour_id = $this->id;
 		$tourItem->item_id = $item_id;
 		$tourItem->ordinal = $ordinal;

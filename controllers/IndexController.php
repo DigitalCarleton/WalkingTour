@@ -21,8 +21,8 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
     {
         // Get the database.
         $db = get_db();
-        // Get the Tour table.
-        $tour_table = $db->getTable('Tour');
+        // Get the Walking Tour table.
+        $tour_table = $db->getTable('WalkingTour');
         // Build the select query.
         $select = $tour_table->getSelect();
         // Fetch some items with our select.
@@ -46,7 +46,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $tourId = $this->getRequest()->getPost('tour_id');
         $route = $this->getRequest()->getPost('route');
         $db = get_db();
-        $tourTable = $db->getTable('Tour');
+        $tourTable = $db->getTable('WalkingTour');
         $tour = $tourTable->find($tourId);
         if ($tour) {
             $tour->route = $route;
@@ -122,7 +122,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $request_tour_id = $this->publicTours();
         $colorArray = array();
 
-        $tourItemTable = $db->getTable('TourItem');
+        $tourItemTable = $db->getTable('WalkingTourItem');
         $tourItemsIDs = array();
         $returnArray = array();
         foreach ($request_tour_id['id'] as $tour_id => $tour_title) {
@@ -185,7 +185,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             $returnArray[$tour_id]["Description"] = $request_tour_id['description'][$tour_id];
             $returnArray[$tour_id]["Credits"] = $request_tour_id['credits'][$tour_id];
             
-            $tourTable = $db->getTable('Tour');
+            $tourTable = $db->getTable('WalkingTour');
             $tour = $tourTable->find($tour_id);
             $returnArray[$tour_id]["Route"] = $tour ? $tour->route : null;
         }
@@ -206,7 +206,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $tour_id = $this->_request->getParam('tour');
 
         $db = $this->_helper->db->getDb();
-        $tourItemTable = $db->getTable('TourItem');
+        $tourItemTable = $db->getTable('WalkingTourItem');
         $prefix = $db->prefix;
 
 

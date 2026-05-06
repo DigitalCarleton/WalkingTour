@@ -34,15 +34,15 @@ function availableExhibit() {
 	}
 }
 
-function has_tours()
+function has_walking_tours()
 {
 	return( total_tours() > 0 );
 }
 
-function has_tours_for_loop()
+function has_walking_tours_for_loop()
 {
 	$view = get_view();
-	return $view->tours && count( $view->tours );
+	return $view->walking_tours && count( $view->walking_tours );
 }
 
 
@@ -116,7 +116,7 @@ function link_to_tour(
 function total_tours()
 {
 	$view = get_view();
-	return count( $view->tours );
+	return count( $view->walking_tours );
 }
 
 function nls2p($str) {
