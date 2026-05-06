@@ -4,7 +4,7 @@
 ?>
 <section class="seven columns alpha" id="edit-form">
 
-  <div id="walkingTour-metadata">
+  <div id="tour-metadata">
 	<div id="form-data">
 
 		<fieldset>
@@ -13,7 +13,7 @@
 				  <?php echo $this->formLabel( 'title', __('Title') ); ?>
 				</div>
 				<div class="five columns omega">
-				  <?php echo $this->formText( 'title', $walkingTour->title ); ?>
+				  <?php echo $this->formText( 'title', $walking_tour->title ); ?>
 				  <p class="explanation"><?php echo __('A title for the tour.');?></p>
 				</div>
 			</div>
@@ -24,7 +24,7 @@
 				  <?php echo $this->formLabel( 'credits', __('Credits') ); ?>
 				</div>
 				<div class="five columns omega inputs">
-				  <?php echo $this->formText( 'credits', $walkingTour->credits ); ?>
+				  <?php echo $this->formText( 'credits', $walking_tour->credits ); ?>
 				  <p class="explanation"><?php echo __('OPTIONAL: The name of the person(s) or organization responsible for the content of the tour.');?></p>
 				</div>
 			</div>
@@ -35,7 +35,7 @@
 
 				</div>
 				<div class="five columns omega inputs">
-				  <?php echo $this->formTextarea( 'description', $walkingTour->description,array( 'rows' => 12, 'cols' => '40' ) ); ?>
+				  <?php echo $this->formTextarea( 'description', $walking_tour->description,array( 'rows' => 12, 'cols' => '40' ) ); ?>
 					<p class="explanation"><?php echo __('The main text of the tour.');?></p>
 				</div>
 			</div>
@@ -45,7 +45,7 @@
 				  <?php echo $this->formLabel( 'postscript_text', __('Postscript Text') ); ?>
 				</div>
 				<div class="five columns omega inputs">
-				  <?php echo $this->formTextarea( 'postscript_text', $walkingTour->postscript_text,array( 'rows' => 3, 'cols' => '40' )  ); ?>
+				  <?php echo $this->formTextarea( 'postscript_text', $walking_tour->postscript_text,array( 'rows' => 3, 'cols' => '40' )  ); ?>
 				  <p class="explanation"><?php echo __('OPTIONAL: Add postscript text to the end of the tour, for example, to thank a sponsor or add directional information.');?></p>
 				</div>
 			</div>
@@ -55,7 +55,7 @@
 				  <?php echo $this->formLabel( 'color', __('Color') ); ?>
 				</div>
 				<div class="five columns omega inputs">
-				  <?php echo $this->formTextarea( 'color', $walkingTour->color,array( 'rows' => 1, 'cols' => '40' )  ); ?>
+				  <?php echo $this->formTextarea( 'color', $walking_tour->color,array( 'rows' => 1, 'cols' => '40' )  ); ?>
 				  <p class="explanation"><?php echo __('Add a HTML color code as a hexadecimal value for the color shown in the map.');?></p>
 				</div>
 			</div>
@@ -68,7 +68,7 @@
         	</div>
 		</div>
 		<script>
-			var currentTour = <?php echo $walkingTour->id?>;
+			var currentTour = <?php echo $walking_tour->id?>;
 		</script>
 		<?php echo js_tag('walking-tour');?>
 		<?php echo js_tag('jquery.cookie');?>
@@ -84,8 +84,8 @@
 
 			<div class="field">
 				<div class="tour_item_ids hidden">
-				  <?php echo $this->formText( 'tour_item_ids', null ); ?>
-				  <?php echo $this->formText( 'tour_item_exhibit_ids', null ); ?>
+				  <?php echo $this->formText( 'walking_tour_item_ids', null ); ?>
+				  <?php echo $this->formText( 'walking_tour_item_exhibit_ids', null ); ?>
 				</div>
 			</div>
 
@@ -95,10 +95,10 @@
 				<input type="search" id="tour-item-search" placeholder="Search item by title..." onkeydown="if (event.keyCode == 13) return false"/>
 			</div>
 			<ul id="sortable">
-				<?php if($walkingTour->id){
-					$walkingTourItems = $walkingTour->getItems();
+				<?php if($walking_tour->id){
+					$walking_tour_items = $walking_tour->getItems();
 					$counter = 1;
-					foreach($walkingTourItems as $ti){
+					foreach($walking_tour_items as $ti){
 						$html  = '<li data-id="'.$ti->id.'" id="'.$ti->id.'" class="ui-state-default">';
 
 						if (plugin_is_active('ExhibitBuilder')){
