@@ -273,7 +273,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
         $module = $request->getModuleName();
         $controller = $request->getControllerName();
 
-        if ($module == 'walking-tour' && $controller == 'walking-tours') {
+        if ($module == 'walking-tour' && $controller == 'tours') {
             queue_css_file('tour-1.7');
             queue_js_url('//code.jquery.com/jquery-migrate-3.0.0.min.js');
         }
