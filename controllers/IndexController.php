@@ -127,8 +127,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $returnArray = array();
         foreach ($request_tour_id['id'] as $tour_id => $tour_title) {
             if ($tour_id != 0) {
-                $tourItemsDat = $tourItemTable->fetchObjects("SELECT item_id FROM " . $prefix . "walking_tour_items 
-                                                            WHERE tour_id = $tour_id");
+                $tourItemsDat = $tourItemTable->fetchObjects("SELECT item_id FROM " . $prefix . "walking_tour_items WHERE tour_id = $tour_id");
             } else {
                 $tourItemsDat = $tourItemTable->fetchObjects("SELECT item_id FROM " . $prefix . "walking_tour_items");
             }
@@ -210,8 +209,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $prefix = $db->prefix;
 
 
-        $tourItem = $tourItemTable->fetchObjects("SELECT * FROM " . $prefix . "walking_tour_items 
-                                                            WHERE tour_id = $tour_id AND item_id = $item_id");
+        $tourItem = $tourItemTable->fetchObjects("SELECT * FROM " . $prefix . "walking_tour_items WHERE tour_id = $tour_id AND item_id = $item_id");
 
         $exhibit_id = $tourItem[0]["exhibit_id"];
 
