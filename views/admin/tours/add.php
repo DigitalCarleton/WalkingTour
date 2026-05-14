@@ -22,7 +22,7 @@ echo flash();
           <?php echo __('Public'); ?>:
         </label>
         <div class="checkbox">
-          <?php echo $this->formCheckbox( 'public', $tour->public,
+          <?php echo $this->formCheckbox( 'public', $walking_tour->public,
 	array(), array( '1', '0' ) ); ?>
         </div>
       </div>
@@ -34,7 +34,7 @@ echo flash();
           <?php echo __('Featured'); ?>:
         </label>
         <div class="checkbox">
-          <?php echo $this->formCheckbox( 'featured', $tour->featured,
+          <?php echo $this->formCheckbox( 'featured', $walking_tour->featured,
 	array(), array( '1', '0' ) ); ?>
         </div>
       </div>

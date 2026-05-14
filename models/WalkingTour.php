@@ -99,6 +99,7 @@ class WalkingTour extends Omeka_Record_AbstractRecord
     {        
 	    $post=$args['post'];
         if($post && isset($post['tour_item_ids']) && !$args['insert']){ 
+        // if($post && isset($post['tour_item_ids'])){ 
 	        $this->removeAllItems();
         
         

@@ -20,7 +20,7 @@ echo flash();
 	  <?php echo $this->formSubmit( 'submit', __('Save Changes'),
 	array( 'id' => 'save-changes',
 		'class' => 'submit big green button' ) ); ?>
-      <a href="<?php echo html_escape( public_url( 'walking-tour') + '?tourId=' + $tour->id); //<a href="<?php echo html_escape( public_url( 'map/' . $tour->id ) ); ?>"
+      <a href="<?php echo html_escape( public_url( 'walking-tour') + '?tourId=' + $walking_tour->id); //<a href="<?php echo html_escape( public_url( 'map/' . $tour->id ) ); ?>"
          class="big blue button" target="_blank">
         <?php echo __('View Map'); ?>
       </a>
@@ -40,7 +40,7 @@ echo flash();
         </label>
         <div class="checkbox">
           <?php echo $this->formCheckbox(
-	'public', $tour->public,
+	'public', $walking_tour->public,
 	array(), array( '1', '0' ) ); ?>
         </div>
       </div>
@@ -53,7 +53,7 @@ echo flash();
         </label>
         <div class="checkbox">
           <?php echo $this->formCheckbox(
-	'featured', $tour->featured,
+	'featured', $walking_tour->featured,
 	array(), array( '1', '0' ) ); ?>
         </div>
       </div>

@@ -84,8 +84,8 @@
 
 			<div class="field">
 				<div class="tour_item_ids hidden">
-				  <?php echo $this->formText( 'walking_tour_item_ids', null ); ?>
-				  <?php echo $this->formText( 'walking_tour_item_exhibit_ids', null ); ?>
+				  <?php echo $this->formText( 'tour_item_ids', null ); ?>
+				  <?php echo $this->formText( 'tour_item_exhibit_ids', null ); ?>
 				</div>
 			</div>
 

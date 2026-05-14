@@ -15,7 +15,7 @@ class WalkingTourTable extends Omeka_Db_Table
 		$select->order( 'ti.ordinal ASC' );
 
 		$items = $itemTable->fetchObjects( "SELECT i.*, ti.ordinal, ti.exhibit_id
-         FROM ".$prefix."items i LEFT JOIN ".$prefix."tour_items ti
+         FROM ".$prefix."items i LEFT JOIN ".$prefix."walking_tour_items ti
          ON i.id = ti.item_id
          WHERE ti.tour_id = ?
          ORDER BY ti.ordinal ASC",
@@ -37,7 +37,7 @@ class WalkingTourTable extends Omeka_Db_Table
 		$select->order( 'ti.ordinal ASC' );
 
 		$items = $itemTable->fetchObjects( "SELECT f.*, ti.ordinal
-         FROM ".$prefix."files f LEFT JOIN ".$prefix."tour_items ti
+         FROM ".$prefix."files f LEFT JOIN ".$prefix."walking_tour_items ti
          ON i.id = ti.item_id
          WHERE ti.tour_id = ?
          ORDER BY ti.ordinal ASC",

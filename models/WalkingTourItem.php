@@ -18,7 +18,7 @@ class WalkingTourItem extends Omeka_Record_AbstractRecord
 
 	protected function getItem()
 	{
-		return $this->getTable( 'Item' )->find( $this->item_id );
+		return $this->getTable( 'WalkingTourItem' )->find( $this->item_id );
 	}
 
 	protected function getWalkingTour()
