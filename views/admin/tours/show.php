@@ -14,46 +14,46 @@ echo flash();
 
 <section class="seven columns alpha">
 
-  <?php if( metadata( 'tour', 'Title' ) ): ?>
+  <?php if( metadata( 'walking_tour', 'Title' ) ): ?>
   <div id="tour-title" class="element">
     <h2>Title</h2>
     <div class="element-text">
-      <?php echo nls2p( metadata( 'tour', 'Title' ) ); ?>
+      <?php echo nls2p( metadata( 'walking_tour', 'Title' ) ); ?>
     </div>
   </div>
   <?php endif; ?>
 
-  <?php if( metadata( 'tour', 'Credits' ) ): ?>
+  <?php if( metadata( 'walking_tour', 'Credits' ) ): ?>
   <div id="tour-credits" class="element">
     <h2>Credits</h2>
     <div class="element-text">
-      <?php echo metadata( 'tour', 'Credits' ); ?>
+      <?php echo metadata( 'walking_tour', 'Credits' ); ?>
     </div>
   </div>
   <?php endif; ?>
 
-  <?php if( metadata( 'tour', 'Description' ) ): ?>
+  <?php if( metadata( 'walking_tour', 'Description' ) ): ?>
   <div id="tour-description" class="element">
     <h2>Description</h2>
     <div class="element-text">
-      <?php echo nls2p( metadata( 'tour', 'Description' ) ); ?>
+      <?php echo nls2p( metadata( 'walking_tour', 'Description' ) ); ?>
     </div>
   </div>
   <?php endif; ?>
 
-  <?php if( metadata( 'tour', 'postscript_text' ) ): ?>
+  <?php if( metadata( 'walking_tour', 'postscript_text' ) ): ?>
   <div id="postscript_text" class="element">
     <h2>Postscript Text</h2>
     <div class="element-text">
-      <?php echo '<em>'.htmlspecialchars_decode(metadata( 'tour', 'postscript_text' )).'</em>'; ?>
+      <?php echo '<em>'.htmlspecialchars_decode(metadata( 'walking_tour', 'postscript_text' )).'</em>'; ?>
     </div>
   </div>
   <?php endif; ?>
 
   
   <?php
-$items = $tour->getItems();
-if( $tour->getItems() ): ?>
+$items = $walking_tour->getItems();
+if( $walking_tour->getItems() ): ?>
   <div id="tour-items" class="element">
     <h2>Items</h2>
     <div class="element-text">
@@ -75,7 +75,7 @@ if( $tour->getItems() ): ?>
 <section class="three columns omega">
   <div id="edit" class="panel">
     <?php if( is_allowed( 'WalkingTourBuilder_Tours', 'edit' ) ): ?>
-    <a href="<?php echo url( array( 'action' => 'edit', 'id' => $tour->id ) ); ?>"
+    <a href="<?php echo url( array( 'action' => 'edit', 'id' => $walking_tour->id ) ); ?>"
        class="edit big green button">
       <?php echo __('Edit'); ?>
     </a>
@@ -98,13 +98,13 @@ if( $tour->getItems() ): ?>
       <span class="label">
         <?php echo __('Public'); ?>:
       </span>
-      <?php echo ($tour->public) ? __('Yes') : __('No'); ?>
+      <?php echo ($walking_tour->public) ? __('Yes') : __('No'); ?>
     </p>
     <p>
       <span class="label">
         <?php echo __('Featured'); ?>:
       </span>
-      <?php echo ($tour->featured) ? __('Yes') : __('No'); ?>
+      <?php echo ($walking_tour->featured) ? __('Yes') : __('No'); ?>
     </p>
   </div>
 </section>

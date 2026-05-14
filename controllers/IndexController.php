@@ -127,10 +127,10 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $returnArray = array();
         foreach ($request_tour_id['id'] as $tour_id => $tour_title) {
             if ($tour_id != 0) {
-                $tourItemsDat = $tourItemTable->fetchObjects("SELECT item_id FROM " . $prefix . "tour_items 
+                $tourItemsDat = $tourItemTable->fetchObjects("SELECT item_id FROM " . $prefix . "walking_tour_items 
                                                             WHERE tour_id = $tour_id");
             } else {
-                $tourItemsDat = $tourItemTable->fetchObjects("SELECT item_id FROM " . $prefix . "tour_items");
+                $tourItemsDat = $tourItemTable->fetchObjects("SELECT item_id FROM " . $prefix . "walking_tour_items");
             }
             $tourItemsIDs[$tour_id] = array();
             foreach ($tourItemsDat as $dat) {
@@ -203,14 +203,14 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             throw new Omeka_Controller_Exception_403;
         }
         $item_id = $this->_request->getParam('id');
-        $tour_id = $this->_request->getParam('tour');
+        $tour_id = $this->_request->getParam('tour_id');
 
         $db = $this->_helper->db->getDb();
         $tourItemTable = $db->getTable('WalkingTourItem');
         $prefix = $db->prefix;
 
 
-        $tourItem = $tourItemTable->fetchObjects("SELECT * FROM " . $prefix . "tour_items 
+        $tourItem = $tourItemTable->fetchObjects("SELECT * FROM " . $prefix . "walking_tour_items 
                                                             WHERE tour_id = $tour_id AND item_id = $item_id");
 
         $exhibit_id = $tourItem[0]["exhibit_id"];
