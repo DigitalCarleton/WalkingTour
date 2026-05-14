@@ -72,7 +72,7 @@ echo flash();
 
 <?php else: ?>
 
-  <?php if( total_records( 'Tour' ) === 0 ): ?>
+  <?php if( total_records( 'WalkingTour' ) === 0 ): ?>
     <h2><?php echo __('You have no tours.'); ?></h2>
     <?php if( is_allowed( 'WalkingTourBuilder_Tours', 'add' ) ): ?>
     <p><?php echo __('Get started by adding your first tour.'); ?></p>
