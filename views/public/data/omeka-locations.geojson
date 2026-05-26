@@ -1,0 +1,5973 @@
+{
+    "type": "FeatureCollection",
+    "name": "omeka_locations",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.472867,
+                    41.900524
+                ]
+            },
+            "properties": {
+                "id": 1,
+                "item_id": 8,
+                "zoom_level": 18,
+                "map_type": "Leaflet",
+                "address": "41.900524, 12.472867"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.487928,
+                    41.89359
+                ]
+            },
+            "properties": {
+                "id": 2,
+                "item_id": 5,
+                "zoom_level": 5,
+                "map_type": "Leaflet",
+                "address": "41.893590, 12.487928"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48667,
+                    41.895959
+                ]
+            },
+            "properties": {
+                "id": 3,
+                "item_id": 6,
+                "zoom_level": 5,
+                "map_type": "Leaflet",
+                "address": "41.895959, 12.486670"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.498546,
+                    41.897557
+                ]
+            },
+            "properties": {
+                "id": 4,
+                "item_id": 1,
+                "zoom_level": 5,
+                "map_type": "Leaflet",
+                "address": "41.897557, 12.498546"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.477983,
+                    41.890783
+                ]
+            },
+            "properties": {
+                "id": 5,
+                "item_id": 4,
+                "zoom_level": 5,
+                "map_type": "Leaflet",
+                "address": "41.890783, 12.477983"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.472214,
+                    41.899174
+                ]
+            },
+            "properties": {
+                "id": 6,
+                "item_id": 7,
+                "zoom_level": 5,
+                "map_type": "Leaflet",
+                "address": "41.899174, 12.472214"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.480039,
+                    41.894203
+                ]
+            },
+            "properties": {
+                "id": 7,
+                "item_id": 3,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.894203, 12.480039"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4698422,
+                    41.9001702
+                ]
+            },
+            "properties": {
+                "id": 8,
+                "item_id": 153,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.9001702, 12.4698422"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4698422,
+                    41.9001702
+                ]
+            },
+            "properties": {
+                "id": 10,
+                "item_id": 154,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.9001702, 12.4698422"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.49272108078,
+                    41.890469399832
+                ]
+            },
+            "properties": {
+                "id": 11,
+                "item_id": 155,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4769,
+                    41.8986
+                ]
+            },
+            "properties": {
+                "id": 12,
+                "item_id": 156,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8986, 12.4769"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4922,
+                    41.8902
+                ]
+            },
+            "properties": {
+                "id": 13,
+                "item_id": 157,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8902, 12.4922"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4769772669522,
+                    41.9025577839289
+                ]
+            },
+            "properties": {
+                "id": 14,
+                "item_id": 158,
+                "zoom_level": 18,
+                "map_type": "Leaflet",
+                "address": "41.90255778392887, 12.476977266952224"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.498546,
+                    41.897557
+                ]
+            },
+            "properties": {
+                "id": 15,
+                "item_id": 165,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": "41.897557, 12.498546"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.480055197821,
+                    41.894545377593
+                ]
+            },
+            "properties": {
+                "id": 16,
+                "item_id": 166,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89454537759293, 12.480055197821097"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.477983,
+                    41.890783
+                ]
+            },
+            "properties": {
+                "id": 17,
+                "item_id": 167,
+                "zoom_level": 5,
+                "map_type": "Leaflet",
+                "address": "41.890783, 12.477983"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.487928,
+                    41.89359
+                ]
+            },
+            "properties": {
+                "id": 18,
+                "item_id": 168,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.893590, 12.487928"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48667,
+                    41.895959
+                ]
+            },
+            "properties": {
+                "id": 19,
+                "item_id": 169,
+                "zoom_level": 5,
+                "map_type": "Leaflet",
+                "address": "41.895959, 12.486670"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.472867,
+                    41.900524
+                ]
+            },
+            "properties": {
+                "id": 20,
+                "item_id": 170,
+                "zoom_level": 18,
+                "map_type": "Leaflet",
+                "address": "41.900524, 12.472867"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473149997822,
+                    41.901282137244
+                ]
+            },
+            "properties": {
+                "id": 21,
+                "item_id": 171,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.901282137243555, 12.473149997822318"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482542061316,
+                    41.908487466461
+                ]
+            },
+            "properties": {
+                "id": 22,
+                "item_id": 172,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90848746646136, 12.482542061315895"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.483254355492,
+                    41.894194444419
+                ]
+            },
+            "properties": {
+                "id": 23,
+                "item_id": 174,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.894194444418765, 12.483254355492441"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.461419682481,
+                    41.888603700412
+                ]
+            },
+            "properties": {
+                "id": 24,
+                "item_id": 177,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88860370041222, 12.461419682481113"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485100938305,
+                    41.878855514876
+                ]
+            },
+            "properties": {
+                "id": 25,
+                "item_id": 178,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8788555148763, 12.485100938304804"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.470728637736,
+                    41.892557835475
+                ]
+            },
+            "properties": {
+                "id": 26,
+                "item_id": 180,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89255783547505, 12.470728637735547"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.470728637736,
+                    41.892557835475
+                ]
+            },
+            "properties": {
+                "id": 27,
+                "item_id": 181,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89255783547505, 12.470728637735547"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.461481359519,
+                    41.901528079675
+                ]
+            },
+            "properties": {
+                "id": 28,
+                "item_id": 182,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90152807967454, 12.461481359518613"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.495929982481,
+                    41.880650097867
+                ]
+            },
+            "properties": {
+                "id": 29,
+                "item_id": 184,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88065009786724, 12.49592998248082"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.494621124811,
+                    41.885575333712
+                ]
+            },
+            "properties": {
+                "id": 30,
+                "item_id": 185,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88557533371161, 12.49462112481059"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.471554362811,
+                    41.899377902131
+                ]
+            },
+            "properties": {
+                "id": 31,
+                "item_id": 186,
+                "zoom_level": 18,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.477932426657,
+                    41.887565680185
+                ]
+            },
+            "properties": {
+                "id": 32,
+                "item_id": 187,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88756568018467, 12.477932426657022"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.494631853646,
+                    41.885567346311
+                ]
+            },
+            "properties": {
+                "id": 33,
+                "item_id": 188,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.885567346311106, 12.494631853645792"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.467599868987,
+                    41.892391717093
+                ]
+            },
+            "properties": {
+                "id": 34,
+                "item_id": 189,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89239171709264, 12.467599868986841"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4754483063,
+                    41.889452938315
+                ]
+            },
+            "properties": {
+                "id": 35,
+                "item_id": 190,
+                "zoom_level": 18,
+                "map_type": "Leaflet",
+                "address": "41.88945293831456, 12.475448306300217"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473704611316,
+                    41.88925901169
+                ]
+            },
+            "properties": {
+                "id": 36,
+                "item_id": 191,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88925901169028, 12.473704611316352"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.524108513162,
+                    41.867179746198
+                ]
+            },
+            "properties": {
+                "id": 37,
+                "item_id": 192,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.86717974619808, 12.524108513162032"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476563068987,
+                    41.887333642226
+                ]
+            },
+            "properties": {
+                "id": 38,
+                "item_id": 193,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.887333642225876, 12.476563068986671"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.488628040152,
+                    41.890884967797
+                ]
+            },
+            "properties": {
+                "id": 39,
+                "item_id": 194,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.890884967796964, 12.488628040151585"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479865382481,
+                    41.892102491006
+                ]
+            },
+            "properties": {
+                "id": 40,
+                "item_id": 195,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892102491006504, 12.479865382481174"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485133497822,
+                    41.886321081207
+                ]
+            },
+            "properties": {
+                "id": 41,
+                "item_id": 196,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88632108120653, 12.485133497821781"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.475608039812,
+                    41.877324145199
+                ]
+            },
+            "properties": {
+                "id": 42,
+                "item_id": 197,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.87732414519913, 12.475608039812117"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473406069363,
+                    41.885153678593
+                ]
+            },
+            "properties": {
+                "id": 43,
+                "item_id": 198,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.885153678593056, 12.47340606936262"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476031068987,
+                    41.907629933922
+                ]
+            },
+            "properties": {
+                "id": 44,
+                "item_id": 199,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90762993392159, 12.476031068987332"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.464158297822,
+                    41.888980686395
+                ]
+            },
+            "properties": {
+                "id": 45,
+                "item_id": 200,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "41.88898068639497, 12.464158297821875"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.494642582481,
+                    41.88563923288
+                ]
+            },
+            "properties": {
+                "id": 46,
+                "item_id": 202,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "41.88563923287975, 12.494642582480987"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.467286797822,
+                    41.893723168251
+                ]
+            },
+            "properties": {
+                "id": 47,
+                "item_id": 203,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89372316825104, 12.467286797822025"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.467286797822,
+                    41.893723168251
+                ]
+            },
+            "properties": {
+                "id": 48,
+                "item_id": 204,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89372316825104, 12.467286797822025"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.466322253646,
+                    41.88888936067
+                ]
+            },
+            "properties": {
+                "id": 49,
+                "item_id": 205,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88888936067022, 12.466322253645888"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.450085701258,
+                    41.917846368856
+                ]
+            },
+            "properties": {
+                "id": 50,
+                "item_id": 206,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.917846368855585, 12.450085701257574"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.481494913162,
+                    41.876862086023
+                ]
+            },
+            "properties": {
+                "id": 51,
+                "item_id": 207,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.876862086022605, 12.481494913162338"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.466357,
+                    41.900659
+                ]
+            },
+            "properties": {
+                "id": 52,
+                "item_id": 208,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.498797726657,
+                    41.896645808991
+                ]
+            },
+            "properties": {
+                "id": 53,
+                "item_id": 212,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89664580899126, 12.498797726657342"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48305,
+                    41.893515
+                ]
+            },
+            "properties": {
+                "id": 54,
+                "item_id": 213,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8935273643236, 12.482750017140422"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.481633297822,
+                    41.888214953099
+                ]
+            },
+            "properties": {
+                "id": 55,
+                "item_id": 214,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.888214953099265, 12.481633297821924"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.483134024811,
+                    41.889692476063
+                ]
+            },
+            "properties": {
+                "id": 56,
+                "item_id": 215,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.889692476062926, 12.483134024810733"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.523157,
+                    41.848302
+                ]
+            },
+            "properties": {
+                "id": 57,
+                "item_id": 216,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.848302, 12.523157"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.478022597822,
+                    41.898256304565
+                ]
+            },
+            "properties": {
+                "id": 58,
+                "item_id": 217,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89825630456512, 12.478022597822216"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473736797822,
+                    41.889266998629
+                ]
+            },
+            "properties": {
+                "id": 59,
+                "item_id": 218,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88926699862922, 12.473736797821946"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.456739026657,
+                    41.902406141284
+                ]
+            },
+            "properties": {
+                "id": 60,
+                "item_id": 219,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.902406141284445, 12.456739026656512"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.501519911316,
+                    41.873656762765
+                ]
+            },
+            "properties": {
+                "id": 61,
+                "item_id": 220,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.87365676276507, 12.501519911315821"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.47764,
+                    41.883599
+                ]
+            },
+            "properties": {
+                "id": 62,
+                "item_id": 221,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.493119341998,
+                    41.897107561691
+                ]
+            },
+            "properties": {
+                "id": 63,
+                "item_id": 223,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8971075616912, 12.49311934199818"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476542,
+                    41.887326
+                ]
+            },
+            "properties": {
+                "id": 64,
+                "item_id": 224,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.887326, 12.476542"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473052740152,
+                    41.899350942919
+                ]
+            },
+            "properties": {
+                "id": 65,
+                "item_id": 225,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.899350942919064, 12.473052740151838"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.478674,
+                    41.89287
+                ]
+            },
+            "properties": {
+                "id": 66,
+                "item_id": 226,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892870, 12.478674"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482589884327,
+                    41.893142440884
+                ]
+            },
+            "properties": {
+                "id": 67,
+                "item_id": 227,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": "41.89314244088442, 12.482589884326694"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.461381197822,
+                    41.901055325001
+                ]
+            },
+            "properties": {
+                "id": 68,
+                "item_id": 228,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": "41.901055325000776, 12.461381197822313"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.462722197966,
+                    41.900260110662
+                ]
+            },
+            "properties": {
+                "id": 69,
+                "item_id": 229,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.90026011066239, 12.462722197965613"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.470092,
+                    41.895641
+                ]
+            },
+            "properties": {
+                "id": 70,
+                "item_id": 230,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.895641, 12.470092 "
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.483972,
+                    41.893667
+                ]
+            },
+            "properties": {
+                "id": 71,
+                "item_id": 231,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.893667, 12.483972"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482611,
+                    41.893306
+                ]
+            },
+            "properties": {
+                "id": 72,
+                "item_id": 232,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": "41.893306, 12.482611"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.489694,
+                    41.8905
+                ]
+            },
+            "properties": {
+                "id": 73,
+                "item_id": 234,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.890500, 12.489694"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473773956299,
+                    41.898726472995
+                ]
+            },
+            "properties": {
+                "id": 74,
+                "item_id": 237,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.469805957908,
+                    41.89187498377
+                ]
+            },
+            "properties": {
+                "id": 75,
+                "item_id": 238,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89187498376976, 12.469805957907566"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479297338637,
+                    41.890110066719
+                ]
+            },
+            "properties": {
+                "id": 76,
+                "item_id": 239,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89011006671925, 12.479297338636828"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4771113,
+                    41.889585
+                ]
+            },
+            "properties": {
+                "id": 77,
+                "item_id": 240,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "Lungotevere degli Alberteschi, 00153 Roma RM, Italy"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479779,
+                    41.884719
+                ]
+            },
+            "properties": {
+                "id": 78,
+                "item_id": 241,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.884719, 12.479779"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.478044,
+                    41.898268
+                ]
+            },
+            "properties": {
+                "id": 79,
+                "item_id": 242,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.898268, 12.478044"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.495987,
+                    41.880649
+                ]
+            },
+            "properties": {
+                "id": 80,
+                "item_id": 243,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.880649, 12.495987"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.495933,
+                    41.880689
+                ]
+            },
+            "properties": {
+                "id": 81,
+                "item_id": 244,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.880689, 12.495933"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479779,
+                    41.884719
+                ]
+            },
+            "properties": {
+                "id": 82,
+                "item_id": 245,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.884719, 12.479779"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479772,
+                    41.884872
+                ]
+            },
+            "properties": {
+                "id": 83,
+                "item_id": 246,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.884872, 12.479772"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.471036,
+                    41.886153
+                ]
+            },
+            "properties": {
+                "id": 84,
+                "item_id": 247,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.886153, 12.471036"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473115,
+                    41.885358
+                ]
+            },
+            "properties": {
+                "id": 85,
+                "item_id": 248,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.885358, 12.473115"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.493055,
+                    41.897199
+                ]
+            },
+            "properties": {
+                "id": 86,
+                "item_id": 249,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.897199, 12.493055"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.480626,
+                    41.903044
+                ]
+            },
+            "properties": {
+                "id": 87,
+                "item_id": 250,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.903044, 12.480626"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4836481,
+                    41.8934821
+                ]
+            },
+            "properties": {
+                "id": 88,
+                "item_id": 251,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "Scala dell'Arce Capitolina, 12, 00186 Roma RM, Italy"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.477293,
+                    41.907839
+                ]
+            },
+            "properties": {
+                "id": 89,
+                "item_id": 252,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.907839, 12.477293"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.46112,
+                    41.901372
+                ]
+            },
+            "properties": {
+                "id": 90,
+                "item_id": 253,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.901372, 12.46112"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.503431,
+                    41.887276
+                ]
+            },
+            "properties": {
+                "id": 91,
+                "item_id": 254,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.887276, 12.503431"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.47678,
+                    41.88961
+                ]
+            },
+            "properties": {
+                "id": 92,
+                "item_id": 255,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88961, 12.47678"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48368,
+                    41.90045
+                ]
+            },
+            "properties": {
+                "id": 93,
+                "item_id": 256,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90045, 12.48368"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.47134,
+                    41.90007
+                ]
+            },
+            "properties": {
+                "id": 94,
+                "item_id": 257,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90007, 12.47134"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.47112,
+                    41.88967
+                ]
+            },
+            "properties": {
+                "id": 95,
+                "item_id": 258,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88967, 12.47112"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48331,
+                    41.90076
+                ]
+            },
+            "properties": {
+                "id": 96,
+                "item_id": 259,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90076, 12.48331"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476887,
+                    41.899485
+                ]
+            },
+            "properties": {
+                "id": 97,
+                "item_id": 260,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.899485, 12.476887"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.494369,
+                    41.890191
+                ]
+            },
+            "properties": {
+                "id": 98,
+                "item_id": 261,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.890191, 12.494369"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4825837,
+                    41.8935737
+                ]
+            },
+            "properties": {
+                "id": 99,
+                "item_id": 262,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8935737, 12.4825837"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.505678,
+                    41.886169
+                ]
+            },
+            "properties": {
+                "id": 100,
+                "item_id": 263,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.886169, 12.505678"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.466858,
+                    41.899873
+                ]
+            },
+            "properties": {
+                "id": 101,
+                "item_id": 264,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.899873, 12.466858"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473031,
+                    41.895523
+                ]
+            },
+            "properties": {
+                "id": 102,
+                "item_id": 265,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.895523, 12.473031"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.466324,
+                    41.903247
+                ]
+            },
+            "properties": {
+                "id": 103,
+                "item_id": 266,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.903247, 12.466324"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482699,
+                    41.893469
+                ]
+            },
+            "properties": {
+                "id": 104,
+                "item_id": 267,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.893469, 12.482699"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485379,
+                    41.892454
+                ]
+            },
+            "properties": {
+                "id": 105,
+                "item_id": 268,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892454, 12.485379"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.45398,
+                    41.903077
+                ]
+            },
+            "properties": {
+                "id": 106,
+                "item_id": 269,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.903077, 12.45398"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.497533,
+                    41.889594
+                ]
+            },
+            "properties": {
+                "id": 107,
+                "item_id": 270,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.889594, 12.497533"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.45398,
+                    41.903077
+                ]
+            },
+            "properties": {
+                "id": 108,
+                "item_id": 271,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.903077, 12.45398"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.487029,
+                    41.895226
+                ]
+            },
+            "properties": {
+                "id": 109,
+                "item_id": 272,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.895226, 12.487029"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.498194,
+                    41.898429
+                ]
+            },
+            "properties": {
+                "id": 110,
+                "item_id": 273,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.898429, 12.498194"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485325,
+                    41.892662
+                ]
+            },
+            "properties": {
+                "id": 111,
+                "item_id": 274,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892662, 12.485325"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.491857,
+                    41.886629
+                ]
+            },
+            "properties": {
+                "id": 112,
+                "item_id": 275,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.886629, 12.491857"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485379,
+                    41.892454
+                ]
+            },
+            "properties": {
+                "id": 113,
+                "item_id": 276,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.892454, 12.485379"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482801797821,
+                    41.893518907561
+                ]
+            },
+            "properties": {
+                "id": 114,
+                "item_id": 277,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89351890756098, 12.482801797821104"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.478674211473,
+                    41.892786436354
+                ]
+            },
+            "properties": {
+                "id": 115,
+                "item_id": 278,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892786436354406, 12.478674211473296"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48528208248,
+                    41.892677915412
+                ]
+            },
+            "properties": {
+                "id": 116,
+                "item_id": 279,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89267791541243, 12.485282082480264"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476266569145,
+                    41.892531110028
+                ]
+            },
+            "properties": {
+                "id": 117,
+                "item_id": 280,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8925311100277, 12.47626656914521"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.487007271165,
+                    41.89513464496
+                ]
+            },
+            "properties": {
+                "id": 118,
+                "item_id": 281,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89513464495978, 12.487007271164801"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473341696344,
+                    41.885241540513
+                ]
+            },
+            "properties": {
+                "id": 119,
+                "item_id": 282,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88524154051263, 12.47334169634412"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.487829140151,
+                    41.893730207033
+                ]
+            },
+            "properties": {
+                "id": 120,
+                "item_id": 283,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89373020703261, 12.487829140150724"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473200441997,
+                    41.885373652619
+                ]
+            },
+            "properties": {
+                "id": 121,
+                "item_id": 284,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88537365261865, 12.47320044199688"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.469800768987,
+                    41.887352990974
+                ]
+            },
+            "properties": {
+                "id": 122,
+                "item_id": 285,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88735299097397, 12.469800768986659"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.469800768987,
+                    41.887368965328
+                ]
+            },
+            "properties": {
+                "id": 123,
+                "item_id": 286,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88736896532752, 12.469800768986659"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.498546,
+                    41.897557
+                ]
+            },
+            "properties": {
+                "id": 124,
+                "item_id": 289,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": "41.897557, 12.498546"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.480055197821,
+                    41.894545377593
+                ]
+            },
+            "properties": {
+                "id": 125,
+                "item_id": 290,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89454537759293, 12.480055197821097"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.477983,
+                    41.890783
+                ]
+            },
+            "properties": {
+                "id": 126,
+                "item_id": 291,
+                "zoom_level": 5,
+                "map_type": "Leaflet",
+                "address": "41.890783, 12.477983"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.487928,
+                    41.89359
+                ]
+            },
+            "properties": {
+                "id": 127,
+                "item_id": 292,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.893590, 12.487928"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48667,
+                    41.895959
+                ]
+            },
+            "properties": {
+                "id": 128,
+                "item_id": 293,
+                "zoom_level": 5,
+                "map_type": "Leaflet",
+                "address": "41.895959, 12.486670"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.472867,
+                    41.900524
+                ]
+            },
+            "properties": {
+                "id": 129,
+                "item_id": 294,
+                "zoom_level": 18,
+                "map_type": "Leaflet",
+                "address": "41.900524, 12.472867"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473149997822,
+                    41.901282137244
+                ]
+            },
+            "properties": {
+                "id": 130,
+                "item_id": 295,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.901282137243555, 12.473149997822318"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482542061316,
+                    41.908487466461
+                ]
+            },
+            "properties": {
+                "id": 131,
+                "item_id": 296,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90848746646136, 12.482542061315895"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.483254355492,
+                    41.894194444419
+                ]
+            },
+            "properties": {
+                "id": 132,
+                "item_id": 298,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.894194444418765, 12.483254355492441"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.461419682481,
+                    41.888603700412
+                ]
+            },
+            "properties": {
+                "id": 133,
+                "item_id": 301,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88860370041222, 12.461419682481113"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485100938305,
+                    41.878855514876
+                ]
+            },
+            "properties": {
+                "id": 134,
+                "item_id": 302,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8788555148763, 12.485100938304804"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.470728637736,
+                    41.892557835475
+                ]
+            },
+            "properties": {
+                "id": 135,
+                "item_id": 304,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89255783547505, 12.470728637735547"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.470728637736,
+                    41.892557835475
+                ]
+            },
+            "properties": {
+                "id": 136,
+                "item_id": 305,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89255783547505, 12.470728637735547"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.461481359519,
+                    41.901528079675
+                ]
+            },
+            "properties": {
+                "id": 137,
+                "item_id": 306,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90152807967454, 12.461481359518613"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.495929982481,
+                    41.880650097867
+                ]
+            },
+            "properties": {
+                "id": 138,
+                "item_id": 308,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88065009786724, 12.49592998248082"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.494621124811,
+                    41.885575333712
+                ]
+            },
+            "properties": {
+                "id": 139,
+                "item_id": 309,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88557533371161, 12.49462112481059"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.471554362811,
+                    41.899377902131
+                ]
+            },
+            "properties": {
+                "id": 140,
+                "item_id": 310,
+                "zoom_level": 18,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.477932426657,
+                    41.887565680185
+                ]
+            },
+            "properties": {
+                "id": 141,
+                "item_id": 311,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88756568018467, 12.477932426657022"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.494631853646,
+                    41.885567346311
+                ]
+            },
+            "properties": {
+                "id": 142,
+                "item_id": 312,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.885567346311106, 12.494631853645792"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.467599868987,
+                    41.892391717093
+                ]
+            },
+            "properties": {
+                "id": 143,
+                "item_id": 313,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89239171709264, 12.467599868986841"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4754483063,
+                    41.889452938315
+                ]
+            },
+            "properties": {
+                "id": 144,
+                "item_id": 314,
+                "zoom_level": 18,
+                "map_type": "Leaflet",
+                "address": "41.88945293831456, 12.475448306300217"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473704611316,
+                    41.88925901169
+                ]
+            },
+            "properties": {
+                "id": 145,
+                "item_id": 315,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88925901169028, 12.473704611316352"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.524108513162,
+                    41.867179746198
+                ]
+            },
+            "properties": {
+                "id": 146,
+                "item_id": 316,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.86717974619808, 12.524108513162032"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476563068987,
+                    41.887333642226
+                ]
+            },
+            "properties": {
+                "id": 147,
+                "item_id": 317,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.887333642225876, 12.476563068986671"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.488628040152,
+                    41.890884967797
+                ]
+            },
+            "properties": {
+                "id": 148,
+                "item_id": 318,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.890884967796964, 12.488628040151585"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479865382481,
+                    41.892102491006
+                ]
+            },
+            "properties": {
+                "id": 149,
+                "item_id": 319,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892102491006504, 12.479865382481174"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485133497822,
+                    41.886321081207
+                ]
+            },
+            "properties": {
+                "id": 150,
+                "item_id": 320,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88632108120653, 12.485133497821781"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.475608039812,
+                    41.877324145199
+                ]
+            },
+            "properties": {
+                "id": 151,
+                "item_id": 321,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.87732414519913, 12.475608039812117"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473406069363,
+                    41.885153678593
+                ]
+            },
+            "properties": {
+                "id": 152,
+                "item_id": 322,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.885153678593056, 12.47340606936262"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476031068987,
+                    41.907629933922
+                ]
+            },
+            "properties": {
+                "id": 153,
+                "item_id": 323,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90762993392159, 12.476031068987332"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.464158297822,
+                    41.888980686395
+                ]
+            },
+            "properties": {
+                "id": 154,
+                "item_id": 324,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "41.88898068639497, 12.464158297821875"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.494642582481,
+                    41.88563923288
+                ]
+            },
+            "properties": {
+                "id": 155,
+                "item_id": 326,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "41.88563923287975, 12.494642582480987"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.467286797822,
+                    41.893723168251
+                ]
+            },
+            "properties": {
+                "id": 156,
+                "item_id": 327,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89372316825104, 12.467286797822025"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.467286797822,
+                    41.893723168251
+                ]
+            },
+            "properties": {
+                "id": 157,
+                "item_id": 328,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89372316825104, 12.467286797822025"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.466322253646,
+                    41.88888936067
+                ]
+            },
+            "properties": {
+                "id": 158,
+                "item_id": 329,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88888936067022, 12.466322253645888"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.450085701258,
+                    41.917846368856
+                ]
+            },
+            "properties": {
+                "id": 159,
+                "item_id": 330,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.917846368855585, 12.450085701257574"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.481494913162,
+                    41.876862086023
+                ]
+            },
+            "properties": {
+                "id": 160,
+                "item_id": 331,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.876862086022605, 12.481494913162338"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.466357,
+                    41.900659
+                ]
+            },
+            "properties": {
+                "id": 161,
+                "item_id": 332,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.498797726657,
+                    41.896645808991
+                ]
+            },
+            "properties": {
+                "id": 162,
+                "item_id": 336,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89664580899126, 12.498797726657342"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48305,
+                    41.893515
+                ]
+            },
+            "properties": {
+                "id": 163,
+                "item_id": 337,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8935273643236, 12.482750017140422"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.481633297822,
+                    41.888214953099
+                ]
+            },
+            "properties": {
+                "id": 164,
+                "item_id": 338,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.888214953099265, 12.481633297821924"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.483134024811,
+                    41.889692476063
+                ]
+            },
+            "properties": {
+                "id": 165,
+                "item_id": 339,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.889692476062926, 12.483134024810733"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.523157,
+                    41.848302
+                ]
+            },
+            "properties": {
+                "id": 166,
+                "item_id": 340,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.848302, 12.523157"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.478022597822,
+                    41.898256304565
+                ]
+            },
+            "properties": {
+                "id": 167,
+                "item_id": 341,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89825630456512, 12.478022597822216"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473736797822,
+                    41.889266998629
+                ]
+            },
+            "properties": {
+                "id": 168,
+                "item_id": 342,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88926699862922, 12.473736797821946"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.456739026657,
+                    41.902406141284
+                ]
+            },
+            "properties": {
+                "id": 169,
+                "item_id": 343,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.902406141284445, 12.456739026656512"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.501519911316,
+                    41.873656762765
+                ]
+            },
+            "properties": {
+                "id": 170,
+                "item_id": 344,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.87365676276507, 12.501519911315821"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.47764,
+                    41.883599
+                ]
+            },
+            "properties": {
+                "id": 171,
+                "item_id": 345,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.493119341998,
+                    41.897107561691
+                ]
+            },
+            "properties": {
+                "id": 172,
+                "item_id": 347,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8971075616912, 12.49311934199818"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476542,
+                    41.887326
+                ]
+            },
+            "properties": {
+                "id": 173,
+                "item_id": 348,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.887326, 12.476542"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473052740152,
+                    41.899350942919
+                ]
+            },
+            "properties": {
+                "id": 174,
+                "item_id": 349,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.899350942919064, 12.473052740151838"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.478674,
+                    41.89287
+                ]
+            },
+            "properties": {
+                "id": 175,
+                "item_id": 350,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892870, 12.478674"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482589884327,
+                    41.893142440884
+                ]
+            },
+            "properties": {
+                "id": 176,
+                "item_id": 351,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": "41.89314244088442, 12.482589884326694"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.461381197822,
+                    41.901055325001
+                ]
+            },
+            "properties": {
+                "id": 177,
+                "item_id": 352,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": "41.901055325000776, 12.461381197822313"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.462722197966,
+                    41.900260110662
+                ]
+            },
+            "properties": {
+                "id": 178,
+                "item_id": 353,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.90026011066239, 12.462722197965613"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.470092,
+                    41.895641
+                ]
+            },
+            "properties": {
+                "id": 179,
+                "item_id": 354,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.895641, 12.470092 "
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.483972,
+                    41.893667
+                ]
+            },
+            "properties": {
+                "id": 180,
+                "item_id": 355,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.893667, 12.483972"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482611,
+                    41.893306
+                ]
+            },
+            "properties": {
+                "id": 181,
+                "item_id": 356,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": "41.893306, 12.482611"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.489694,
+                    41.8905
+                ]
+            },
+            "properties": {
+                "id": 182,
+                "item_id": 358,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.890500, 12.489694"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473773956299,
+                    41.898726472995
+                ]
+            },
+            "properties": {
+                "id": 183,
+                "item_id": 361,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.469805957908,
+                    41.89187498377
+                ]
+            },
+            "properties": {
+                "id": 184,
+                "item_id": 362,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89187498376976, 12.469805957907566"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479297338637,
+                    41.890110066719
+                ]
+            },
+            "properties": {
+                "id": 185,
+                "item_id": 363,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89011006671925, 12.479297338636828"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4771113,
+                    41.889585
+                ]
+            },
+            "properties": {
+                "id": 186,
+                "item_id": 364,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "Lungotevere degli Alberteschi, 00153 Roma RM, Italy"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479779,
+                    41.884719
+                ]
+            },
+            "properties": {
+                "id": 187,
+                "item_id": 365,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.884719, 12.479779"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.478044,
+                    41.898268
+                ]
+            },
+            "properties": {
+                "id": 188,
+                "item_id": 366,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.898268, 12.478044"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.495987,
+                    41.880649
+                ]
+            },
+            "properties": {
+                "id": 189,
+                "item_id": 367,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.880649, 12.495987"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.495933,
+                    41.880689
+                ]
+            },
+            "properties": {
+                "id": 190,
+                "item_id": 368,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.880689, 12.495933"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479779,
+                    41.884719
+                ]
+            },
+            "properties": {
+                "id": 191,
+                "item_id": 369,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.884719, 12.479779"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479772,
+                    41.884872
+                ]
+            },
+            "properties": {
+                "id": 192,
+                "item_id": 370,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.884872, 12.479772"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.471036,
+                    41.886153
+                ]
+            },
+            "properties": {
+                "id": 193,
+                "item_id": 371,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.886153, 12.471036"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473115,
+                    41.885358
+                ]
+            },
+            "properties": {
+                "id": 194,
+                "item_id": 372,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.885358, 12.473115"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.493055,
+                    41.897199
+                ]
+            },
+            "properties": {
+                "id": 195,
+                "item_id": 373,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.897199, 12.493055"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.480626,
+                    41.903044
+                ]
+            },
+            "properties": {
+                "id": 196,
+                "item_id": 374,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.903044, 12.480626"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4836481,
+                    41.8934821
+                ]
+            },
+            "properties": {
+                "id": 197,
+                "item_id": 375,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "Scala dell'Arce Capitolina, 12, 00186 Roma RM, Italy"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.477293,
+                    41.907839
+                ]
+            },
+            "properties": {
+                "id": 198,
+                "item_id": 376,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.907839, 12.477293"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.46112,
+                    41.901372
+                ]
+            },
+            "properties": {
+                "id": 199,
+                "item_id": 377,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.901372, 12.46112"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.503431,
+                    41.887276
+                ]
+            },
+            "properties": {
+                "id": 200,
+                "item_id": 378,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.887276, 12.503431"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.47678,
+                    41.88961
+                ]
+            },
+            "properties": {
+                "id": 201,
+                "item_id": 379,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88961, 12.47678"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48368,
+                    41.90045
+                ]
+            },
+            "properties": {
+                "id": 202,
+                "item_id": 380,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90045, 12.48368"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.47134,
+                    41.90007
+                ]
+            },
+            "properties": {
+                "id": 203,
+                "item_id": 381,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90007, 12.47134"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.47112,
+                    41.88967
+                ]
+            },
+            "properties": {
+                "id": 204,
+                "item_id": 382,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88967, 12.47112"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48331,
+                    41.90076
+                ]
+            },
+            "properties": {
+                "id": 205,
+                "item_id": 383,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90076, 12.48331"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476887,
+                    41.899485
+                ]
+            },
+            "properties": {
+                "id": 206,
+                "item_id": 384,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.899485, 12.476887"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.494369,
+                    41.890191
+                ]
+            },
+            "properties": {
+                "id": 207,
+                "item_id": 385,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.890191, 12.494369"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4825837,
+                    41.8935737
+                ]
+            },
+            "properties": {
+                "id": 208,
+                "item_id": 386,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8935737, 12.4825837"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.505678,
+                    41.886169
+                ]
+            },
+            "properties": {
+                "id": 209,
+                "item_id": 387,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.886169, 12.505678"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.466858,
+                    41.899873
+                ]
+            },
+            "properties": {
+                "id": 210,
+                "item_id": 388,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.899873, 12.466858"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473031,
+                    41.895523
+                ]
+            },
+            "properties": {
+                "id": 211,
+                "item_id": 389,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.895523, 12.473031"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.466324,
+                    41.903247
+                ]
+            },
+            "properties": {
+                "id": 212,
+                "item_id": 390,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.903247, 12.466324"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482699,
+                    41.893469
+                ]
+            },
+            "properties": {
+                "id": 213,
+                "item_id": 391,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.893469, 12.482699"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485379,
+                    41.892454
+                ]
+            },
+            "properties": {
+                "id": 214,
+                "item_id": 392,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892454, 12.485379"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.45398,
+                    41.903077
+                ]
+            },
+            "properties": {
+                "id": 215,
+                "item_id": 393,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.903077, 12.45398"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.497533,
+                    41.889594
+                ]
+            },
+            "properties": {
+                "id": 216,
+                "item_id": 394,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.889594, 12.497533"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.45398,
+                    41.903077
+                ]
+            },
+            "properties": {
+                "id": 217,
+                "item_id": 395,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.903077, 12.45398"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.487029,
+                    41.895226
+                ]
+            },
+            "properties": {
+                "id": 218,
+                "item_id": 396,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.895226, 12.487029"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.498194,
+                    41.898429
+                ]
+            },
+            "properties": {
+                "id": 219,
+                "item_id": 397,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.898429, 12.498194"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485325,
+                    41.892662
+                ]
+            },
+            "properties": {
+                "id": 220,
+                "item_id": 398,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892662, 12.485325"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.491857,
+                    41.886629
+                ]
+            },
+            "properties": {
+                "id": 221,
+                "item_id": 399,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.886629, 12.491857"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485379,
+                    41.892454
+                ]
+            },
+            "properties": {
+                "id": 222,
+                "item_id": 400,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.892454, 12.485379"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482801797821,
+                    41.893518907561
+                ]
+            },
+            "properties": {
+                "id": 223,
+                "item_id": 401,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89351890756098, 12.482801797821104"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.478674211473,
+                    41.892786436354
+                ]
+            },
+            "properties": {
+                "id": 224,
+                "item_id": 402,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892786436354406, 12.478674211473296"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48528208248,
+                    41.892677915412
+                ]
+            },
+            "properties": {
+                "id": 225,
+                "item_id": 403,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89267791541243, 12.485282082480264"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476266569145,
+                    41.892531110028
+                ]
+            },
+            "properties": {
+                "id": 226,
+                "item_id": 404,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8925311100277, 12.47626656914521"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.487007271165,
+                    41.89513464496
+                ]
+            },
+            "properties": {
+                "id": 227,
+                "item_id": 405,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89513464495978, 12.487007271164801"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473341696344,
+                    41.885241540513
+                ]
+            },
+            "properties": {
+                "id": 228,
+                "item_id": 406,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88524154051263, 12.47334169634412"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.487829140151,
+                    41.893730207033
+                ]
+            },
+            "properties": {
+                "id": 229,
+                "item_id": 407,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89373020703261, 12.487829140150724"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473200441997,
+                    41.885373652619
+                ]
+            },
+            "properties": {
+                "id": 230,
+                "item_id": 408,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88537365261865, 12.47320044199688"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.469800768987,
+                    41.887352990974
+                ]
+            },
+            "properties": {
+                "id": 231,
+                "item_id": 409,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88735299097397, 12.469800768986659"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.469800768987,
+                    41.887368965328
+                ]
+            },
+            "properties": {
+                "id": 232,
+                "item_id": 410,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88736896532752, 12.469800768986659"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.498546,
+                    41.897557
+                ]
+            },
+            "properties": {
+                "id": 233,
+                "item_id": 411,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": "41.897557, 12.498546"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.480055197821,
+                    41.894545377593
+                ]
+            },
+            "properties": {
+                "id": 234,
+                "item_id": 412,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89454537759293, 12.480055197821097"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.477983,
+                    41.890783
+                ]
+            },
+            "properties": {
+                "id": 235,
+                "item_id": 413,
+                "zoom_level": 5,
+                "map_type": "Leaflet",
+                "address": "41.890783, 12.477983"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.487928,
+                    41.89359
+                ]
+            },
+            "properties": {
+                "id": 236,
+                "item_id": 414,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.893590, 12.487928"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48667,
+                    41.895959
+                ]
+            },
+            "properties": {
+                "id": 237,
+                "item_id": 415,
+                "zoom_level": 5,
+                "map_type": "Leaflet",
+                "address": "41.895959, 12.486670"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.472867,
+                    41.900524
+                ]
+            },
+            "properties": {
+                "id": 238,
+                "item_id": 416,
+                "zoom_level": 18,
+                "map_type": "Leaflet",
+                "address": "41.900524, 12.472867"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473149997822,
+                    41.901282137244
+                ]
+            },
+            "properties": {
+                "id": 239,
+                "item_id": 417,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.901282137243555, 12.473149997822318"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482542061316,
+                    41.908487466461
+                ]
+            },
+            "properties": {
+                "id": 240,
+                "item_id": 418,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90848746646136, 12.482542061315895"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.483254355492,
+                    41.894194444419
+                ]
+            },
+            "properties": {
+                "id": 241,
+                "item_id": 420,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.894194444418765, 12.483254355492441"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.461419682481,
+                    41.888603700412
+                ]
+            },
+            "properties": {
+                "id": 242,
+                "item_id": 423,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88860370041222, 12.461419682481113"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485100938305,
+                    41.878855514876
+                ]
+            },
+            "properties": {
+                "id": 243,
+                "item_id": 424,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8788555148763, 12.485100938304804"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.470728637736,
+                    41.892557835475
+                ]
+            },
+            "properties": {
+                "id": 244,
+                "item_id": 426,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89255783547505, 12.470728637735547"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.470728637736,
+                    41.892557835475
+                ]
+            },
+            "properties": {
+                "id": 245,
+                "item_id": 427,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89255783547505, 12.470728637735547"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.461481359519,
+                    41.901528079675
+                ]
+            },
+            "properties": {
+                "id": 246,
+                "item_id": 428,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90152807967454, 12.461481359518613"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.495929982481,
+                    41.880650097867
+                ]
+            },
+            "properties": {
+                "id": 247,
+                "item_id": 430,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88065009786724, 12.49592998248082"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.494621124811,
+                    41.885575333712
+                ]
+            },
+            "properties": {
+                "id": 248,
+                "item_id": 431,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88557533371161, 12.49462112481059"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.471554362811,
+                    41.899377902131
+                ]
+            },
+            "properties": {
+                "id": 249,
+                "item_id": 432,
+                "zoom_level": 18,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.477932426657,
+                    41.887565680185
+                ]
+            },
+            "properties": {
+                "id": 250,
+                "item_id": 433,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88756568018467, 12.477932426657022"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.494631853646,
+                    41.885567346311
+                ]
+            },
+            "properties": {
+                "id": 251,
+                "item_id": 434,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.885567346311106, 12.494631853645792"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.467599868987,
+                    41.892391717093
+                ]
+            },
+            "properties": {
+                "id": 252,
+                "item_id": 435,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89239171709264, 12.467599868986841"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4754483063,
+                    41.889452938315
+                ]
+            },
+            "properties": {
+                "id": 253,
+                "item_id": 436,
+                "zoom_level": 18,
+                "map_type": "Leaflet",
+                "address": "41.88945293831456, 12.475448306300217"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473704611316,
+                    41.88925901169
+                ]
+            },
+            "properties": {
+                "id": 254,
+                "item_id": 437,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88925901169028, 12.473704611316352"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.524108513162,
+                    41.867179746198
+                ]
+            },
+            "properties": {
+                "id": 255,
+                "item_id": 438,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.86717974619808, 12.524108513162032"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476563068987,
+                    41.887333642226
+                ]
+            },
+            "properties": {
+                "id": 256,
+                "item_id": 439,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.887333642225876, 12.476563068986671"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.488628040152,
+                    41.890884967797
+                ]
+            },
+            "properties": {
+                "id": 257,
+                "item_id": 440,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.890884967796964, 12.488628040151585"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479865382481,
+                    41.892102491006
+                ]
+            },
+            "properties": {
+                "id": 258,
+                "item_id": 441,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892102491006504, 12.479865382481174"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485133497822,
+                    41.886321081207
+                ]
+            },
+            "properties": {
+                "id": 259,
+                "item_id": 442,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88632108120653, 12.485133497821781"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.475608039812,
+                    41.877324145199
+                ]
+            },
+            "properties": {
+                "id": 260,
+                "item_id": 443,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.87732414519913, 12.475608039812117"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473406069363,
+                    41.885153678593
+                ]
+            },
+            "properties": {
+                "id": 261,
+                "item_id": 444,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.885153678593056, 12.47340606936262"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476031068987,
+                    41.907629933922
+                ]
+            },
+            "properties": {
+                "id": 262,
+                "item_id": 445,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90762993392159, 12.476031068987332"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.464158297822,
+                    41.888980686395
+                ]
+            },
+            "properties": {
+                "id": 263,
+                "item_id": 446,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "41.88898068639497, 12.464158297821875"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.494642582481,
+                    41.88563923288
+                ]
+            },
+            "properties": {
+                "id": 264,
+                "item_id": 448,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "41.88563923287975, 12.494642582480987"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.467286797822,
+                    41.893723168251
+                ]
+            },
+            "properties": {
+                "id": 265,
+                "item_id": 449,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89372316825104, 12.467286797822025"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.467286797822,
+                    41.893723168251
+                ]
+            },
+            "properties": {
+                "id": 266,
+                "item_id": 450,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89372316825104, 12.467286797822025"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.466322253646,
+                    41.88888936067
+                ]
+            },
+            "properties": {
+                "id": 267,
+                "item_id": 451,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88888936067022, 12.466322253645888"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.450085701258,
+                    41.917846368856
+                ]
+            },
+            "properties": {
+                "id": 268,
+                "item_id": 452,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.917846368855585, 12.450085701257574"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.481494913162,
+                    41.876862086023
+                ]
+            },
+            "properties": {
+                "id": 269,
+                "item_id": 453,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.876862086022605, 12.481494913162338"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.466357,
+                    41.900659
+                ]
+            },
+            "properties": {
+                "id": 270,
+                "item_id": 454,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.498797726657,
+                    41.896645808991
+                ]
+            },
+            "properties": {
+                "id": 271,
+                "item_id": 458,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89664580899126, 12.498797726657342"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48305,
+                    41.893515
+                ]
+            },
+            "properties": {
+                "id": 272,
+                "item_id": 459,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8935273643236, 12.482750017140422"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.481633297822,
+                    41.888214953099
+                ]
+            },
+            "properties": {
+                "id": 273,
+                "item_id": 460,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.888214953099265, 12.481633297821924"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.483134024811,
+                    41.889692476063
+                ]
+            },
+            "properties": {
+                "id": 274,
+                "item_id": 461,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.889692476062926, 12.483134024810733"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.523157,
+                    41.848302
+                ]
+            },
+            "properties": {
+                "id": 275,
+                "item_id": 462,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.848302, 12.523157"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.478022597822,
+                    41.898256304565
+                ]
+            },
+            "properties": {
+                "id": 276,
+                "item_id": 463,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89825630456512, 12.478022597822216"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473736797822,
+                    41.889266998629
+                ]
+            },
+            "properties": {
+                "id": 277,
+                "item_id": 464,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88926699862922, 12.473736797821946"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.456739026657,
+                    41.902406141284
+                ]
+            },
+            "properties": {
+                "id": 278,
+                "item_id": 465,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.902406141284445, 12.456739026656512"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.501519911316,
+                    41.873656762765
+                ]
+            },
+            "properties": {
+                "id": 279,
+                "item_id": 466,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.87365676276507, 12.501519911315821"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.47764,
+                    41.883599
+                ]
+            },
+            "properties": {
+                "id": 280,
+                "item_id": 467,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.493119341998,
+                    41.897107561691
+                ]
+            },
+            "properties": {
+                "id": 281,
+                "item_id": 469,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8971075616912, 12.49311934199818"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476542,
+                    41.887326
+                ]
+            },
+            "properties": {
+                "id": 282,
+                "item_id": 470,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.887326, 12.476542"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473052740152,
+                    41.899350942919
+                ]
+            },
+            "properties": {
+                "id": 283,
+                "item_id": 471,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.899350942919064, 12.473052740151838"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.478674,
+                    41.89287
+                ]
+            },
+            "properties": {
+                "id": 284,
+                "item_id": 472,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892870, 12.478674"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482589884327,
+                    41.893142440884
+                ]
+            },
+            "properties": {
+                "id": 285,
+                "item_id": 473,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": "41.89314244088442, 12.482589884326694"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.461381197822,
+                    41.901055325001
+                ]
+            },
+            "properties": {
+                "id": 286,
+                "item_id": 474,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": "41.901055325000776, 12.461381197822313"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.462722197966,
+                    41.900260110662
+                ]
+            },
+            "properties": {
+                "id": 287,
+                "item_id": 475,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.90026011066239, 12.462722197965613"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.470092,
+                    41.895641
+                ]
+            },
+            "properties": {
+                "id": 288,
+                "item_id": 476,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.895641, 12.470092 "
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.483972,
+                    41.893667
+                ]
+            },
+            "properties": {
+                "id": 289,
+                "item_id": 477,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.893667, 12.483972"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482611,
+                    41.893306
+                ]
+            },
+            "properties": {
+                "id": 290,
+                "item_id": 478,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": "41.893306, 12.482611"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.489694,
+                    41.8905
+                ]
+            },
+            "properties": {
+                "id": 291,
+                "item_id": 480,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.890500, 12.489694"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.478221754154308,
+                    41.891069599999994
+                ]
+            },
+            "properties": {
+                "id": 292,
+                "item_id": 483,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "Ponte Fabricio, 00186, Rome"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.469805957908,
+                    41.89187498377
+                ]
+            },
+            "properties": {
+                "id": 293,
+                "item_id": 484,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89187498376976, 12.469805957907566"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479297338637,
+                    41.890110066719
+                ]
+            },
+            "properties": {
+                "id": 294,
+                "item_id": 485,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89011006671925, 12.479297338636828"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4771113,
+                    41.889585
+                ]
+            },
+            "properties": {
+                "id": 295,
+                "item_id": 486,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "Lungotevere degli Alberteschi, 00153 Roma RM, Italy"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479779,
+                    41.884719
+                ]
+            },
+            "properties": {
+                "id": 296,
+                "item_id": 487,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.884719, 12.479779"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.478044,
+                    41.898268
+                ]
+            },
+            "properties": {
+                "id": 297,
+                "item_id": 488,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.898268, 12.478044"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.495987,
+                    41.880649
+                ]
+            },
+            "properties": {
+                "id": 298,
+                "item_id": 489,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.880649, 12.495987"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.495933,
+                    41.880689
+                ]
+            },
+            "properties": {
+                "id": 299,
+                "item_id": 490,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.880689, 12.495933"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479779,
+                    41.884719
+                ]
+            },
+            "properties": {
+                "id": 300,
+                "item_id": 491,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.884719, 12.479779"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.479772,
+                    41.884872
+                ]
+            },
+            "properties": {
+                "id": 301,
+                "item_id": 492,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.884872, 12.479772"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.471036,
+                    41.886153
+                ]
+            },
+            "properties": {
+                "id": 302,
+                "item_id": 493,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.886153, 12.471036"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473115,
+                    41.885358
+                ]
+            },
+            "properties": {
+                "id": 303,
+                "item_id": 494,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.885358, 12.473115"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.493055,
+                    41.897199
+                ]
+            },
+            "properties": {
+                "id": 304,
+                "item_id": 495,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.897199, 12.493055"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.480626,
+                    41.903044
+                ]
+            },
+            "properties": {
+                "id": 305,
+                "item_id": 496,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.903044, 12.480626"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4836481,
+                    41.8934821
+                ]
+            },
+            "properties": {
+                "id": 306,
+                "item_id": 497,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "Scala dell'Arce Capitolina, 12, 00186 Roma RM, Italy"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.477293,
+                    41.907839
+                ]
+            },
+            "properties": {
+                "id": 307,
+                "item_id": 498,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.907839, 12.477293"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.46112,
+                    41.901372
+                ]
+            },
+            "properties": {
+                "id": 308,
+                "item_id": 499,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.901372, 12.46112"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.503431,
+                    41.887276
+                ]
+            },
+            "properties": {
+                "id": 309,
+                "item_id": 500,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.887276, 12.503431"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.47678,
+                    41.88961
+                ]
+            },
+            "properties": {
+                "id": 310,
+                "item_id": 501,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88961, 12.47678"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48368,
+                    41.90045
+                ]
+            },
+            "properties": {
+                "id": 311,
+                "item_id": 502,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90045, 12.48368"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.47134,
+                    41.90007
+                ]
+            },
+            "properties": {
+                "id": 312,
+                "item_id": 503,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90007, 12.47134"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.47112,
+                    41.88967
+                ]
+            },
+            "properties": {
+                "id": 313,
+                "item_id": 504,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88967, 12.47112"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48331,
+                    41.90076
+                ]
+            },
+            "properties": {
+                "id": 314,
+                "item_id": 505,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.90076, 12.48331"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476887,
+                    41.899485
+                ]
+            },
+            "properties": {
+                "id": 315,
+                "item_id": 506,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.899485, 12.476887"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.494369,
+                    41.890191
+                ]
+            },
+            "properties": {
+                "id": 316,
+                "item_id": 507,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.890191, 12.494369"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4825837,
+                    41.8935737
+                ]
+            },
+            "properties": {
+                "id": 317,
+                "item_id": 508,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8935737, 12.4825837"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.505678,
+                    41.886169
+                ]
+            },
+            "properties": {
+                "id": 318,
+                "item_id": 509,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.886169, 12.505678"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.466858,
+                    41.899873
+                ]
+            },
+            "properties": {
+                "id": 319,
+                "item_id": 510,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.899873, 12.466858"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473031,
+                    41.895523
+                ]
+            },
+            "properties": {
+                "id": 320,
+                "item_id": 511,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.895523, 12.473031"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.466324,
+                    41.903247
+                ]
+            },
+            "properties": {
+                "id": 321,
+                "item_id": 512,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.903247, 12.466324"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482699,
+                    41.893469
+                ]
+            },
+            "properties": {
+                "id": 322,
+                "item_id": 513,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.893469, 12.482699"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485379,
+                    41.892454
+                ]
+            },
+            "properties": {
+                "id": 323,
+                "item_id": 514,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892454, 12.485379"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.455137968063354,
+                    41.90220018229139
+                ]
+            },
+            "properties": {
+                "id": 324,
+                "item_id": 515,
+                "zoom_level": 16,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.497533,
+                    41.889594
+                ]
+            },
+            "properties": {
+                "id": 325,
+                "item_id": 516,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.889594, 12.497533"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.457423210144043,
+                    41.90228901893026
+                ]
+            },
+            "properties": {
+                "id": 326,
+                "item_id": 517,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": ""
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.487029,
+                    41.895226
+                ]
+            },
+            "properties": {
+                "id": 327,
+                "item_id": 518,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.895226, 12.487029"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.498194,
+                    41.898429
+                ]
+            },
+            "properties": {
+                "id": 328,
+                "item_id": 519,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.898429, 12.498194"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485325,
+                    41.892662
+                ]
+            },
+            "properties": {
+                "id": 329,
+                "item_id": 520,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892662, 12.485325"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.491857,
+                    41.886629
+                ]
+            },
+            "properties": {
+                "id": 330,
+                "item_id": 521,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.886629, 12.491857"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.485379,
+                    41.892454
+                ]
+            },
+            "properties": {
+                "id": 331,
+                "item_id": 522,
+                "zoom_level": 17,
+                "map_type": "Leaflet",
+                "address": "41.892454, 12.485379"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.482801797821,
+                    41.893518907561
+                ]
+            },
+            "properties": {
+                "id": 332,
+                "item_id": 523,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89351890756098, 12.482801797821104"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.478674211473,
+                    41.892786436354
+                ]
+            },
+            "properties": {
+                "id": 333,
+                "item_id": 524,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.892786436354406, 12.478674211473296"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.48528208248,
+                    41.892677915412
+                ]
+            },
+            "properties": {
+                "id": 334,
+                "item_id": 525,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89267791541243, 12.485282082480264"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.476266569145,
+                    41.892531110028
+                ]
+            },
+            "properties": {
+                "id": 335,
+                "item_id": 526,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.8925311100277, 12.47626656914521"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.487007271165,
+                    41.89513464496
+                ]
+            },
+            "properties": {
+                "id": 336,
+                "item_id": 527,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89513464495978, 12.487007271164801"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473341696344,
+                    41.885241540513
+                ]
+            },
+            "properties": {
+                "id": 337,
+                "item_id": 528,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88524154051263, 12.47334169634412"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.487829140151,
+                    41.893730207033
+                ]
+            },
+            "properties": {
+                "id": 338,
+                "item_id": 529,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.89373020703261, 12.487829140150724"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.473200441997,
+                    41.885373652619
+                ]
+            },
+            "properties": {
+                "id": 339,
+                "item_id": 530,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88537365261865, 12.47320044199688"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.469800768987,
+                    41.887352990974
+                ]
+            },
+            "properties": {
+                "id": 340,
+                "item_id": 531,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88735299097397, 12.469800768986659"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.469800768987,
+                    41.887368965328
+                ]
+            },
+            "properties": {
+                "id": 341,
+                "item_id": 532,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41.88736896532752, 12.469800768986659"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4713595,
+                    41.9000664
+                ]
+            },
+            "properties": {
+                "id": 342,
+                "item_id": 456,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "Arco della Pace 10/11, Rome"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4939594,
+                    41.889521
+                ]
+            },
+            "properties": {
+                "id": 343,
+                "item_id": 447,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "Via dei SS. Quattro, 20, 00184 Roma RM, Italy"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4665819,
+                    41.9004777
+                ]
+            },
+            "properties": {
+                "id": 344,
+                "item_id": 455,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "Via del Banco di Santo Spirito, 60/ 61, 00186 Roma RM"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.469286055275456,
+                    41.88709745
+                ]
+            },
+            "properties": {
+                "id": 345,
+                "item_id": 429,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "Piazza di S. Cosimato, 10, 00153 Roma RM"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4764574,
+                    41.8865243
+                ]
+            },
+            "properties": {
+                "id": 346,
+                "item_id": 421,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "Via di S. Michele, 00153 Roma RM"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4755402,
+                    41.9048691
+                ]
+            },
+            "properties": {
+                "id": 347,
+                "item_id": 422,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "Via Tomacelli, 132, 00186 Roma RM"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4676289,
+                    41.8921993
+                ]
+            },
+            "properties": {
+                "id": 348,
+                "item_id": 425,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "Via di Porta Settimiana, 00165 Roma RM, Italy"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.4806725,
+                    41.8867901
+                ]
+            },
+            "properties": {
+                "id": 349,
+                "item_id": 468,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "Clivo di Rocca Savella, 10, 00153 Roma RM"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.463969911440824,
+                    41.90154125
+                ]
+            },
+            "properties": {
+                "id": 350,
+                "item_id": 479,
+                "zoom_level": 14,
+                "map_type": "Leaflet",
+                "address": "41\u00b054'07.3\"N 12\u00b027'52.9\"E"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.5063717,
+                    41.8178036
+                ]
+            },
+            "properties": {
+                "id": 351,
+                "item_id": 481,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "Vicolo della Cecchignoletta, 14, 00143 Roma RM, Italy"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    12.457709832382092,
+                    41.90043215
+                ]
+            },
+            "properties": {
+                "id": 352,
+                "item_id": 482,
+                "zoom_level": 15,
+                "map_type": "Leaflet",
+                "address": "Via Paolo VI, 25, 00193 Roma RM"
+            }
+        }
+    ]
+}

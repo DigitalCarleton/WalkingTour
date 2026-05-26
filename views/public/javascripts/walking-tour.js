@@ -245,7 +245,7 @@ return new Iiif(url, options);
 
 const getPackages = async function() {
     const allmapsAnnotation = await import("https://unpkg.com/@allmaps/annotation?module")
-    const allmapsTransform = await import("https://unpkg.com/@allmaps/transform@1.0.0-beta.37/dist/bundled/index.es.js?module")
+    const allmapsTransform = await import("https://unpkg.com/@allmaps/transform?module")
     
     return [allmapsAnnotation, allmapsTransform]
 }
@@ -281,6 +281,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
 
     var MAP_URL_TEMPLATE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
     const annotationUrl = 'https://annotations.allmaps.org/manifests/47574ee029cca631'
+    const omekaLocationsGeojsonUrl = 'plugins/WalkingTour/views/public/data/omeka-locations.geojson'
     // const annotationUrl = "https://annotations.allmaps.org/manifests/c047e9dd35f2d377"
 
     var MAP_CENTER;
@@ -562,10 +563,11 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
         })
         .then(data => {
             const maps = allmapsAnnotation.parseAnnotation(data)
-            const transformer = new allmapsTransform.GcpTransformer(maps[0].gcps);
+            const transformer = createGcpTransformer(maps[0]);
             console.log(maps)
             imageZoom = maps[0].resource.height / $('#map').height()
             mapSetUp(maps[0])
+            loadOmekaLocationsGeojson(transformer);
             doQuery(transformer, maps);
         })
         .catch(error => {
@@ -575,6 +577,89 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
 
     // Retain previous form state, if needed.
     retainFormState();
+    function createGcpTransformer(georeferencedMap) {
+        if (allmapsTransform.GcpTransformer.fromGeoreferencedMap) {
+            return allmapsTransform.GcpTransformer.fromGeoreferencedMap(georeferencedMap);
+        }
+    
+        return new allmapsTransform.GcpTransformer(
+            georeferencedMap.gcps,
+            georeferencedMap.transformation && georeferencedMap.transformation.type
+        );
+    }
+    
+    function transformGeoPointToImagePoint(transformer, coordinates) {
+        var point;
+    
+        if (transformer.transformToResource) {
+            point = transformer.transformToResource(coordinates);
+        } else if (transformer.transformBackward) {
+            point = transformer.transformBackward(coordinates);
+        } else {
+            throw new Error('Allmaps transformer does not support geo-to-resource transforms.');
+        }
+    
+        return point.map(function (value) {
+            return value / imageZoom;
+        });
+    }
+    
+    function imagePointToLatLng(point) {
+        return xy(point[0], point[1]);
+    }
+    
+    function loadOmekaLocationsGeojson(transformer) {
+        fetch(omekaLocationsGeojsonUrl)
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error('Could not load Omeka locations GeoJSON.');
+                }
+                return response.json();
+            })
+            .then(function (geojson) {
+                var transformedFeatures = geojson.features.map(function (feature) {
+                    var imagePoint = transformGeoPointToImagePoint(transformer, feature.geometry.coordinates);
+    
+                    return {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: imagePoint
+                        },
+                        properties: feature.properties
+                    };
+                });
+    
+                L.geoJson({
+                    type: 'FeatureCollection',
+                    features: transformedFeatures
+                }, {
+                    pointToLayer: function (feature) {
+                        var popupContent = '<strong>Item ' + feature.properties.item_id + '</strong>';
+    
+                        if (feature.properties.address) {
+                            popupContent += '<br>' + feature.properties.address;
+                        }
+    
+                        var marker = L.circleMarker(imagePointToLatLng(feature.geometry.coordinates), {
+                            radius: 5,
+                            color: '#1f2937',
+                            weight: 1,
+                            fillColor: '#f59e0b',
+                            fillOpacity: 0.85
+                        });
+    
+                        marker.bindPopup(popupContent);
+                        return marker;
+                    }
+                }).addTo(map);
+    
+                console.log('Loaded Omeka locations GeoJSON', transformedFeatures.length);
+            })
+            .catch(function (error) {
+                console.error('Omeka locations GeoJSON error:', error);
+            });
+    }
 
     /*
      * Setup map layer
@@ -784,15 +869,15 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
                     newList = []
 
                     response.features = response.features.map(ele => {
-                        var test = transformer.transformBackward(
-                            ele.geometry
-                        )
-                        test = test.map(ele => {return ele/imageZoom})
+                        var test = transformGeoPointToImagePoint(transformer, ele.geometry.coordinates)
                         // console.log(test)
                         itemIDList.push(ele.properties.id)
                         return({
                             ...ele,
-                            geometry: test
+                            geometry: {
+                                ...ele.geometry,
+                                coordinates: test
+                            }
                         })
                     })
                     console.log(response.features)
@@ -809,7 +894,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
                         });
                         numMarker++;
                         
-                        var marker = L.marker(xy(feature.geometry[0], feature.geometry[1]), { icon: numberIcon });
+                        var marker = L.marker(imagePointToLatLng(feature.geometry.coordinates), { icon: numberIcon });
                         marker.on('click', function (e) {
                             // center click location
                             map.flyTo(e.latlng, 4);
