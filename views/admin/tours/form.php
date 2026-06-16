@@ -70,7 +70,7 @@
 		<script>
 			var currentTour = <?php echo $walking_tour->id?>;
 		</script>
-		<?php echo js_tag('walking-tour');?>
+		<?php echo js_tag('walking-tour-admin');?>
 		<?php echo js_tag('jquery.cookie');?>
 
 		<style>

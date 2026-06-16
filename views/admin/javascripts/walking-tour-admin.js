@@ -495,9 +495,10 @@ jQuery(document).ready(function ($) {
         var markerBounds = L.latLngBounds();
         jqXhr = $.post(baseUrl + '/walking-tour/index/query', function (response) {
             markerData = response;
+            console.log(markerData);
             dataArray = Object.entries(markerData)
             for (const tour in markerData) {
-                itemArray = itemArray.concat(markerData[tour]['Data']['features'])
+                itemArray = itemArray.concat(markerData[walking_tour]['Data']['features'])
             }
             let requests = dataArray.map(([tourId, value]) => {
                 if (tourId != currentTour) return Promise.resolve();
@@ -539,7 +540,7 @@ jQuery(document).ready(function ($) {
                                 var marker = this;
                                 //response = allItems[`${tourId}:${feature.properties.id}`]
                                 //if (response == undefined) {
-                                //    $.post(baseUrl + '/walking-tour//index/get-item', { id: feature.properties.id, tour: tourId }, function (response) {
+                                //    $.post(baseUrl + '/walking-tour/index/get-item', { id: feature.properties.id, tour: tourId }, function (response) {
                                 //        allItems[`${tourId}:${feature.properties.id}`] = response;
                                 //        featureOnclickAction(response, layer, marker, itemIDList, value, tourId);
                                 //    })
@@ -614,6 +615,7 @@ jQuery(document).ready(function ($) {
      * This must be called on every form change.
      */
     function doFilters() {
+        console.log(markers)
         // Remove the current markers.
         if (markers) {
             map.removeLayer(markers);

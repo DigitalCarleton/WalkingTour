@@ -74,12 +74,12 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             ->appendFile(src('modernizr.custom.63332', 'javascripts', 'js'))
             ->appendFile(src('Polyline.encoded', 'javascripts', 'js'))
             ->appendFile('//cdn.jsdelivr.net/npm/@allmaps/leaflet/dist/bundled/allmaps-leaflet-1.9.umd.js')
-            ->appendFile(src('walking-tour', 'javascripts', 'js'));
+            ->appendFile(src('walking-tour-public', 'javascripts', 'js'));
         $this->view->headLink()
             ->appendStylesheet('//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css', 'all')
             // ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.css', 'all')
             // ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.ie.css', 'all', 'lte IE 8')
-            ->appendStylesheet(src('walking-tour', 'css', 'css'));
+            ->appendStylesheet(src('walking-tour-public', 'css', 'css'));
             // ->appendStylesheet(src('/../../../themes/mall-theme', 'css', 'css'));
     }
 
@@ -153,6 +153,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             }
             $sql .= "\nGROUP BY items.id";
 
+            // TODO ERROR
             $dbItems = $db->query($sql)->fetchAll();
             $orderedItems = array();
 
@@ -201,15 +202,24 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         if (!$this->_request->isXmlHttpRequest()) {
             throw new Omeka_Controller_Exception_403;
         }
-        $item_id = $this->_request->getParam('id');
-        $tour_id = $this->_request->getParam('tour_id');
+        $item_id = (int) $this->_request->getParam('id');
+        $tour_id = (int) $this->_request->getParam('tour_id', $this->_request->getParam('tour'));
+
+        if (!$item_id || !$tour_id) {
+            $this->_helper->json(array('error' => 'Missing tour or item id.'));
+            return;
+        }
 
         $db = $this->_helper->db->getDb();
         $tourItemTable = $db->getTable('WalkingTourItem');
         $prefix = $db->prefix;
 
-
         $tourItem = $tourItemTable->fetchObjects("SELECT * FROM " . $prefix . "walking_tour_items WHERE tour_id = $tour_id AND item_id = $item_id");
+
+        if (empty($tourItem)) {
+            $this->_helper->json(array('error' => 'Tour item not found.'));
+            return;
+        }
 
         $exhibit_id = $tourItem[0]["exhibit_id"];
 
