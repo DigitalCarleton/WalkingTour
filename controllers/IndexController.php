@@ -139,6 +139,20 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
 
         foreach ($tourItemsIDs as $tour_id => $item_array) {
 
+            $returnArray[$tour_id]["Data"] = array('type' => 'FeatureCollection', 'features' => array());
+            $returnArray[$tour_id]["Color"] = $request_tour_id['color'][$tour_id];
+            $returnArray[$tour_id]["Tour Name"] = $request_tour_id['id'][$tour_id];
+            $returnArray[$tour_id]["Description"] = $request_tour_id['description'][$tour_id];
+            $returnArray[$tour_id]["Credits"] = $request_tour_id['credits'][$tour_id];
+
+            $tourTable = $db->getTable('WalkingTour');
+            $tour = $tourTable->find($tour_id);
+            $returnArray[$tour_id]["Route"] = $tour ? $tour->route : null;
+
+            if (empty($item_array)) {
+                continue;
+            }
+
             $tourItemsID = implode(", ", $item_array);
             $wheres = array("items.public = 1");
             $wheres[] = $db->quoteInto("items.id IN ($tourItemsID)", Zend_Db::INT_TYPE);
@@ -166,7 +180,6 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
                 }
             }
             // Build geoJSON: http://www.geojson.org/geojson-spec.html
-            $returnArray[$tour_id]["Data"] = array('type' => 'FeatureCollection', 'features' => array());
             foreach ($orderedItems as $row) {
                 $returnArray[$tour_id]["Data"]['features'][] = array(
                     'type' => 'Feature',
@@ -180,14 +193,6 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
                     ),
                 );
             }
-            $returnArray[$tour_id]["Color"] = $request_tour_id['color'][$tour_id];
-            $returnArray[$tour_id]["Tour Name"] = $request_tour_id['id'][$tour_id];
-            $returnArray[$tour_id]["Description"] = $request_tour_id['description'][$tour_id];
-            $returnArray[$tour_id]["Credits"] = $request_tour_id['credits'][$tour_id];
-            
-            $tourTable = $db->getTable('WalkingTour');
-            $tour = $tourTable->find($tour_id);
-            $returnArray[$tour_id]["Route"] = $tour ? $tour->route : null;
         }
         $this->_helper->json($returnArray);
 

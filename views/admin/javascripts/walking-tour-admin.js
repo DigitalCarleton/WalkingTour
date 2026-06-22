@@ -248,6 +248,11 @@ jQuery(document).ready(function ($) {
             const coordinates = points.map(point => [point[1], point[0]]); // Convert to [lng, lat] format
             const url = "https://api.openrouteservice.org/v2/directions/foot-walking/geojson";
 
+            if (coordinates.length < 2) {
+                console.error("At least two coordinates are required to request a route.", coordinates);
+                return null;
+            }
+
             try {
                 const response = await fetch(url, {
                     method: "POST",
@@ -261,7 +266,8 @@ jQuery(document).ready(function ($) {
                 });
 
                 if (!response.ok) {
-                    console.error("OpenRouteService API error:", response.statusText);
+                    const errorText = await response.text();
+                    console.error("OpenRouteService API error:", response.status, response.statusText, errorText);
                     return null;
                 }
 
@@ -475,6 +481,10 @@ jQuery(document).ready(function ($) {
             points.forEach(ele => {
                 pointsParam.push([ele.lng, ele.lat])
             })
+            if (pointsParam.length < 2) {
+                console.error("At least two coordinates are required to request a route.", pointsParam);
+                return { features: [] };
+            }
             url = "https://api.openrouteservice.org/v2/directions/foot-walking/geojson"
             const response = await fetch(url, {
                 method: "POST", // *GET, POST, PUT, DELETE, etc.
@@ -486,6 +496,11 @@ jQuery(document).ready(function ($) {
                 },
                 body: `{"coordinates": ${JSON.stringify(pointsParam)}}`, // body data type must match "Content-Type" header
             })
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error("OpenRouteService API error:", response.status, response.statusText, errorText);
+                    return { features: [] };
+                }
             return response.json();
         }
 
@@ -498,7 +513,7 @@ jQuery(document).ready(function ($) {
             console.log(markerData);
             dataArray = Object.entries(markerData)
             for (const tour in markerData) {
-                itemArray = itemArray.concat(markerData[walking_tour]['Data']['features'])
+                itemArray = itemArray.concat(markerData[tour]['Data']['features'])
             }
             let requests = dataArray.map(([tourId, value]) => {
                 if (tourId != currentTour) return Promise.resolve();
