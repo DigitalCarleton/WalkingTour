@@ -663,13 +663,22 @@ function walkingTourJs() {
             rightContent += "<p> No descriptions available. </p>"
         }
 
-        route = JSON.parse(value.Route);
-        var distance = route.features[0].properties.summary.distance;
-        var duration = route.features[0].properties.summary.duration;
+        if (value.Route) {
+            try {
+                route = JSON.parse(value.Route);
+                var distance = route.features[0].properties.summary.distance;
+                var duration = route.features[0].properties.summary.duration;
 
-        rightContent += '<div><strong>Distance:</strong> ' + Math.round(distance / 10) / 100 + ' km</div>'
-        rightContent += '<div><strong>Duration:</strong> ~' + Math.round(duration / 60) + ' min walk</div>'
-        rightContent += '<p></p>'
+                rightContent += '<div><strong>Distance:</strong> ' + Math.round(distance / 10) / 100 + ' km</div>'
+                rightContent += '<div><strong>Duration:</strong> ~' + Math.round(duration / 60) + ' min walk</div>'
+                rightContent += '<p></p>'
+            } catch (err) {
+                console.warn('Invalid Route for tour', tour_id, err);
+                rightContent += '<p><em>Route information is not available yet.</em></p>'
+            }
+        } else {
+            rightContent += '<p><em>Route information is not available yet.</em></p>'
+        }
 
         if (value.Credits != "") {
             rightContent += "<h2 class = credits> Credits </h2>"
@@ -689,8 +698,12 @@ function walkingTourJs() {
 
     function populatePopup(itemIDList, value, response, numPopup, tour_id) {
         var numPopup = itemIDList.findIndex((ele) => ele == response.id);
-        var coor = value.Data.features[numPopup].geometry.coordinates;
-        map.flyTo([coor[1], coor[0]], MAP_ZOOM + MAP_MAX_ZOOM_STOP);
+        if (!value || !value.Data || !value.Data.features || !value.Data.features[numPopup] || !value.Data.features[numPopup].geometry || !value.Data.features[numPopup].geometry.coordinates) {
+            console.warn('Route or feature geometry is not available yet for tour', tour_id, response.id);
+        } else {
+            var coor = value.Data.features[numPopup].geometry.coordinates;
+            map.flyTo([coor[1], coor[0]], MAP_ZOOM + MAP_MAX_ZOOM_STOP);
+        }
 
         $('.next-button').unbind("click");
         $('.prev-button').unbind("click");
