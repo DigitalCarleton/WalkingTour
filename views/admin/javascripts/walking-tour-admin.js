@@ -242,6 +242,154 @@ jQuery(document).ready(function ($) {
         $('#info-panel-container').fadeToggle(200, 'linear');
     });
 
+    async function refreshCurrentTourPreview() {
+        if (!currentTour) {
+            return;
+        }
+
+        var itemIds = ($('#tour_item_ids').val() || '')
+            .split(',')
+            .map(function (value) {
+                return parseInt(value, 10);
+            })
+            .filter(function (value) {
+                return !isNaN(value) && value > 0;
+            });
+
+        if (!itemIds.length) {
+            markerData[currentTour] = markerData[currentTour] || {};
+            markerData[currentTour].Data = { type: 'FeatureCollection', features: [] };
+            markerData[currentTour].geoJson = L.geoJson([]);
+            markerData[currentTour].walkingPath = L.polyline([], {
+                color: markerData[currentTour].Color || '#000000',
+                weight: 3,
+                opacity: 1,
+                smoothFactor: 1
+            });
+            doFilters();
+            return;
+        }
+
+        try {
+            var response = await $.ajax({
+                url: baseUrl + '/walking-tour/index/preview',
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    tour_id: currentTour,
+                    item_ids: itemIds.join(',')
+                }
+            });
+
+            markerData[currentTour] = response;
+
+            var itemIDList = [];
+            var features = (response.Data && response.Data.features) ? response.Data.features : [];
+            features.forEach(function (feature) {
+                itemIDList.push(feature.properties.id);
+            });
+
+            var previewMarkerFontHtmlStyles = `
+                transform: rotate(-45deg);
+                color:white;
+                text-align: center;
+                padding: 0.2rem 0 0.18rem 0;
+                font-size: 15px;
+            `;
+
+            var numMarker = 1;
+            var geoJsonLayer = L.geoJson(features, {
+                pointToLayer: function (feature, latlng) {
+                    var numberIcon = L.divIcon({
+                        className: "my-custom-pin",
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 40],
+                        popupAnchor: [0, -5],
+                        html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > <p style="${previewMarkerFontHtmlStyles}"> ${numMarker} </p> </spam>`
+                    });
+                    numMarker++;
+                    return L.marker(latlng, { icon: numberIcon });
+                }
+            });
+
+            markerData[currentTour].Data = response.Data;
+            markerData[currentTour].geoJson = geoJsonLayer;
+
+            var pointList = [];
+            features.forEach(function (feature) {
+                if (feature.geometry && feature.geometry.coordinates) {
+                    pointList.push(new L.LatLng(feature.geometry.coordinates[1], feature.geometry.coordinates[0]));
+                }
+            });
+
+            async function getRoute(points) {
+                var pointsParam = [];
+                points.forEach(function (ele) {
+                    pointsParam.push([ele.lng, ele.lat]);
+                });
+                if (pointsParam.length < 2) {
+                    return null;
+                }
+                const response = await fetch('https://api.openrouteservice.org/v2/directions/foot-walking/geojson', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+                        'Content-Type': 'application/json',
+                        'Authorization': '5b3ce3597851110001cf62489dde4c6690bc423bb86bd99921c5da77'
+                    },
+                    body: `{"coordinates": ${JSON.stringify(pointsParam)}}`
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('OpenRouteService API error:', response.status, response.statusText, errorText);
+                    return null;
+                }
+
+                return response.json();
+            }
+
+            if (pointList.length >= 2) {
+                const routeData = await getRoute(pointList);
+                if (routeData && routeData.features && routeData.features.length) {
+                    var path = routeData.features[0].geometry.coordinates;
+                    path = path.map(function (coord) {
+                        return [coord[1], coord[0]];
+                    });
+                    markerData[currentTour].walkingPath = L.polyline(path, {
+                        color: response.Color || '#000000',
+                        weight: 3,
+                        opacity: 1,
+                        smoothFactor: 1
+                    });
+                } else {
+                    markerData[currentTour].walkingPath = L.polyline([], {
+                        color: response.Color || '#000000',
+                        weight: 3,
+                        opacity: 1,
+                        smoothFactor: 1
+                    });
+                }
+            } else {
+                markerData[currentTour].walkingPath = L.polyline([], {
+                    color: response.Color || '#000000',
+                    weight: 3,
+                    opacity: 1,
+                    smoothFactor: 1
+                });
+            }
+
+            createCustomCSS();
+            doFilters();
+        } catch (error) {
+            console.error('Failed to refresh tour preview:', error);
+        }
+    }
+
+    $(document).on('tourItemsUpdated', function () {
+        refreshCurrentTourPreview();
+    });
+
     $(document).on('tourOrderChanged', async function (event, updatedOrder) {
 
         async function getRoute(points) {
@@ -496,11 +644,11 @@ jQuery(document).ready(function ($) {
                 },
                 body: `{"coordinates": ${JSON.stringify(pointsParam)}}`, // body data type must match "Content-Type" header
             })
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error("OpenRouteService API error:", response.status, response.statusText, errorText);
-                    return { features: [] };
-                }
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("OpenRouteService API error:", response.status, response.statusText, errorText);
+                return { features: [] };
+            }
             return response.json();
         }
 

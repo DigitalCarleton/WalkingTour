@@ -57,6 +57,73 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         }
     }
 
+    public function previewAction()
+    {
+        if (!$this->_request->isXmlHttpRequest()) {
+            throw new Omeka_Controller_Exception_403;
+        }
+
+        $tourId = (int) $this->_request->getPost('tour_id');
+        $itemIds = $this->_request->getPost('item_ids', array());
+
+        if (is_string($itemIds)) {
+            $itemIds = array_filter(array_map('trim', explode(',', $itemIds)));
+        }
+
+        $itemIds = array_values(array_filter(array_map('intval', (array) $itemIds)));
+
+        $db = $this->_helper->db->getDb();
+        $tourTable = $db->getTable('WalkingTour');
+        $tour = $tourTable->find($tourId);
+
+        if (!$tour) {
+            $this->_helper->json(array('error' => 'Tour not found.'));
+            return;
+        }
+
+        $locations = array();
+        if (!empty($itemIds)) {
+            $prefix = $db->prefix;
+            $placeholders = implode(',', array_fill(0, count($itemIds), '?'));
+            $sql = "SELECT item_id, latitude, longitude FROM {$prefix}locations WHERE item_id IN ($placeholders)";
+            $rows = $db->fetchAll($sql, $itemIds);
+            foreach ($rows as $row) {
+                $locations[(int) $row['item_id']] = $row;
+            }
+        }
+
+        $features = array();
+        foreach ($itemIds as $itemId) {
+            if (!isset($locations[$itemId])) {
+                continue;
+            }
+
+            $features[] = array(
+                'type' => 'Feature',
+                'geometry' => array(
+                    'type' => 'Point',
+                    'coordinates' => array((float) $locations[$itemId]['longitude'], (float) $locations[$itemId]['latitude']),
+                ),
+                'properties' => array(
+                    'id' => $itemId,
+                    'marker-color' => $tour->color,
+                ),
+            );
+        }
+
+        $this->_helper->json(array(
+            'Data' => array(
+                'type' => 'FeatureCollection',
+                'features' => $features,
+            ),
+            'Color' => $tour->color,
+            'Tour Name' => $tour->title,
+            'Description' => $tour->description,
+            'Credits' => $tour->credits,
+            'Route' => $tour->route,
+        ));
+    }
+
     /**
      * Display the map.
      */
@@ -117,6 +184,18 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $joins = array("$db->Item AS items ON items.id = locations.item_id");
         $wheres = array("items.public = 1");
         $prefix = $db->prefix;
+        $previewTourId = (int) $this->_request->getParam('tour_id');
+        $previewItemIds = array();
+        $postedItemIds = trim((string) $this->_request->getParam('item_ids'));
+
+        if ($postedItemIds !== '') {
+            foreach (explode(',', $postedItemIds) as $postedItemId) {
+                $postedItemId = (int) trim($postedItemId);
+                if ($postedItemId) {
+                    $previewItemIds[] = $postedItemId;
+                }
+            }
+        }
 
         // Filter public tours' items
         $request_tour_id = $this->publicTours();
@@ -126,6 +205,11 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $tourItemsIDs = array();
         $returnArray = array();
         foreach ($request_tour_id['id'] as $tour_id => $tour_title) {
+            if ($previewTourId && $tour_id == $previewTourId) {
+                $tourItemsIDs[$tour_id] = $previewItemIds;
+                continue;
+            }
+
             if ($tour_id != 0) {
                 $tourItemsDat = $tourItemTable->fetchObjects("SELECT item_id FROM " . $prefix . "walking_tour_items WHERE tour_id = $tour_id");
             } else {
