@@ -34,39 +34,39 @@ function availableExhibit() {
 	}
 }
 
-function has_tours()
+function has_walking_tours()
 {
 	return( total_tours() > 0 );
 }
 
-function has_tours_for_loop()
+function has_walking_tours_for_loop()
 {
 	$view = get_view();
-	return $view->tours && count( $view->tours );
+	return $view->walking_tours && count( $view->walking_tours );
 }
 
 
-function tour( $fieldName, $options=array(), $tour=null )
+function tour( $fieldName, $options=array(), $walking_tour=null )
 {
-	if( ! $tour ) {
-		$tour = get_current_tour();
+	if( ! $walking_tour ) {
+		$walking_tour = get_current_tour();
 	}
 
 	switch( strtolower( $fieldName ) ) {
 	case 'id':
-		$text = $tour->id;
+		$text = $walking_tour->id;
 		break;
 	case 'title':
-		$text = $tour->title;
+		$text = $walking_tour->title;
 		break;
 	case 'description':
-		$text = $tour->description;
+		$text = $walking_tour->description;
 		break;
 	case 'credits':
-		$text = $tour->credits;
+		$text = $walking_tour->credits;
 		break;
 	case 'postscript_text':
-		$text = $tour->postscript_text;
+		$text = $walking_tour->postscript_text;
 		break;
 	default:
 		throw new Exception( "\"$fieldName\" does not exist for tours!" );
@@ -92,7 +92,7 @@ function tour( $fieldName, $options=array(), $tour=null )
 
 function get_current_tour()
 {
-	return get_view()->tour;
+	return get_view()->walking_tour;
 }
 
 function link_to_tour(
@@ -116,7 +116,7 @@ function link_to_tour(
 function total_tours()
 {
 	$view = get_view();
-	return count( $view->tours );
+	return count( $view->walking_tours );
 }
 
 function nls2p($str) {

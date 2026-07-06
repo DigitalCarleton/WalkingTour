@@ -1,6 +1,6 @@
 <?php
 
-class TourTable extends Omeka_Db_Table
+class WalkingTourTable extends Omeka_Db_Table
 {
 	public function findItemsByTourId( $tour_id )
 	{
@@ -9,13 +9,13 @@ class TourTable extends Omeka_Db_Table
 		$itemTable = $this->getTable( 'Item' );
 		$select = $itemTable->getSelect();
 		$iAlias = $itemTable->getTableAlias();
-		$select->joinInner( array( 'ti' => $db->TourItem ),
+		$select->joinInner( array( 'ti' => $db->WalkingTourItem ),
 			"ti.item_id = $iAlias.id", array() );
 		$select->where( 'ti.tour_id = ?', array( $tour_id ) );
 		$select->order( 'ti.ordinal ASC' );
 
 		$items = $itemTable->fetchObjects( "SELECT i.*, ti.ordinal, ti.exhibit_id
-         FROM ".$prefix."items i LEFT JOIN ".$prefix."tour_items ti
+         FROM ".$prefix."items i LEFT JOIN ".$prefix."walking_tour_items ti
          ON i.id = ti.item_id
          WHERE ti.tour_id = ?
          ORDER BY ti.ordinal ASC",
@@ -31,13 +31,13 @@ class TourTable extends Omeka_Db_Table
 		$itemTable = $this->getTable( 'File' );
 		$select = $itemTable->getSelect();
 		$iAlias = $itemTable->getTableAlias();
-		$select->joinInner( array( 'ti' => $db->TourItem ),
+		$select->joinInner( array( 'ti' => $db->WalkingTourItem ),
 			"ti.item_id = $iAlias.id", array() );
 		$select->where( 'ti.tour_id = ?', array( $tour_id ) );
 		$select->order( 'ti.ordinal ASC' );
 
 		$items = $itemTable->fetchObjects( "SELECT f.*, ti.ordinal
-         FROM ".$prefix."files f LEFT JOIN ".$prefix."tour_items ti
+         FROM ".$prefix."files f LEFT JOIN ".$prefix."walking_tour_items ti
          ON i.id = ti.item_id
          WHERE ti.tour_id = ?
          ORDER BY ti.ordinal ASC",
@@ -49,7 +49,7 @@ class TourTable extends Omeka_Db_Table
 
 	public function getSelect()
 	{
-		$select = parent::getSelect()->order('tours.id');
+		$select = parent::getSelect()->order('walking_tours.id');
 
 		$permissions = new Omeka_Db_Select_PublicPermissions( 'WalkingTourBuilder_Tours' );
 		$permissions->apply( $select, 'tours', null );
