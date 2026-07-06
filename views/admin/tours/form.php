@@ -166,7 +166,7 @@
 		jQuery("html, body").animate({ scrollTop: jQuery('#tour-items-picker').position().top }, 'slow');
 	});
 
-	jQuery('#sortable').on('focus', 'tour-item-exhibit-search', function () {
+	jQuery('#sortable').on('focus', '#tour-item-exhibit-search', function () {
 		// give user some vertical space for autosuggest dropdown
 		jQuery("html, body").animate({ scrollTop: jQuery('#tour-items-picker').position().top }, 'slow');
 	});
