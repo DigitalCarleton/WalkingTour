@@ -1,4 +1,8 @@
 jQuery(document).ready(function ($) {
+    var currentTour = (typeof window.currentTour !== 'undefined' && window.currentTour !== null && window.currentTour !== '')
+        ? window.currentTour.toString()
+        : null;
+
     var markers;
     var map;
     var markerData;
@@ -659,6 +663,12 @@ jQuery(document).ready(function ($) {
         jqXhr = $.post(baseUrl + '/walking-tour/index/query', function (response) {
             markerData = response;
             console.log(markerData);
+            if (!currentTour) {
+                var tourIds = Object.keys(markerData || {});
+                if (tourIds.length) {
+                    currentTour = tourIds[0];
+                }
+            }
             dataArray = Object.entries(markerData)
             for (const tour in markerData) {
                 itemArray = itemArray.concat(markerData[tour]['Data']['features'])
