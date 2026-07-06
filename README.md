@@ -86,5 +86,5 @@ This plugin builds on a number of other projects. Thus, we would like to thank t
 
 1. Jim Safley, Kim Nguyen, and John Flatness for the [Mall Map](https://github.com/omeka/MallMap.git) plugin.
 2. Kim Nguyen and Sheila Brennan for the [Mall Theme](https://github.com/chnm/mall-theme.git) theme.
-3. Erin Bell, Greyson, Eli Pousson, and jbretmaney for the [Tour Builder](https://github.com/CPHDH/Curatescape/tree/master/plugins/TourBuilder) plugin.
+3. [CSU Center for Public History + Digital Humanities](https://csudigitalhumanities.org/) for the [Tour Builder](https://github.com/CPHDH/Curatescape/tree/master/plugins/TourBuilder) for the [Tour Builder](https://github.com/CPHDH/Curatescape/tree/master/plugins/TourBuilder) plugin.
 4. The team that maintains the [openrouteservice APIs](https://openrouteservice.org).
