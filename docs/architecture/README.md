@@ -1,3 +1,4 @@
+From https://github.com/tt-a1i/archify
 # WalkingTour architecture and next steps
 
 This document accompanies the **current-state** [interactive architecture diagram](walking-tour.html). The diagram describes branch `add-historic-maps1` at commit `01bf8490178124fc31052ad624436e4176874ce1`, including the “Add Omeka locations GeoJSON overlay” change. The improvements below are proposals; they are not implemented by this documentation change.
