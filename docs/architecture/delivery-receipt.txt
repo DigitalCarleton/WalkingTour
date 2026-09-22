@@ -1,0 +1,12 @@
+diagram_type: architecture
+output: D:/study/Carleton/CS/DSI work/WalkingTour/docs/architecture/walking-tour.html
+revision: 01bf8490178124fc31052ad624436e4176874ce1
+specification_sha256: 82b347583f36951136054d55dded34a3fd2dbd3747b6f861afd2c78a92fe392b
+specification_bytes: 7493
+artifact_sha256: 39c869bcbbedb835e6932661513132c39becdadf8e76eda98c853d0508f395a8
+artifact_bytes: 815683
+validation: 9/9 showcase, 0 errors, 0 warnings
+browser_evidence: passed
+visual_review: passed
+visual_review_scope: Inspected generated light 1440x900 and dark 2048x1320 screenshots for layout, legibility, routes, and card fit. Application runtime and interactive viewer actions were not exercised manually.
+correction_rounds: 2

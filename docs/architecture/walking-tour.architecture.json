@@ -1,0 +1,350 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "WalkingTour — Omeka Locations Overlay",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1370,
+      680
+    ],
+    "repository": {
+      "url": "https://github.com/DigitalCarleton/WalkingTour",
+      "revision": "01bf8490178124fc31052ad624436e4176874ce1",
+      "provider": "github"
+    }
+  },
+  "components": [
+    {
+      "id": "db",
+      "type": "database",
+      "label": "Omeka database",
+      "sublabel": "Items / Locations / Tours",
+      "pos": [
+        35,
+        40
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "controllers/IndexController.php",
+          "line": 111
+        }
+      ]
+    },
+    {
+      "id": "php",
+      "type": "backend",
+      "label": "PHP plugin + MVC",
+      "sublabel": "IndexController / Tours admin",
+      "pos": [
+        385,
+        40
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "WalkingTourPlugin.php",
+          "line": 23
+        },
+        {
+          "path": "controllers/IndexController.php",
+          "line": 48
+        }
+      ]
+    },
+    {
+      "id": "bootstrap",
+      "type": "frontend",
+      "label": "walking-tour.js",
+      "sublabel": "Bootstrap + live tour query",
+      "pos": [
+        730,
+        40
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "views/public/javascripts/walking-tour.js",
+          "line": 556
+        },
+        {
+          "path": "views/public/javascripts/walking-tour.js",
+          "line": 855
+        }
+      ]
+    },
+    {
+      "id": "annotation",
+      "type": "external",
+      "label": "Allmaps annotation",
+      "sublabel": "First map: GCPs + resource",
+      "pos": [
+        1075,
+        40
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "sources": [
+        {
+          "path": "views/public/javascripts/walking-tour.js",
+          "line": 283
+        }
+      ]
+    },
+    {
+      "id": "snapshot",
+      "type": "database",
+      "label": "Location export",
+      "sublabel": "omeka_locations.json",
+      "pos": [
+        35,
+        285
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "omeka_locations.json",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "id": "converter",
+      "type": "backend",
+      "label": "Offline converter",
+      "sublabel": "Node.js or PHP script",
+      "pos": [
+        385,
+        285
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "views/public/javascripts/omeka-locations-to-geojson.js",
+          "line": 1
+        },
+        {
+          "path": "views/public/javascripts/omeka-locations-to-geojson.php",
+          "line": 1
+        }
+      ]
+    },
+    {
+      "id": "geojson",
+      "type": "database",
+      "label": "Static GeoJSON",
+      "sublabel": "[longitude, latitude] points",
+      "pos": [
+        730,
+        285
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "views/public/data/omeka-locations.geojson",
+          "line": 1
+        },
+        {
+          "path": "views/public/javascripts/walking-tour.js",
+          "line": 612
+        }
+      ]
+    },
+    {
+      "id": "transform",
+      "type": "frontend",
+      "label": "Geo → image space",
+      "sublabel": "Inverse GCP transform / imageZoom",
+      "pos": [
+        1075,
+        285
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "sources": [
+        {
+          "path": "views/public/javascripts/walking-tour.js",
+          "line": 580
+        }
+      ]
+    },
+    {
+      "id": "iiif",
+      "type": "external",
+      "label": "IIIF image server",
+      "sublabel": "resource.id / full / … / default.jpg",
+      "pos": [
+        385,
+        530
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "views/public/javascripts/walking-tour.js",
+          "line": 689
+        }
+      ]
+    },
+    {
+      "id": "map",
+      "type": "frontend",
+      "label": "Leaflet image map",
+      "sublabel": "CRS.Simple + imageOverlay",
+      "pos": [
+        730,
+        530
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "views/public/javascripts/walking-tour.js",
+          "line": 670
+        }
+      ]
+    },
+    {
+      "id": "overlay",
+      "type": "frontend",
+      "label": "Orange circle overlay",
+      "sublabel": "Popup: item_id + address",
+      "pos": [
+        1075,
+        530
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "sources": [
+        {
+          "path": "views/public/javascripts/walking-tour.js",
+          "line": 633
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from": "db",
+      "to": "php",
+      "label": "SQL"
+    },
+    {
+      "from": "php",
+      "to": "bootstrap",
+      "label": "HTML + JS"
+    },
+    {
+      "from": "bootstrap",
+      "to": "annotation",
+      "label": "fetch"
+    },
+    {
+      "from": "annotation",
+      "to": "transform",
+      "label": "GCP model",
+      "labelDy": 95
+    },
+    {
+      "from": "snapshot",
+      "to": "converter",
+      "label": "manual run",
+      "variant": "emphasis"
+    },
+    {
+      "from": "converter",
+      "to": "geojson",
+      "label": "write file",
+      "variant": "emphasis"
+    },
+    {
+      "from": "bootstrap",
+      "to": "geojson",
+      "label": "fetch after map setup",
+      "labelDy": 95
+    },
+    {
+      "from": "geojson",
+      "to": "transform",
+      "label": "each point",
+      "variant": "emphasis"
+    },
+    {
+      "from": "transform",
+      "to": "overlay",
+      "label": "xy(x,y) → L.latLng(y,x)",
+      "variant": "emphasis",
+      "labelDy": 95
+    },
+    {
+      "from": "overlay",
+      "to": "map",
+      "label": "addTo(map)",
+      "variant": "emphasis"
+    },
+    {
+      "from": "iiif",
+      "to": "map",
+      "label": "image GET"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "amber",
+      "title": "New overlay: static and independent",
+      "items": [
+        "Export → convert → fetch → transform → circles.",
+        "No live DB query, public-item check, or tour filter.",
+        "Source changes require regeneration of the file."
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Coordinate contract",
+      "items": [
+        "Use maps[0]; prefer transformToResource, else transformBackward.",
+        "imageZoom = resource.height / map element height.",
+        "Divide image x/y by imageZoom; keep feature properties."
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Existing tour path + current limits",
+      "items": [
+        "POST query → public tour items → same coordinate helper → numbered pins.",
+        "Pin click: POST get-item → item details; overlay uses a simple popup.",
+        "Overlay errors log to console; no layer toggle or explicit Y flip."
+      ]
+    }
+  ]
+}
