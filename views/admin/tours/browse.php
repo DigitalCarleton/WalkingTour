@@ -20,10 +20,10 @@ echo flash();
 <div id="primary">
 		<?php
 		echo flash();
-		if( has_tours() ):
+		if( has_walking_tours() ):
 		?>
 		<div class="pagination"><?php echo pagination_links(); ?></div>
-		<?php if( has_tours_for_loop() ): ?>
+		<?php if( has_walking_tours_for_loop() ): ?>
 		 <table id="tours" class="simple" cellspacing="0" cellpadding="0">
 		    <thead>
 		       <tr>
@@ -38,7 +38,7 @@ echo flash();
                
                <?php $key = 0;
 
-				foreach( $tours as $tour ):
+				foreach( $walking_tours as $tour ):
 					$oddness = ((++$key % 2) == 1) ? 'odd' : 'even';
 					$showUrl = url( array( 'action' => 'show','id' => $tour->id ), 'tourAction' );
 					$editUrl = url( array( 'action' => 'edit','id' => $tour->id ), 'tourAction' );
@@ -72,7 +72,7 @@ echo flash();
 
 <?php else: ?>
 
-  <?php if( total_records( 'Tour' ) === 0 ): ?>
+  <?php if( total_records( 'WalkingTour' ) === 0 ): ?>
     <h2><?php echo __('You have no tours.'); ?></h2>
     <?php if( is_allowed( 'WalkingTourBuilder_Tours', 'add' ) ): ?>
     <p><?php echo __('Get started by adding your first tour.'); ?></p>

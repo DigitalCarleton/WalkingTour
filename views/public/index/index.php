@@ -11,7 +11,7 @@
     <div id="filters">
         <div id="tour-type-div">
             <div class="tour-filter">
-                <p>Tours</p>
+                <p>Walking Tours</p>
                 <a href="#" class="button" id="tour-confirm-button">Choose tour</a>
             </div>
             <label class="on"><input type="checkbox" name="place-type-all" value="0" checked="checked" /> All

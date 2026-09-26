@@ -4,7 +4,7 @@
  * Tour Item.
  * @package: Omeka
  */
-class TourItem extends Omeka_Record_AbstractRecord
+class WalkingTourItem extends Omeka_Record_AbstractRecord
 {
 	public $tour_id;
 	public $item_id;
@@ -12,18 +12,18 @@ class TourItem extends Omeka_Record_AbstractRecord
 	public $exhibit_id = -1;
 
 	protected $_related = array(
-		'Tour' => 'getTour',
+		'WalkingTour' => 'getWalkingTour',
 		'Item' => 'getItem',
 	);
 
 	protected function getItem()
 	{
-		return $this->getTable( 'Item' )->find( $this->item_id );
+		return $this->getTable( 'WalkingTourItem' )->find( $this->item_id );
 	}
 
-	protected function getTour()
+	protected function getWalkingTour()
 	{
-		return $this->getTable( 'Tour' )->find( $this->tour_id );
+		return $this->getTable( 'WalkingTour' )->find( $this->tour_id );
 	}
 
 	protected function _validate()

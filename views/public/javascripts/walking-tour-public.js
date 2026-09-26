@@ -29,8 +29,8 @@ function walkingTourJs() {
     var allItems = {};
     var allMarkers = {};
 
- 
- 
+
+
     /*
      * JQuery Setup
      */
@@ -93,6 +93,12 @@ function walkingTourJs() {
         var itemIDList = [];
         var tour_id;
 
+        // Guard: ensure markerData is available before attempting to operate on it
+        if (!markerData || Object.keys(markerData).length === 0) {
+            console.warn('Tours data not loaded yet (markerData is empty)');
+            return;
+        }
+
         if (tourTypeCheck.length) {
             tourTypeCheck.each(function () {
                 tour_id = this.value;
@@ -119,10 +125,28 @@ function walkingTourJs() {
             $('#info-panel-container').fadeToggle(200, 'linear');
             $('#toggle-map-button + .back-button').show();
             populateTourIntroPopup(itemIDList, curTourSelected, tour_id);
+        } else {
+            // No explicit tour selected (e.g., "All Tours"). Choose the first available tour.
+            const firstId = Object.keys(markerData)[0];
+            curTourSelected = markerData[firstId];
+            tour_id = firstId;
+            // If tourSelected is empty, build it from markerData so we have polylines to fit.
+            if (tourSelected.length === 0) {
+                tourSelected = Object.keys(markerData).map(id => markerData[id].walkingPath).filter(p => p);
+            }
         }
-        let polylineGroup = L.featureGroup(tourSelected);
-        let bounds = polylineGroup.getBounds();
-        map.fitBounds(bounds);
+
+        // Only attempt to fit bounds if we have polylines
+        if (tourSelected.length) {
+            let polylineGroup = L.featureGroup(tourSelected);
+            let bounds = polylineGroup.getBounds();
+            if (bounds.isValid && bounds.isValid()) {
+                map.fitBounds(bounds);
+            } else {
+                // Guard: some polyline groups may not provide valid bounds
+                try { map.fitBounds(bounds); } catch (e) { console.warn('Could not fit bounds', e); }
+            }
+        }
     })
 
     // Revert form to default and display all markers.
@@ -252,7 +276,7 @@ function walkingTourJs() {
     // Retain previous form state, if needed.
     retainFormState();
 
-    function mapLocateCenter(map){
+    function mapLocateCenter(map) {
         map.flyTo(MAP_CENTER, MAP_ZOOM);
     }
 
@@ -412,9 +436,9 @@ function walkingTourJs() {
                         onEachFeature: function (feature, layer) {
                             layer.on('click', function (e) {
                                 // center click location
-                                map.flyTo(e.latlng,MAP_ZOOM + MAP_MAX_ZOOM_STOP);
+                                map.flyTo(e.latlng, MAP_ZOOM + MAP_MAX_ZOOM_STOP);
                                 // Close the filtering
-                                var filterButton = $('filter-button');
+                                var filterButton = $('#filter-button');
                                 filterButton.removeClass('on').
                                     find('.screen-reader-text').
                                     html('Filters');
@@ -438,8 +462,17 @@ function walkingTourJs() {
                     markerData[tourId].allMarker = markerList;
                     markerData[tourId].geoJson = geoJsonLayer;
 
-                    const path = JSON.parse(value.Route);
-                    const route = path.features[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);;
+                    var route = [];
+                    if (value.Route) {
+                        try {
+                            const parsedPath = JSON.parse(value.Route);
+                            if (parsedPath && parsedPath.features && parsedPath.features.length && parsedPath.features[0].geometry && parsedPath.features[0].geometry.coordinates) {
+                                route = parsedPath.features[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                            }
+                        } catch (err) {
+                            console.warn('Invalid Route for tour', tourId, err);
+                        }
+                    }
 
                     var tourPolyline = new L.Polyline(route, {
                         color: value["Color"],
@@ -447,22 +480,22 @@ function walkingTourJs() {
                         opacity: 1,
                         smoothFactor: 1
                     });
-                    
+
                     markerData[tourId].walkingPath = tourPolyline;
                     resolve();
                 });
             })
             Promise.all(requests).then(() => {
                 createCustomCSS();
-                if (IS_AUTO_FIT){
-                    map.fitBounds(markerBounds, {padding: [10, 10]})
-                    mapLocateCenter = function(map) {
-                        map.fitBounds(markerBounds, {padding: [10, 10]})
-                    } 
+                if (IS_AUTO_FIT) {
+                    map.fitBounds(markerBounds, { padding: [10, 10] })
+                    mapLocateCenter = function (map) {
+                        map.fitBounds(markerBounds, { padding: [10, 10] })
+                    }
                     var curZoom = map._zoom;
-                    map.setMaxZoom( curZoom + MAP_MAX_ZOOM_STOP);
-                    map.setMinZoom( curZoom - MAP_MIN_ZOOM_STOP);
-                        // map["options"]["minZoom"] = curZoom - MAP_MIN_ZOOM_STOP                   
+                    map.setMaxZoom(curZoom + MAP_MAX_ZOOM_STOP);
+                    map.setMinZoom(curZoom - MAP_MIN_ZOOM_STOP);
+                    // map["options"]["minZoom"] = curZoom - MAP_MIN_ZOOM_STOP                   
                 }
                 doFilters();
             });
@@ -486,7 +519,7 @@ function walkingTourJs() {
         var toursToPlot = [];
         var mapToPlot;
         // Handle each filter
-        if ('0' != mapCoverage.val()) {
+        if (mapCoverage.val() != '0') {
             mapToPlot = mapCoverage.val();
         }
 
@@ -502,11 +535,29 @@ function walkingTourJs() {
         var markerLayers = [];
         var numMarkers = 0;
 
+        // Guard: if markerData isn't ready, bail out
+        if (!markerData || Object.keys(markerData).length === 0) {
+            console.warn('doFilters: markerData is empty or undefined');
+            $('#marker-count').text('0 items');
+            return;
+        }
+
         // handle the GeoJSON response, and add markers.
         toursToPlot.forEach(ele => {
-            numMarkers += markerData[ele].Data.features.length;
-            markerLayers.push(markerData[ele].geoJson);
-            pathToPlot.push(markerData[ele].walkingPath);
+            var md = markerData[ele];
+            if (!md) {
+                console.warn('doFilters: missing markerData for', ele);
+                return;
+            }
+            if (md.Data && md.Data.features && md.Data.features.length) {
+                numMarkers += md.Data.features.length;
+            }
+            if (md.geoJson) {
+                markerLayers.push(md.geoJson);
+            }
+            if (md.walkingPath) {
+                pathToPlot.push(md.walkingPath);
+            }
         });
         //response is an array of coordinate;
         var item = (1 == numMarkers) ? 'item' : 'items';
@@ -520,10 +571,14 @@ function walkingTourJs() {
         }
 
         markerLayers.forEach(ele => {
-            markers.addLayer(ele);
+            if (ele) {
+                markers.addLayer(ele);
+            }
         })
         pathToPlot.forEach(ele => {
-            ele.addTo(markers);
+            if (ele && typeof ele.addTo === 'function') {
+                ele.addTo(markers);
+            }
         })
         map.addLayer(markers);
     }
@@ -538,10 +593,10 @@ function walkingTourJs() {
         for (const tour_id in markerData) {
             var color = markerData[tour_id]['Color']
 
-            if (color.length == 0){
+            if (color.length == 0) {
                 color = "#000000"
             }
-            
+
             var rgb = hexToRgb(color)
             css += `#filters div label.label${tour_id}:before {
                         background-color: ${color} !important;
@@ -608,13 +663,22 @@ function walkingTourJs() {
             rightContent += "<p> No descriptions available. </p>"
         }
 
-        route = JSON.parse(value.Route);
-        var distance = route.features[0].properties.summary.distance;
-        var duration = route.features[0].properties.summary.duration;
+        if (value.Route) {
+            try {
+                route = JSON.parse(value.Route);
+                var distance = route.features[0].properties.summary.distance;
+                var duration = route.features[0].properties.summary.duration;
 
-        rightContent += '<div><strong>Distance:</strong> ' + Math.round(distance / 10) / 100 + ' km</div>'
-        rightContent += '<div><strong>Duration:</strong> ~' + Math.round(duration / 60) + ' min walk</div>'
-        rightContent += '<p></p>'
+                rightContent += '<div><strong>Distance:</strong> ' + Math.round(distance / 10) / 100 + ' km</div>'
+                rightContent += '<div><strong>Duration:</strong> ~' + Math.round(duration / 60) + ' min walk</div>'
+                rightContent += '<p></p>'
+            } catch (err) {
+                console.warn('Invalid Route for tour', tour_id, err);
+                rightContent += '<p><em>Route information is not available yet.</em></p>'
+            }
+        } else {
+            rightContent += '<p><em>Route information is not available yet.</em></p>'
+        }
 
         if (value.Credits != "") {
             rightContent += "<h2 class = credits> Credits </h2>"
@@ -634,8 +698,12 @@ function walkingTourJs() {
 
     function populatePopup(itemIDList, value, response, numPopup, tour_id) {
         var numPopup = itemIDList.findIndex((ele) => ele == response.id);
-        var coor = value.Data.features[numPopup].geometry.coordinates;
-        map.flyTo([coor[1], coor[0]], MAP_ZOOM + MAP_MAX_ZOOM_STOP);
+        if (!value || !value.Data || !value.Data.features || !value.Data.features[numPopup] || !value.Data.features[numPopup].geometry || !value.Data.features[numPopup].geometry.coordinates) {
+            console.warn('Route or feature geometry is not available yet for tour', tour_id, response.id);
+        } else {
+            var coor = value.Data.features[numPopup].geometry.coordinates;
+            map.flyTo([coor[1], coor[0]], MAP_ZOOM + MAP_MAX_ZOOM_STOP);
+        }
 
         $('.next-button').unbind("click");
         $('.prev-button').unbind("click");
@@ -690,9 +758,9 @@ function walkingTourJs() {
             rightContent += '<p>No descriptions available.</p>';
         }
         rightContent += '<div class = "popupButton">'
-        rightContent += '<a href="' + response.url + '" class="button" target="_blank">'+ DETAIL_BUTTON_TEXT +'</a>';
-        if (response.exhibitUrl != ""){
-            rightContent += '<a href="' + response.exhibitUrl + '" class="button" target="_blank">'+ EXHIBIT_BUTTON_TEXT +'</a>';
+        rightContent += '<a href="' + response.url + '" class="button" target="_blank">' + DETAIL_BUTTON_TEXT + '</a>';
+        if (response.exhibitUrl != "") {
+            rightContent += '<a href="' + response.exhibitUrl + '" class="button" target="_blank">' + EXHIBIT_BUTTON_TEXT + '</a>';
         }
         rightContent += '</div>'
         infoContent += '<div class = "content-container"> <div class ="article">' + rightContent + '</div></div>';
@@ -796,9 +864,9 @@ function walkingTourJs() {
         return b_new
     }
 
-        /*
-     * Revert to default (original) form state.
-     */
+    /*
+    * Revert to default (original) form state.
+    */
     function revertFormState() {
         if (historicMapLayer) {
             removeHistoricMapLayer();
