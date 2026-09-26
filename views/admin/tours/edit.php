@@ -1,11 +1,11 @@
 <?php
-$tourTitle = strip_formatting(tour('title'));
+$tourTitle = strip_formatting(walking_tour('title'));
 if ($tourTitle != '' && $tourTitle != '[Untitled]') {
   $tourTitle = ': &quot;' . $tourTitle . '&quot; ';
 } else {
   $tourTitle = '';
 }
-$tourTitle = 'Edit Tour #' . tour('id') . $tourTitle;
+$tourTitle = 'Edit Tour #' . walking_tour('id') . $tourTitle;
 
 echo head(array(
   'title' => $tourTitle,
@@ -33,7 +33,7 @@ echo flash();
         class="big blue button" target="_blank">
         <?php echo __('View Map'); ?>
       </a>
-      <?php echo link_to_tour(
+      <?php echo link_to_walking_tour(
         __('Delete'),
         array('class' => 'delete-confirm big red button'),
         'delete-confirm'
