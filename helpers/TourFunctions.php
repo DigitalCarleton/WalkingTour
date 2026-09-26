@@ -97,7 +97,7 @@ function get_current_walking_tour()
 	return get_view()->walking_tour;
 }
 
-function link_to_walking_tour(
+function link_to_walking_tour_search(
 	$text = null,
 	$props = array(),
 	$action = 'show',

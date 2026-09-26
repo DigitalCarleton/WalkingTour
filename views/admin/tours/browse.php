@@ -1,6 +1,6 @@
 <?php
 $pageTitle = __('Browse Tours') . ' ' . __('(%s total)', $total_results );
-$editable = is_allowed( 'WalkingTourBuilder_Tours', 'edit' );
+$editable = is_allowed( 'WalkingTour_Tours', 'edit' );
 $addUrl = url( array( 'action' => 'add' ) );
 
 echo head( array( 'title' => $pageTitle, 'bodyid'=>'tour','bodyclass' => 'tours browse' ) );
@@ -10,7 +10,7 @@ echo flash();
 <?php if( $total_results ): ?>
 
 <div class="table-actions">
-  <?php if( is_allowed( 'WalkingTourBuilder_Tours', 'add' ) ): ?>
+  <?php if( is_allowed( 'WalkingTour_Tours', 'add' ) ): ?>
   <a class="add button small green" href="<?php echo $addUrl; ?>">
     <?php echo __('Add a Tour'); ?>
   </a>
@@ -74,7 +74,7 @@ echo flash();
 
   <?php if( total_records( 'WalkingTour' ) === 0 ): ?>
     <h2><?php echo __('You have no tours.'); ?></h2>
-    <?php if( is_allowed( 'WalkingTourBuilder_Tours', 'add' ) ): ?>
+    <?php if( is_allowed( 'WalkingTour_Tours', 'add' ) ): ?>
     <p><?php echo __('Get started by adding your first tour.'); ?></p>
     <a class="add big green button" href="<?php echo $addUrl; ?>">
       <?php echo __('Add a Tour'); ?>
@@ -84,7 +84,7 @@ echo flash();
     <p><?php echo __('The query searched %s tours and returned no results.',
 		total_records( 'Tour' ));
 echo __('Would you like to %s?',
-	link_to_tour_search( __('refine your search') ) ); ?></p>
+	link_to_walking_tour_search( __('refine your search') ) ); ?></p>
   <?php endif; ?>
 
 <?php endif; ?>

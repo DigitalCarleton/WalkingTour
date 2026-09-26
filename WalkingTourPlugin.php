@@ -161,13 +161,13 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
         $acl = $args['acl'];
 
         // Create the ACL context
-        $acl->addResource('WalkingTourBuilder_Tours');
+        $acl->addResource('WalkingTour_Tours');
 
         // Allow anyone to look but not touch
-        $acl->allow(null, 'WalkingTourBuilder_Tours', array('browse', 'show'));
+        $acl->allow(null, 'WalkingTour_Tours', array('browse', 'show'));
 
         // Allow contributor (and better) to do anything with tours
-        $acl->allow('contributor', 'WalkingTourBuilder_Tours');
+        $acl->allow('contributor', 'WalkingTour_Tours');
 
     }
 
@@ -224,7 +224,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
 
     public function filterAdminDashboardStats($stats)
     {
-        if (is_allowed('WalkingTourBuilder_Tours', 'browse')) {
+        if (is_allowed('WalkingTour_Tours', 'browse')) {
             if (version_compare(OMEKA_VERSION, '3.1') >= 0) {
                 $stats['tours'] = array(total_records('Tours'), __('tours'));
             } else {

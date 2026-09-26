@@ -33,7 +33,7 @@ echo flash();
         class="big blue button" target="_blank">
         <?php echo __('View Map'); ?>
       </a>
-      <?php echo link_to_walking_tour(
+      <?php echo link_to_walking_tour_search(
         __('Delete'),
         array('class' => 'delete-confirm big red button'),
         'delete-confirm'
@@ -41,7 +41,7 @@ echo flash();
     </div>
 
     <div id="public-featured">
-      <?php if (is_allowed('WalkingTourBuilder_Tours', 'makePublic')): ?>
+      <?php if (is_allowed('WalkingTour_Tours', 'makePublic')): ?>
         <div class="checkbox">
           <label for="public">
             <?php echo __('Public'); ?>:
@@ -57,7 +57,7 @@ echo flash();
         </div>
       <?php endif; ?>
 
-      <?php if (is_allowed('WalkingTourBuilder_Tours', 'makeFeatured')): ?>
+      <?php if (is_allowed('WalkingTour_Tours', 'makeFeatured')): ?>
         <div class="checkbox">
           <label for="featured">
             <?php echo __('Featured'); ?>:

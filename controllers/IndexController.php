@@ -43,8 +43,8 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
 
     // Save the route for a tour
     public function saveRouteAction() {
-        $tourId = $this->getRequest()->getPost('tour_id');
-        $route = $this->getRequest()->getPost('route');
+        $tourId = $this->getRequest()->getParam('tour_id');
+        $route = $this->getRequest()->getParam('route');
         $db = get_db();
         $tourTable = $db->getTable('WalkingTour');
         $tour = $tourTable->find($tourId);
@@ -63,8 +63,8 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             throw new Omeka_Controller_Exception_403;
         }
 
-        $tourId = (int) $this->_request->getPost('tour_id');
-        $itemIds = $this->_request->getPost('item_ids', array());
+        $tourId = (int) $this->_request->getParam('tour_id');
+        $itemIds = $this->_request->getParam('item_ids', array());
 
         if (is_string($itemIds)) {
             $itemIds = array_filter(array_map('trim', explode(',', $itemIds)));
