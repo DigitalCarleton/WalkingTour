@@ -1,2 +1,10 @@
 .DS_Store
 .vscode
+
+# Local preview, tests, and implementation notes (kept on this machine).
+/dev/
+/tests/
+/.scratch/
+/docs/development.md
+/docs/dual-map-annotation-spec.md
+/docs/dual-map-ticket-plan.md

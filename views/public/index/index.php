@@ -77,7 +77,7 @@
                 <div id="map" role="region" aria-label="Modern map with walking tours and control points">
                     <a href="#" id="locate-button" aria-label="Show my location"><span class="screen-reader-text">Show my location</span></a>
                 </div>
-                <p id="omeka-locations-status" class="dual-map-feedback" role="status">Loading Omeka locations…</p>
+                <p id="omeka-locations-status" class="dual-map-feedback" role="status" hidden>Loading Omeka locations…</p>
                 <p id="modern-map-status" class="dual-map-feedback" role="status">Walking tours and shared control points</p>
             </section>
             <aside id="historical-map-catalog" aria-labelledby="map-catalog-heading">

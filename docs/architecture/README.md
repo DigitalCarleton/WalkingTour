@@ -1,6 +1,6 @@
 From https://github.com/tt-a1i/archify
 
-> Snapshot notice: the diagram below describes the implementation before the dual-map batch. The current viewer uses a persistent historical-map catalog and displays the existing location snapshot on the modern map. See [current development notes](../development.md). The original diagram and receipts are retained unchanged.
+> Snapshot notice: the diagram below describes the implementation before the dual-map batch. The current viewer uses a persistent historical-map catalog. The existing location snapshot is retained but hidden by default. The original diagram and receipts are retained unchanged.
 # WalkingTour architecture and next steps
 
 This document accompanies the **current-state** [interactive architecture diagram](walking-tour.html). The diagram describes branch `add-historic-maps1` at commit `01bf8490178124fc31052ad624436e4176874ce1`, including the “Add Omeka locations GeoJSON overlay” change. The improvements below are proposals; they are not implemented by this documentation change.

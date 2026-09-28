@@ -242,7 +242,8 @@ function walkingTourJs() {
         mapSetUp(response);
         WalkingTourHistoricalMaps.start(map);
         doQuery();
-        loadOmekaLocationsGeojson();
+        // Keep the legacy locations snapshot available, but hide it for this release.
+        // loadOmekaLocationsGeojson();
     }).fail(function () {
         $('#modern-map-status').text('Map settings could not be loaded. Please reload the page.');
         $('#historical-map-status').text('Maps could not start. Please reload the page.');
@@ -350,6 +351,7 @@ function walkingTourJs() {
     }
 
     function loadOmekaLocationsGeojson() {
+        $('#omeka-locations-status').prop('hidden', false);
         var source = document.getElementById('dual-map').dataset.locationsUrl;
         $.ajax({url: source, dataType: 'json', timeout: 15000}).done(function (geojson) {
             var features = (geojson.features || []).filter(function (feature) {

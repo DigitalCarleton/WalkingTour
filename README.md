@@ -10,8 +10,8 @@ See [WalkingTour architecture and next steps](docs/architecture/README.md) for t
 
 This increment is based on `add-historic-maps1`. It adds a persistent BnF map catalog,
 ten paired control points, and side-by-side historical and modern maps. The existing
-Omeka locations snapshot remains available on the modern map. Run the plugin upgrade
-in Omeka; do not uninstall to upgrade. See [local validation](docs/development.md).
+Omeka locations snapshot is retained but hidden by default. Run the plugin upgrade
+in Omeka; do not uninstall to upgrade.
 Point creation and calibration editing remain later batches.
 
 ## Configuration
