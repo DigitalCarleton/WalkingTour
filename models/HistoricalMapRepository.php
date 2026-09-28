@@ -16,6 +16,7 @@ class WalkingTour_HistoricalMapRepository
 
     public function install()
     {
+        //create two maps if there are not any
         $this->db->query("CREATE TABLE IF NOT EXISTS `{$this->maps}` (
             id INT UNSIGNED NOT NULL AUTO_INCREMENT,
             slug VARCHAR(191) NOT NULL,
