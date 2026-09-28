@@ -1,0 +1,45 @@
+/* Scoped styles keep the host Omeka theme and existing tour controls intact. */
+#dual-map { --map-accent: #663a71; margin: 0; color: #263e43; }
+#dual-map * { box-sizing: border-box; }
+#dual-map [hidden] { display: none !important; }
+#dual-map button { font: inherit; cursor: pointer; min-height: 44px; padding: 8px 12px; border: 1px solid #c2cfd2; border-radius: 5px; background: #fff; color: #263e43 !important; margin: 0; }
+#dual-map button:hover { background: #edf4f5; }
+#dual-map button:focus-visible, #dual-map a:focus-visible { outline: 3px solid #247eae; outline-offset: 2px; }
+#dual-map button:disabled { opacity: .5; cursor: default; }
+.dual-map-toolbar, .dual-map-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: #f6f9f9; }
+.dual-map-toolbar { border-bottom: 1px solid #d8e1e3; }
+#dual-map p { margin: 0; }
+.dual-map-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 230px; align-items: start; }
+#dual-map.catalog-collapsed .dual-map-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.dual-map-pane { min-width: 0; border-right: 1px solid #d8e1e3; }
+#dual-map h2 { font-size: 18px; line-height: 1.3; margin: 0; }
+.dual-map-heading { min-height: 70px; background: #fff; }
+.dual-map-heading button { font-size: 13px !important; flex-shrink: 0; }
+#dual-map #historical-map, #dual-map #map { width: 100%; height: clamp(360px, 65vh, 760px) !important; min-height: 0; position: relative; z-index: 0; }
+#historical-map { background: #f0ebe1; }
+#dual-map .leaflet-container img { margin: 0; max-width: none !important; max-height: none !important; }
+#dual-map .dual-map-feedback { padding: 10px 16px; font-size: 13px; line-height: 1.5; min-height: 44px; }
+#historical-map-status.is-error { color: #8c2929; }
+#historical-map-retry { margin-top: 8px !important; }
+#historical-map-catalog { padding: 20px 16px; font-size: 14px; line-height: 1.5; }
+#historical-map-catalog p { margin-top: 16px; }
+#historical-map-list { margin-top: 16px; }
+#historical-map-list button { width: 100%; text-align: left; margin-bottom: 8px; }
+#historical-map-list button[aria-pressed="true"] { border-color: var(--map-accent); box-shadow: inset 3px 0 var(--map-accent); }
+#historical-map-sources a { display: block; margin-top: 12px; text-decoration: underline; color: #365e6b; }
+.control-point-key span { color: var(--map-accent); font-size: 22px; vertical-align: middle; }
+#dual-map .control-point-marker { background: var(--map-accent); border: 2px solid #fff; border-radius: 50%; color: #fff; font: bold 12px/26px sans-serif; text-align: center; box-shadow: 0 1px 5px #3338; }
+#dual-map .control-point-marker.is-selected { background: #a54500; outline: 3px solid #ffc857; z-index: 1000 !important; }
+#dual-map .leaflet-control-zoom a { min-width: 36px; min-height: 36px; line-height: 36px; }
+@media (max-width: 1000px) {
+    .dual-map-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    #historical-map-catalog { grid-column: 1 / -1; border-top: 1px solid #d8e1e3; }
+}
+@media (max-width: 640px) {
+    .dual-map-layout, #dual-map.catalog-collapsed .dual-map-layout { grid-template-columns: minmax(0, 1fr); }
+    .dual-map-toolbar { align-items: start; }
+    .dual-map-toolbar p { max-width: 55%; }
+    .dual-map-heading { padding: 8px 12px; }
+    #dual-map #historical-map, #dual-map #map { height: 52vh !important; min-height: 300px; max-height: 520px; }
+    .dual-map-pane { border-right: 0; border-bottom: 1px solid #d8e1e3; }
+}

@@ -17,6 +17,8 @@ if (!defined('WALKINGTOUR_PLUGIN_DIR')) {
     define('WALKINGTOUR_PLUGIN_DIR', dirname(__FILE__));
 }
 
+require_once WALKINGTOUR_PLUGIN_DIR . '/models/HistoricalMapRepository.php';
+
 class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
 {
     protected $_hooks = array(
@@ -40,7 +42,13 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
 
     protected $_options = array(
         'walking_tour_filter_tooltip' => '',
-        'walking_tour_tooltip_button' => 'OK'
+        'walking_tour_tooltip_button' => 'OK',
+        'walking_tour_center' => '41.895, 12.48',
+        'walking_tour_default_zoom' => '13',
+        'walking_tour_max_zoom' => '19',
+        'walking_tour_min_zoom' => '2',
+        'walking_tour_exhibit_button' => 'See Exhibit',
+        'walking_tour_detail_button' => 'Full Details'
     );
 
     public function hookInstall()
@@ -73,12 +81,16 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
 
         $db->query($tourQuery);
         $db->query($tourItemQuery);
+        $historicalMaps = new WalkingTour_HistoricalMapRepository($db);
+        $historicalMaps->install();
         $this->_installOptions();
     }
 
     public function hookUninstall()
     {
         $db = $this->_db;
+        $historicalMaps = new WalkingTour_HistoricalMapRepository($db);
+        $historicalMaps->uninstall();
         $db->query("DROP TABLE IF EXISTS `$db->TourItem`");
         $db->query("DROP TABLE IF EXISTS `$db->Tour`");
         $this->_uninstallOptions();
@@ -86,6 +98,11 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
 
     public function hookUpgrade($args)
     {
+        $db = $this->_db;
+        if (version_compare($args['old_version'], '1.1.1', '<')) {
+            $historicalMaps = new WalkingTour_HistoricalMapRepository($db);
+            $historicalMaps->install();
+        }
         if (version_compare($args['old_version'], '0.1-dev', "<")) {
             $sql = "ALTER TABLE `{$db->prefix}tour_items` MODIFY COLUMN `exhibit_id` INT NOT NULL;";
             $this->_db->query($sql);

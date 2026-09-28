@@ -1,0 +1,216 @@
+/* global jQuery */
+(function (window, $) {
+    'use strict';
+
+    // Resolve Leaflet after all host-plugin scripts have loaded. Geolocation may
+    // enqueue its own Leaflet asset; both viewers must use the same instance.
+    $(function () {
+        var L = window.L;
+
+        // CRS.Simple uses x east and y north; image pixels use x right and y down.
+        function imageLatLng(x, y) { return L.latLng(-y, x); }
+
+        // Request original IIIF regions, never the Allmaps warped geographic tiles.
+        var OriginalImageTiles = L.TileLayer.extend({
+            getTileUrl: function (coords) {
+                var scale = Math.pow(2, -coords.z);
+                var span = this.options.tileSize * scale;
+                var x = Math.round(coords.x * span);
+                var y = Math.round(coords.y * span);
+                var width = Math.min(span, this.options.imageWidth - x);
+                var height = Math.min(span, this.options.imageHeight - y);
+                return this._url + '/' + [x, y, width, height].join(',') + '/' +
+                    Math.ceil(width / scale) + ',' + Math.ceil(height / scale) + '/0/default.jpg';
+            },
+            _initTile: function (tile) {
+                L.TileLayer.prototype._initTile.call(this, tile);
+                // Edge regions are smaller than a full tile; do not stretch them.
+                tile.style.width = 'auto';
+                tile.style.height = 'auto';
+            }
+        });
+
+        function start(modernMap) {
+            var root = document.getElementById('dual-map');
+            if (!root) { return; }
+            var historicalMap = L.map('historical-map', {
+                crs: L.CRS.Simple, minZoom: -7, maxZoom: 1, attributionControl: true
+            });
+            historicalMap.setView([0, 0], -5);
+            var imageLayer;
+            var activeMap;
+            var imageBounds;
+            var geographicBounds;
+            var pairs = [];
+            var imagePoints = L.layerGroup().addTo(historicalMap);
+            var modernPoints = L.layerGroup().addTo(modernMap);
+            var status = document.getElementById('historical-map-status');
+            var retry = document.getElementById('historical-map-retry');
+            var loadGeneration = 0;
+
+            function setStatus(message, error) {
+                status.textContent = message;
+                status.classList.toggle('is-error', !!error);
+                retry.hidden = !error;
+            }
+
+            function resize() {
+                historicalMap.invalidateSize({pan: false});
+                modernMap.invalidateSize({pan: false});
+            }
+            if (window.ResizeObserver) {
+                var observer = new ResizeObserver(resize);
+                observer.observe(document.getElementById('historical-map'));
+                observer.observe(document.getElementById('map'));
+            } else {
+                window.addEventListener('resize', resize);
+            }
+
+            $('#map-list-toggle').on('click', function () {
+                var collapsed = root.classList.toggle('catalog-collapsed');
+                document.getElementById('historical-map-catalog').hidden = collapsed;
+                this.setAttribute('aria-expanded', String(!collapsed));
+                this.textContent = collapsed ? 'Show map list' : 'Hide map list';
+                resize();
+            });
+            $('#historical-map-fit').on('click', function () {
+                if (imageBounds) { historicalMap.fitBounds(imageBounds, {padding: [20, 20]}); }
+            });
+            $('#control-points-fit').on('click', function () {
+                if (geographicBounds && geographicBounds.isValid()) {
+                    modernMap.fitBounds(geographicBounds, {padding: [40, 40]});
+                }
+            });
+
+            function selectPair(index) {
+                pairs.forEach(function (pair, i) {
+                    pair.forEach(function (marker) {
+                        var element = marker.getElement();
+                        if (element) {
+                            element.classList.toggle('is-selected', i === index);
+                            element.setAttribute('aria-pressed', String(i === index));
+                        }
+                        marker.setZIndexOffset(i === index ? 1000 : 0);
+                    });
+                });
+                historicalMap.panTo(pairs[index][0].getLatLng());
+                modernMap.panTo(pairs[index][1].getLatLng());
+                document.getElementById('control-point-selection').textContent =
+                    'Control point ' + activeMap.control_points[index].ordinal + ' selected on both maps.';
+            }
+
+            function markerAt(position, number, index) {
+                var marker = L.marker(position, {
+                    icon: L.divIcon({className: 'control-point-marker', html: String(number),
+                        iconSize: [30, 30], iconAnchor: [15, 15]}),
+                    title: 'Control point ' + number, alt: 'Control point ' + number,
+                    keyboard: true, riseOnHover: true
+                });
+                marker.on('click', function () { selectPair(index); });
+                marker.on('add', function () {
+                    marker.getElement().setAttribute('aria-label', 'Control point ' + number);
+                    marker.getElement().setAttribute('role', 'button');
+                    marker.getElement().setAttribute('aria-pressed', 'false');
+                });
+                return marker;
+            }
+
+            function sourceLink(container, label, url) {
+                // Catalog data is text. Only expose HTTP(S) links, never raw HTML.
+                if (!/^https?:\/\//i.test(url)) { return; }
+                var link = document.createElement('a');
+                link.textContent = label;
+                link.href = url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                container.appendChild(link);
+            }
+
+            function showMap(record) {
+                var generation = ++loadGeneration;
+                activeMap = record;
+                if (imageLayer) { historicalMap.removeLayer(imageLayer); }
+                imagePoints.clearLayers();
+                modernPoints.clearLayers();
+                pairs = [];
+                imageBounds = L.latLngBounds(imageLatLng(0, record.image_height), imageLatLng(record.image_width, 0));
+                geographicBounds = L.latLngBounds();
+                historicalMap.setMaxBounds(imageBounds.pad(.2));
+                historicalMap.fitBounds(imageBounds, {padding: [20, 20]});
+                setStatus('Loading the original historical image…', false);
+                var failedTiles = new Set();
+                imageLayer = new OriginalImageTiles(record.image_service, {
+                    imageWidth: record.image_width, imageHeight: record.image_height,
+                    tileSize: 256, minZoom: -7, maxZoom: 1, maxNativeZoom: 0,
+                    bounds: imageBounds, noWrap: true,
+                    attribution: 'Image: <a href="https://gallica.bnf.fr/">Bibliothèque nationale de France</a>'
+                });
+                imageLayer.on('tileerror', function (event) {
+                    if (generation !== loadGeneration) { return; }
+                    failedTiles.add(event.tile);
+                    setStatus('Some historical image tiles could not load. The modern map remains available.', true);
+                });
+                imageLayer.on('tileload tileunload', function (event) { failedTiles.delete(event.tile); });
+                imageLayer.on('load', function () {
+                    if (generation !== loadGeneration || failedTiles.size) { return; }
+                    setStatus('Original image · ' + record.control_points.length + ' shared control points', false);
+                });
+                imageLayer.addTo(historicalMap);
+
+                record.control_points.forEach(function (point, index) {
+                    var imageMarker = markerAt(imageLatLng(point.image_x, point.image_y), point.ordinal, index);
+                    var modernMarker = markerAt([point.latitude, point.longitude], point.ordinal, index);
+                    pairs.push([imageMarker, modernMarker]);
+                    imageMarker.addTo(imagePoints);
+                    modernMarker.addTo(modernPoints);
+                    geographicBounds.extend(modernMarker.getLatLng());
+                });
+                document.getElementById('historical-map-fit').disabled = false;
+                document.getElementById('control-points-fit').disabled = !geographicBounds.isValid();
+                document.getElementById('historical-map-heading').title = record.title;
+                document.getElementById('control-point-selection').textContent = 'Select a numbered point to locate its pair.';
+                var sources = document.getElementById('historical-map-sources');
+                sources.textContent = '';
+                sourceLink(sources, 'Image source (IIIF)', record.manifest_url);
+                sourceLink(sources, 'Imported calibration source', record.source_url);
+                $('#historical-map-list button').each(function () {
+                    this.setAttribute('aria-pressed', String(this.dataset.mapId === String(record.id)));
+                });
+                // Start at the seeded map's area; tour auto-fit may subsequently show the selected route.
+                if (geographicBounds.isValid()) {
+                    modernMap.fitBounds(geographicBounds, {padding: [40, 40]});
+                }
+            }
+
+            function loadCatalog() {
+                setStatus('Loading historical maps…', false);
+                $.ajax({url: root.dataset.catalogUrl, dataType: 'json', timeout: 15000})
+                    .done(function (response) {
+                        var list = document.getElementById('historical-map-list');
+                        list.textContent = '';
+                        if (!response.maps || !response.maps.length) {
+                            setStatus('No historical maps are available yet.', false);
+                            return;
+                        }
+                        response.maps.forEach(function (record) {
+                            var button = document.createElement('button');
+                            button.type = 'button';
+                            button.dataset.mapId = record.id;
+                            button.textContent = record.title;
+                            button.addEventListener('click', function () { showMap(record); });
+                            list.appendChild(button);
+                        });
+                        showMap(response.maps[0]);
+                    }).fail(function () {
+                        setStatus('Historical maps could not be loaded. Please retry or contact the site administrator.', true);
+                    });
+            }
+            retry.addEventListener('click', function () {
+                if (activeMap) { showMap(activeMap); } else { loadCatalog(); }
+            });
+            loadCatalog();
+        }
+
+        window.WalkingTourHistoricalMaps = {start: start};
+    });
+}(window, jQuery));

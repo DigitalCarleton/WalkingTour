@@ -1,294 +1,16 @@
-console.log("start")
-/*
- * Leaflet-IIIF 1.1.1
- * IIIF Viewer for Leaflet
- * by Jack Reed, @mejackreed
- */
+$(document).ready(function () {
+    walkingTourJs()
+});
 
-const Iiif = L.TileLayer.extend({
-    options: {
-      continuousWorld: true,
-      tileSize: 256,
-      updateWhenIdle: true,
-      tileFormat: 'jpg',
-      fitBounds: true
-    },
-  
-    initialize: function(url, options) {
-      options = typeof options !== 'undefined' ? options : {};
-  
-      if (options.maxZoom) {
-        this._customMaxZoom = true;
-      }
-  
-      // Check for explicit tileSize set
-      if (options.tileSize) {
-        this._explicitTileSize = true;
-      }
-  
-      // Check for an explicit quality
-      if (options.quality) {
-        this._explicitQuality = true;
-      }
-  
-      options = L.setOptions(this, options);
-      this._infoDeferred = new $.Deferred();
-      this._infoUrl = url;
-      this._baseUrl = this._templateUrl();
-      this._getInfo();
-    },
-    getTileUrl: function(coords) {
-      var _this = this,
-        x = coords.x,
-        y = (coords.y),
-        zoom = _this._getZoomForUrl(),
-        scale = Math.pow(2, _this.maxNativeZoom - zoom),
-        tileBaseSize = _this.options.tileSize * scale,
-        minx = (x * tileBaseSize),
-        miny = (y * tileBaseSize),
-        maxx = Math.min(minx + tileBaseSize, _this.x),
-        maxy = Math.min(miny + tileBaseSize, _this.y);
-      
-      var xDiff = (maxx - minx);
-      var yDiff = (maxy - miny);
-  
-      return L.Util.template(this._baseUrl, L.extend({
-        format: _this.options.tileFormat,
-        quality: _this.quality,
-        region: [minx, miny, xDiff, yDiff].join(','),
-        rotation: 0,
-        size: Math.ceil(xDiff / scale) + ','
-      }, this.options));
-    },
-    onAdd: function(map) {
-      var _this = this;
-  
-      // Wait for deferred to complete
-      $.when(_this._infoDeferred).done(function() {
-  
-        // Set maxZoom for map
-        map._layersMaxZoom = _this.maxZoom;
-  
-        // Call add TileLayer
-        L.TileLayer.prototype.onAdd.call(_this, map);
-  
-        if (_this.options.fitBounds) {
-          _this._fitBounds();
-        }
-  
-        // Reset tile sizes to handle non 256x256 IIIF tiles
-        _this.on('tileload', function(tile, url) {
-  
-          var height = tile.tile.naturalHeight,
-            width = tile.tile.naturalWidth;
-  
-          // No need to resize if tile is 256 x 256
-          if (height === 256 && width === 256) return;
-  
-          tile.tile.style.width = width + 'px';
-          tile.tile.style.height = height + 'px';
-  
-        });
-      });
-    },
-    _fitBounds: function() {
-      var _this = this;
-  
-      // Find best zoom level and center map
-      var initialZoom = _this._getInitialZoom(_this._map.getSize());
-      var imageSize = _this._imageSizes[initialZoom];
-      var sw = _this._map.options.crs.pointToLatLng(L.point(0, imageSize.y), initialZoom);
-      var ne = _this._map.options.crs.pointToLatLng(L.point(imageSize.x, 0), initialZoom);
-      var bounds = L.latLngBounds(sw, ne);
-      _this._map.fitBounds(bounds, true);
-    },
-    _getInfo: function() {
-      var _this = this;
-  
-      // Look for a way to do this without jQuery
-      $.getJSON(_this._infoUrl)
-        .done(function(data) {
-          _this.y = data.height;
-          _this.x = data.width;
-  
-          var tierSizes = [],
-            imageSizes = [],
-            scale,
-            width_,
-            height_,
-            tilesX_,
-            tilesY_;
-  
-          // Set quality based off of IIIF version
-          if (data.profile instanceof Array) {
-            _this.profile = data.profile[0];
-          }else {
-            _this.profile = data.profile;
-          }
-  
-          _this._setQuality();
-  
-          // Unless an explicit tileSize is set, use a preferred tileSize
-          if (!_this._explicitTileSize) {
-            // Set the default first
-            _this.options.tileSize = 256;
-            if (data.tiles) {
-              // Image API 2.0 Case
-              _this.options.tileSize = data.tiles[0].width;
-            } else if (data.tile_width){
-              // Image API 1.1 Case
-              _this.options.tileSize = data.tile_width;
-            }
-          }
-  
-          function ceilLog2(x) {
-            return Math.ceil(Math.log(x) / Math.LN2);
-          };
-  
-          // Calculates maximum native zoom for the layer
-          _this.maxNativeZoom = Math.max(ceilLog2(_this.x / _this.options.tileSize),
-            ceilLog2(_this.y / _this.options.tileSize));
-          
-          // Enable zooming further than native if maxZoom option supplied
-          if (_this._customMaxZoom && _this.options.maxZoom > _this.maxNativeZoom) {
-            _this.maxZoom = _this.options.maxZoom;
-          }
-          else {
-            _this.maxZoom = _this.maxNativeZoom;
-          }
-          
-          for (var i = 0; i <= _this.maxZoom; i++) {
-            scale = Math.pow(2, _this.maxNativeZoom - i);
-            width_ = Math.ceil(_this.x / scale);
-            height_ = Math.ceil(_this.y / scale);
-            tilesX_ = Math.ceil(width_ / _this.options.tileSize);
-            tilesY_ = Math.ceil(height_ / _this.options.tileSize);
-            tierSizes.push([tilesX_, tilesY_]);
-            imageSizes.push(L.point(width_,height_));
-          }
-  
-          _this._tierSizes = tierSizes;
-          _this._imageSizes = imageSizes;
-  
-          // Resolved Deferred to initiate tilelayer load
-          _this._infoDeferred.resolve();
-        });
-    },
-  
-    _setQuality: function() {
-      var _this = this;
-      var profileToCheck = _this.profile;
-  
-      if (_this._explicitQuality) {
-        return;
-      }
-  
-      // If profile is an object
-      if (typeof(profileToCheck) === 'object') {
-        profileToCheck = profileToCheck['@id'];
-      }
-  
-      // Set the quality based on the IIIF compliance level
-      switch (true) {
-        case /^http:\/\/library.stanford.edu\/iiif\/image-api\/1.1\/compliance.html.*$/.test(profileToCheck):
-          _this.options.quality = 'native';
-          break;
-        // Assume later profiles and set to default
-        default:
-          _this.options.quality = 'default';
-          break;
-      }
-    },
-  
-    _infoToBaseUrl: function() {
-      return this._infoUrl.replace('info.json', '');
-    },
-    _templateUrl: function() {
-      return this._infoToBaseUrl() + '{region}/{size}/{rotation}/{quality}.{format}';
-    },
-    _isValidTile: function(coords) {
-      var _this = this,
-        zoom = _this._getZoomForUrl(),
-        sizes = _this._tierSizes[zoom],
-        x = coords.x,
-        y = (coords.y);
-  
-      if (!sizes) return false;
-      if (x < 0 || sizes[0] <= x || y < 0 || sizes[1] <= y) {
-        return false;
-      }else {
-        return true;
-      }
-    },
-    _getInitialZoom: function (mapSize) {
-      var _this = this,
-        tolerance = 0.8,
-        imageSize;
-  
-      for (var i = _this.maxNativeZoom; i >= 0; i--) {
-        imageSize = this._imageSizes[i];
-        if (imageSize.x * tolerance < mapSize.x && imageSize.y * tolerance < mapSize.y) {
-          return i;
-        }
-      }
-      // return a default zoom
-      return 2;
-    },
-    _getImageSize: function() {
-        return this._imageSizes;
-    }
-  });
-  
-const tiff = function(url, options) {
-return new Iiif(url, options);
-};
-
-const getPackages = async function() {
-    const allmapsAnnotation = await import("https://unpkg.com/@allmaps/annotation?module")
-    const allmapsTransform = await import("https://unpkg.com/@allmaps/transform?module")
-    
-    return [allmapsAnnotation, allmapsTransform]
-}
-
-console.log(tiff)
-async function main() {
-    let packages = await getPackages();
-    console.log(packages);
-    console.log(tiff)
-    walkingTourJs(packages[0], packages[1], tiff)
-  }
-
-main()
-
-//   .then(([allmapsAnnotation, allmapsTransform]) => {
-//     // Both modules loaded successfully
-//     // Use the imported modules
-//     console.log(L.tileLayer)
-//     walkingTourJs(allmapsAnnotation, allmapsTransform, L.tileLayer.iiif)
-//   })
-//   .catch((error) => {
-//     // An error occurred while loading one of the modules
-//     console.error('Error loading modules:', error);
-//   });
-
-
-function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
-    var imported = document.createElement("script");
-    document.head.appendChild(imported);
-    // Set map height to be window height minus header height.
-    var windowheight = $(window).height();
-    $('#map').css('height', windowheight - 54);
+function walkingTourJs() {
+    var apiBase = document.getElementById('dual-map').dataset.apiBase.replace(/\/?$/, '/');
 
     var MAP_URL_TEMPLATE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
-    const annotationUrl = 'https://annotations.allmaps.org/manifests/47574ee029cca631'
-    const omekaLocationsGeojsonUrl = 'plugins/WalkingTour/views/public/data/omeka-locations.geojson'
-    // const annotationUrl = "https://annotations.allmaps.org/manifests/c047e9dd35f2d377"
 
     var MAP_CENTER;
     var MAP_ZOOM;  // MAP_ZOOM controls the default zoom of the map
     var MAP_MIN_ZOOM;
     var MAP_MAX_ZOOM;
-    var MAP_MAX_BOUNDS;  // MAP_MAX_BOUNDS controls the boundaries of the map
     var LOCATE_BOUNDS;
     var EXHIBIT_BUTTON_TEXT;
     var DETAIL_BUTTON_TEXT;
@@ -301,17 +23,6 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
     var markerData;
     var allItems = {};
     var allMarkers = {};
-
-    var imageZoom;
-
-    var yx = L.latLng;
-
-    var xy = function(x, y) {
-        if (Array.isArray(x)) {    // When doing xy([x, y]);
-            return yx(x[1], x[0]);
-        }
-        return yx(y, x);  // When doing xy(x, y);
-    };
 
  
  
@@ -380,13 +91,13 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
         if (tourTypeCheck.length) {
             tourTypeCheck.each(function () {
                 tour_id = this.value;
-                tourSelected.push(markerData[this.value].walkingPath);
+                tourSelected.push(markerData[this.value].geoJson);
                 curTourSelected = markerData[this.value];
             });
         } else {
             var toursToPlot = Object.keys(markerData);
             toursToPlot.forEach((ele) => {
-                tourSelected.push(markerData[ele].walkingPath);
+                tourSelected.push(markerData[ele].geoJson);
             });
         }
 
@@ -406,7 +117,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
         }
         let polylineGroup = L.featureGroup(tourSelected);
         let bounds = polylineGroup.getBounds();
-        map.fitBounds(bounds);
+        if (bounds.isValid()) { map.fitBounds(bounds); }
     })
 
     // Revert form to default and display all markers.
@@ -526,139 +237,22 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
      * Query backend
      */
 
-    // window.onload = function () {
-    //     jqXhr = $.post('walking-tour/index/map-config', function (response) {
-    //         const mapConfig = response
-    //         mapSetUp(mapConfig, "https://iiif.digitalcommonwealth.org/iiif/2/commonwealth:ht250943q")
-    //         fetch(annotationUrl)
-    //             .then(response => {
-    //                 // Check if the request was successful
-    //                 if (!response.ok) {
-    //                     throw new Error('Network response was not ok');
-    //                 }
-    //                 // Parse the response as JSON
-    //                 return response.json();
-    //             })
-    //             .then(data => {
-    //                 const maps = allmapsAnnotation.parseAnnotation(data)
-    //                 const transformer = new allmapsTransform.GcpTransformer(maps[0].gcps);
-    //                 console.log(maps)
-    //                 doQuery(transformer, maps);
-    //             })
-    //             .catch(error => {
-    //                 // Handle any errors that occurred during the fetch
-    //                 console.error('Fetch error:', error);
-    //             });
-    //     })
-    // };
-
-    fetch(annotationUrl)
-        .then(response => {
-            // Check if the request was successful
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            // Parse the response as JSON
-            return response.json();
-        })
-        .then(data => {
-            const maps = allmapsAnnotation.parseAnnotation(data)
-            const transformer = createGcpTransformer(maps[0]);
-            console.log(maps)
-            imageZoom = maps[0].resource.height / $('#map').height()
-            mapSetUp(maps[0])
-            loadOmekaLocationsGeojson(transformer);
-            doQuery(transformer, maps);
-        })
-        .catch(error => {
-            // Handle any errors that occurred during the fetch
-            console.error('Fetch error:', error);
-        });
+    // DOM-ready initialization also works when the window load event has already fired.
+    jqXhr = $.post(apiBase + 'map-config', function (response) {
+        mapSetUp(response);
+        WalkingTourHistoricalMaps.start(map);
+        doQuery();
+        loadOmekaLocationsGeojson();
+    }).fail(function () {
+        $('#modern-map-status').text('Map settings could not be loaded. Please reload the page.');
+        $('#historical-map-status').text('Maps could not start. Please reload the page.');
+    });
 
     // Retain previous form state, if needed.
     retainFormState();
-    function createGcpTransformer(georeferencedMap) {
-        if (allmapsTransform.GcpTransformer.fromGeoreferencedMap) {
-            return allmapsTransform.GcpTransformer.fromGeoreferencedMap(georeferencedMap);
-        }
-    
-        return new allmapsTransform.GcpTransformer(
-            georeferencedMap.gcps,
-            georeferencedMap.transformation && georeferencedMap.transformation.type
-        );
-    }
-    
-    function transformGeoPointToImagePoint(transformer, coordinates) {
-        var point;
-    
-        if (transformer.transformToResource) {
-            point = transformer.transformToResource(coordinates);
-        } else if (transformer.transformBackward) {
-            point = transformer.transformBackward(coordinates);
-        } else {
-            throw new Error('Allmaps transformer does not support geo-to-resource transforms.');
-        }
-    
-        return point.map(function (value) {
-            return value / imageZoom;
-        });
-    }
-    
-    function imagePointToLatLng(point) {
-        return xy(point[0], point[1]);
-    }
-    
-    function loadOmekaLocationsGeojson(transformer) {
-        fetch(omekaLocationsGeojsonUrl)
-            .then(function (response) {
-                if (!response.ok) {
-                    throw new Error('Could not load Omeka locations GeoJSON.');
-                }
-                return response.json();
-            })
-            .then(function (geojson) {
-                var transformedFeatures = geojson.features.map(function (feature) {
-                    var imagePoint = transformGeoPointToImagePoint(transformer, feature.geometry.coordinates);
-    
-                    return {
-                        type: 'Feature',
-                        geometry: {
-                            type: 'Point',
-                            coordinates: imagePoint
-                        },
-                        properties: feature.properties
-                    };
-                });
-    
-                L.geoJson({
-                    type: 'FeatureCollection',
-                    features: transformedFeatures
-                }, {
-                    pointToLayer: function (feature) {
-                        var popupContent = '<strong>Item ' + feature.properties.item_id + '</strong>';
-    
-                        if (feature.properties.address) {
-                            popupContent += '<br>' + feature.properties.address;
-                        }
-    
-                        var marker = L.circleMarker(imagePointToLatLng(feature.geometry.coordinates), {
-                            radius: 5,
-                            color: '#1f2937',
-                            weight: 1,
-                            fillColor: '#f59e0b',
-                            fillOpacity: 0.85
-                        });
-    
-                        marker.bindPopup(popupContent);
-                        return marker;
-                    }
-                }).addTo(map);
-    
-                console.log('Loaded Omeka locations GeoJSON', transformedFeatures.length);
-            })
-            .catch(function (error) {
-                console.error('Omeka locations GeoJSON error:', error);
-            });
+
+    function mapLocateCenter(map){
+        map.flyTo(MAP_CENTER, MAP_ZOOM);
     }
 
     /*
@@ -666,136 +260,128 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
      *
      * Call only once during set up
      */
-    function mapSetUp(maps) {
-        var mapHeight = maps.resource.height / imageZoom
-        var mapWidth = maps.resource.width / imageZoom
-        var bounds = [[0,0], [mapHeight, mapWidth]];
-        var center = [(bounds[1][0] - bounds[0][0])/ 2, (bounds[1][1] - bounds[0][1])/ 2]
+    function mapSetUp(response) {
+        EXHIBIT_BUTTON_TEXT = response.walking_tour_exhibit_button || 'See Exhibit';
+        DETAIL_BUTTON_TEXT = response.walking_tour_detail_button || 'Full Details';
+        MAP_ZOOM = Number(response.walking_tour_default_zoom) || 13;
+        MAP_MAX_ZOOM = Number(response.walking_tour_max_zoom) || 19;
+        MAP_MIN_ZOOM = Number(response.walking_tour_min_zoom) || 2;
+        if (MAP_MAX_ZOOM < MAP_ZOOM) { MAP_MAX_ZOOM = 19; }
+        if (MAP_MIN_ZOOM > MAP_ZOOM) { MAP_MIN_ZOOM = 2; }
+        MAP_CENTER = parse1DArrayPoint(response.walking_tour_center || '41.895, 12.48');
+        if (MAP_CENTER.length !== 2 || !MAP_CENTER.every(Number.isFinite)) { MAP_CENTER = [41.895, 12.48]; }
+        var minZoom = MAP_MIN_ZOOM;
         map = L.map('map', {
-            center: center,
-            crs: L.CRS.Simple,
-            zoom: -1,
-            maxBounds: bounds
-          });
-
-        // const iiif_layer = iiif(maps.resource.id+'/info.json', {
-        //     fitBounds: true,
-        //     setMaxBounds: true,
-        // }).addTo(map)
-        console.log(maps.resource.id +'/full/'+ maps.resource.width +',/0/default.jpg')
-        var image = L.imageOverlay(maps.resource.id +'/full/'+ $('#map').width() +',/0/default.jpg', bounds).addTo(map);
-          console.log(image)
-        // console.log(iiif_layer)
-        // console.log(iiif_layer._getImageSize())
-        // const imageSize = iiif_layer._imageSizes.map(ele => {
-        //     return xy(ele[0], ele[1])
-        // })
-
-        map.on('zoomend', function() {
-            console.log(map.getZoom())
+            center: MAP_CENTER,
+            minZoom: MAP_MIN_ZOOM,
+            maxZoom: MAP_MAX_ZOOM,
+            zoom: minZoom,
+            zoomControl: false
         });
-        // map.setZoom(zoom)
-        // var bounds = L.bounds(L.point(maps.resourceMask[0][0], maps.resourceMask[0][1]), L.point(maps.resourceMask[2][0], maps.resourceMask[2][1]));
-        
-        // console.log(bounds)
-        // map.fitBounds(bounds)
-        // console.log(map.getBounds(), map.getZoom())
-        // var rect = L.rectangle(imageSize, {color: 'blue', weight: 1}).on('click', function (e) {
-        //     // There event is event object
-        //     // there e.type === 'click'
-        //     // there e.lanlng === L.LatLng on map
-        //     // there e.target.getLatLngs() - your rectangle coordinates
-        //     // but e.target !== rect
-        //     console.info(e);
-        // }).addTo(map);
+        LOCATE_BOUNDS = map.getBounds();
+        map.setZoom(MAP_ZOOM);
 
-        // EXHIBIT_BUTTON_TEXT = response['walking_tour_exhibit_button']
-        // DETAIL_BUTTON_TEXT = response['walking_tour_detail_button']
-        // MAP_MAX_ZOOM = parseInt(response['walking_tour_max_zoom'])
-        // MAP_MIN_ZOOM = parseInt(response['walking_tour_min_zoom'])
-        // MAP_CENTER = parse1DArrayPoint(response['walking_tour_center'])
-        // MAP_ZOOM = parseInt(response["walking_tour_default_zoom"])
-        // MAP_MAX_BOUNDS = parse2DArrayPoint(response["walking_tour_max_bounds"])
-        // // Set the base map layer.
-        // map = L.map('map', {
-        //     center: MAP_CENTER,
-        //     zoom: MAP_MIN_ZOOM,
-        //     minZoom: MAP_MIN_ZOOM,
-        //     maxZoom: MAP_MAX_ZOOM,
-        //     zoomControl: false
-        // });
-        // LOCATE_BOUNDS = map.getBounds();
-        // map.setZoom(MAP_ZOOM);
+        map.addLayer(L.tileLayer(MAP_URL_TEMPLATE));
+        map.addControl(L.control.zoom({ position: 'topleft' }));
+        var extentControl = L.Control.extend({
+            options: {
+                position: 'topleft'
+            },
+            onAdd: function (map) {
+                var container = L.DomUtil.create('div', 'extentControl');
+                $(container).attr('id', 'extent-control');
+                $(container).css('width', '26px').css('height', '26px').css('outline', '1px black');
+                $(container).addClass('extentControl-disabled')
+                $(container).addClass('leaflet-bar')
+                $(container).on('click', function () {
+                    mapLocateCenter(map);
+                });
+                return container;
+            }
+        })
+        map.addControl(new extentControl());
+        map.attributionControl.setPrefix('Tiles &copy; Esri');
 
-        // map.addLayer(L.tileLayer(MAP_URL_TEMPLATE));
-        // map.addControl(L.control.zoom({ position: 'topleft' }));
-        // var extentControl = L.Control.extend({
-        //     options: {
-        //         position: 'topleft'
-        //     },
-        //     onAdd: function (map) {
-        //         var container = L.DomUtil.create('div', 'extentControl');
-        //         $(container).attr('id', 'extent-control');
-        //         $(container).css('width', '26px').css('height', '26px').css('outline', '1px black');
-        //         $(container).addClass('extentControl-disabled')
-        //         $(container).addClass('leaflet-bar')
-        //         $(container).on('click', function () {
-        //             map.flyTo(MAP_CENTER, MAP_ZOOM);
-        //         });
-        //         return container;
-        //     }
-        // })
-        // map.addControl(new extentControl());
-        // map.attributionControl.setPrefix('Tiles &copy; Esri');
-
-        // const warpedMapLayer = new Allmaps.WarpedMapLayer(annotationUrl)
-        // map.addLayer(warpedMapLayer);
-
-        // map.on('zoomend', function () {
-        //     if (map.getZoom() == MAP_MIN_ZOOM) {
-        //         $('#extent-control').addClass('extentControl-disabled')
-        //     } else {
-        //         $('#extent-control').removeClass('extentControl-disabled')
-        //     }
-        // })
+        map.on('zoomend', function () {
+            if (map.getZoom() == minZoom) {
+                $('#extent-control').addClass('extentControl-disabled')
+            } else {
+                $('#extent-control').removeClass('extentControl-disabled')
+            }
+        })
 
         // Handle location found.
-        // map.on('locationfound', function (e) {
-        //     if (!locationMarker) {
-        //         $("#locate-button").toggleClass('loading');
-        //     }
-        //     // User within location bounds. Set the location marker.
-        //     if (L.latLngBounds(LOCATE_BOUNDS).contains(e.latlng)) {
-        //         if (locationMarker) {
-        //             // Remove the existing location marker before adding to map.
-        //             map.removeLayer(locationMarker);
-        //         } else {
-        //             // Pan to location only on first locate.
-        //             map.panTo(e.latlng);
-        //         }
-        //         locationMarker = L.marker(e.latlng, {
-        //             icon: L.icon({
-        //                 iconUrl: 'plugins/WalkingTour/views/public/images/location.png',
-        //                 iconSize: [25, 25]
-        //             })
-        //         });
-        //         locationMarker.addTo(map).bindPopup("You are within " + e.accuracy / 2 + " meters from this point");
-        //         // User outside location bounds.
-        //     } else {
-        //         var locateMeters = e.latlng.distanceTo(map.options.center);
-        //         var locateMiles = Math.ceil((locateMeters * 0.000621371) * 100) / 100;
-        //         alert('Cannot locate your location. You are ' + locateMiles + ' miles from the map bounds.');
-        //         map.stopLocate();
-        //     }
-        // });
+        map.on('locationfound', function (e) {
+            if (!locationMarker) {
+                $("#locate-button").toggleClass('loading');
+            }
+            // User within location bounds. Set the location marker.
+            if (L.latLngBounds(LOCATE_BOUNDS).contains(e.latlng)) {
+                if (locationMarker) {
+                    // Remove the existing location marker before adding to map.
+                    map.removeLayer(locationMarker);
+                } else {
+                    // Pan to location only on first locate.
+                    map.panTo(e.latlng);
+                }
+                locationMarker = L.marker(e.latlng, {
+                    icon: L.icon({
+                        iconUrl: 'plugins/WalkingTour/views/public/images/location.png',
+                        iconSize: [25, 25]
+                    })
+                });
+                locationMarker.addTo(map).bindPopup("You are within " + e.accuracy / 2 + " meters from this point");
+                // User outside location bounds.
+            } else {
+                var locateMeters = e.latlng.distanceTo(map.options.center);
+                var locateMiles = Math.ceil((locateMeters * 0.000621371) * 100) / 100;
+                alert('Cannot locate your location. You are ' + locateMiles + ' miles from the map bounds.');
+                map.stopLocate();
+            }
+        });
 
-        // // Handle location error.
-        // map.on('locationerror', function () {
-        //     $("#locate-button").toggleClass('loading');
-        //     map.stopLocate();
-        //     alert('Location Error, Please try again.');
-        //     console.log('location error')
-        // });
+        // Handle location error.
+        map.on('locationerror', function () {
+            $("#locate-button").toggleClass('loading');
+            map.stopLocate();
+            alert('Location Error, Please try again.');
+            console.log('location error')
+        });
+    }
+
+    function loadOmekaLocationsGeojson() {
+        var source = document.getElementById('dual-map').dataset.locationsUrl;
+        $.ajax({url: source, dataType: 'json', timeout: 15000}).done(function (geojson) {
+            var features = (geojson.features || []).filter(function (feature) {
+                var coordinates = feature.geometry && feature.geometry.coordinates;
+                return feature.geometry && feature.geometry.type === 'Point' &&
+                    Array.isArray(coordinates) && coordinates.length >= 2 &&
+                    coordinates.every(Number.isFinite) && Math.abs(coordinates[0]) <= 180 &&
+                    Math.abs(coordinates[1]) <= 90;
+            });
+            L.geoJson(features, {
+                pointToLayer: function (feature, latlng) {
+                    var properties = feature.properties || {};
+                    var content = document.createElement('div');
+                    var title = document.createElement('strong');
+                    title.textContent = 'Item ' + properties.item_id;
+                    content.appendChild(title);
+                    if (properties.address) {
+                        var address = document.createElement('p');
+                        address.textContent = properties.address;
+                        content.appendChild(address);
+                    }
+                    return L.circleMarker(latlng, {
+                        radius: 5, color: '#1f2937', weight: 1,
+                        fillColor: '#f59e0b', fillOpacity: 0.85,
+                        className: 'omeka-location-marker'
+                    }).bindPopup(content);
+                }
+            }).addTo(map);
+            $('#omeka-locations-status').text(features.length + ' Omeka locations · existing snapshot');
+        }).fail(function () {
+            $('#omeka-locations-status').text('The Omeka locations snapshot could not be loaded.');
+        });
     }
 
     /*
@@ -803,7 +389,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
      *
      * Call only once during set up
      */
-    function doQuery(transformer) {
+    function doQuery() {
         const markerFontHtmlStyles = `
         transform: rotate(-45deg);
         color:white;
@@ -811,48 +397,10 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
         padding: 0.2rem 0 0.18rem 0;
         font-size: 15px;
         `
-        // correctly formats coordinates as [lat, long] (API returns [long, lat])
-        function orderCoords(path) {
-            var directions = [];
-            for (var i = 0; i < path.length; i++) {
-                directions.push([path[i][1], path[i][0]]);
-            }
-            return directions;
-        }
 
-        async function getOverallPath(points, key) {
-            var pointsParam = []
-            points.forEach(ele => {
-                pointsParam.push([ele.lng, ele.lat])
-            })
-            url = "https://api.openrouteservice.org/v2/directions/foot-walking/geojson"
-            const response = await fetch(url, {
-                method: "POST", // *GET, POST, PUT, DELETE, etc.
-                headers: {
-                    'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
-                    "Content-Type": "application/json",
-                    'Authorization': key
-                    // 'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `{"coordinates": ${JSON.stringify(pointsParam)}}`, // body data type must match "Content-Type" header
-            })
-            return response.json();
-        }
-
-        var key = "5b3ce3597851110001cf62489dde4c6690bc423bb86bd99921c5da77";
-        var url;
         var itemArray = []
         var tourToItem = {}
-
-        var yx = L.latLng;
-
-        var xy = function(x, y) {
-            if (Array.isArray(x)) {    // When doing xy([x, y]);
-                return yx(x[1], x[0]);
-            }
-            return yx(y, x);  // When doing xy(x, y);
-        };
-        jqXhr = $.post('walking-tour/index/query', function (response) {
+        jqXhr = $.post(apiBase + 'query', function (response) {
             markerData = response;
             dataArray = Object.entries(markerData)
             for (const tour in markerData) {
@@ -863,153 +411,63 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
                     var numMarker = 1;
                     var response = value["Data"];
                     var itemIDList = [];
-                    // console.log(transformer)
-                    // console.log(response.features)
 
-                    newList = []
-
-                    response.features = response.features.map(ele => {
-                        var test = transformGeoPointToImagePoint(transformer, ele.geometry.coordinates)
-                        // console.log(test)
+                    response.features.forEach(ele => {
                         itemIDList.push(ele.properties.id)
-                        return({
-                            ...ele,
-                            geometry: {
-                                ...ele.geometry,
-                                coordinates: test
-                            }
-                        })
                     })
-                    console.log(response.features)
                     tourToItem[tourId] = itemIDList;
                     markerList = []
+                    var geoJsonLayer = L.geoJson(response.features, {
+                        // adds the correct number to each marker based on order of tour
+                        pointToLayer: function (feature, latlng) {
+                            var numberIcon = L.divIcon({
+                                className: "my-custom-pin",
+                                iconSize: [25, 41],
+                                iconAnchor: [12, 40],
+                                popupAnchor: [0, -5],
+                                html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > <p style="${markerFontHtmlStyles}"> ${numMarker} </p> </spam>`
+                            });
+                            numMarker++;
+                            return L.marker(latlng, { icon: numberIcon });
+                        },
+                        onEachFeature: function (feature, layer) {
+                            layer.on('click', function (e) {
+                                // center click location
+                                map.flyTo(e.latlng,MAP_MAX_ZOOM);
+                                // Close the filtering
+                                var filterButton = $('filter-button');
+                                filterButton.removeClass('on').
+                                    find('.screen-reader-text').
+                                    html('Filters');
+                                $('#filters').fadeOut(200, 'linear');
 
-                    response.features.forEach(feature => {
-                        var numberIcon = L.divIcon({
-                            className: "my-custom-pin",
-                            iconSize: [25, 41],
-                            iconAnchor: [12, 40],
-                            popupAnchor: [0, -5],
-                            html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > <p style="${markerFontHtmlStyles}"> ${numMarker} </p> </spam>`
-                        });
-                        numMarker++;
-                        
-                        var marker = L.marker(imagePointToLatLng(feature.geometry.coordinates), { icon: numberIcon });
-                        marker.on('click', function (e) {
-                            // center click location
-                            map.flyTo(e.latlng, 4);
-                            // Close the filtering
-                            var filterButton = $('filter-button');
-                            filterButton.removeClass('on').
-                                find('.screen-reader-text').
-                                html('Filters');
-                            $('#filters').fadeOut(200, 'linear');
-
-                            var marker = this;
-                            response = allItems[`${tourId}:${feature.properties.id}`]
-                            if (response == undefined) {
-                                $.post('walking-tour/index/get-item', { id: feature.properties.id, tour: tourId }, function (response) {
-                                    allItems[`${tourId}:${feature.properties.id}`] = response;
-
-
-
-                                    var popupContent = '<h3>' + response.title + '</h3>';
-                                    if (response.thumbnail) {
-                                        popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
-                                    }
-                                    popupContent += '<a href="' + response.url + '" class="open-info-panel button">View More Info</a>';
-                                    if (!marker.getPopup()) {
-                                        marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
-                                        allMarkers[response.id] = marker;
-                                    }
-                                })
-                            } else {
-                                var popupContent = '<h3>' + response.title + '</h3>';
-                                if (response.thumbnail) {
-                                    popupContent += '<a href="#" class="open-info-panel">' + response.thumbnail + '</a><br/>';
+                                var marker = this;
+                                response = allItems[`${tourId}:${feature.properties.id}`]
+                                if (response == undefined) {
+                                    $.post(apiBase + 'get-item', { id: feature.properties.id, tour: tourId }, function (response) {
+                                        allItems[`${tourId}:${feature.properties.id}`] = response;
+                                        featureOnclickAction(response, layer, marker, itemIDList, value, tourId);
+                                    })
+                                } else {
+                                    featureOnclickAction(response, layer, marker, itemIDList, value, tourId);
                                 }
-                                popupContent += '<a href="' + response.url + '" class="open-info-panel button">View More Info</a>';
-                                if (!marker.getPopup()) {
-                                    marker.bindPopup(popupContent, { maxWidth: 200, offset: L.point(0, -40) }).openPopup();
-                                    allMarkers[response.id] = marker;
-                                }
-                            }
-                        })
-                        marker.addTo(map)
-                    })
 
+                            });
 
-
-                    // var geoJsonLayer = L.geoJson(response.features, {
-                    //     // adds the correct number to each marker based on order of tour
-                    //     pointToLayer: function (feature, latlng) {
-                    //         var numberIcon = L.divIcon({
-                    //             className: "my-custom-pin",
-                    //             iconSize: [25, 41],
-                    //             iconAnchor: [12, 40],
-                    //             popupAnchor: [0, -5],
-                    //             html: `<span style="${getMarkerHTML(feature.properties["marker-color"])}" > <p style="${markerFontHtmlStyles}"> ${numMarker} </p> </spam>`
-                    //         });
-                    //         numMarker++;
-                    //         console.log(latlng)
-                    //         return L.marker(latlng, { icon: numberIcon });
-                    //     },
-                    //     onEachFeature: function (feature, layer) {
-                    //         layer.on('click', function (e) {
-                    //             // center click location
-                    //             map.flyTo(e.latlng,MAP_MAX_ZOOM);
-                    //             // Close the filtering
-                    //             var filterButton = $('filter-button');
-                    //             filterButton.removeClass('on').
-                    //                 find('.screen-reader-text').
-                    //                 html('Filters');
-                    //             $('#filters').fadeOut(200, 'linear');
-
-                    //             var marker = this;
-                    //             response = allItems[`${tourId}:${feature.properties.id}`]
-                    //             if (response == undefined) {
-                    //                 $.post('walking-tour/index/get-item', { id: feature.properties.id, tour: tourId }, function (response) {
-                    //                     allItems[`${tourId}:${feature.properties.id}`] = response;
-                    //                     featureOnclickAction(response, layer, marker, itemIDList, value, tourId);
-                    //                 })
-                    //             } else {
-                    //                 featureOnclickAction(response, layer, marker, itemIDList, value, tourId);
-                    //             }
-
-                    //         });
-
-                    //     }
-                    // });
+                        }
+                    });
                     markerData[tourId].allMarker = markerList;
-                    // var json_content = response.features;
-                    // var pointList = [];
-                    // for (var i = 0; i < json_content.length; i++) {
-                    //     lat = json_content[i].geometry.coordinates[1];
-                    //     lng = json_content[i].geometry.coordinates[0];
-                    //     var point = new L.LatLng(lat, lng);
-                    //     pointList[i] = point;
-                    // }
-                    // getOverallPath(pointList, key).then((data) => {
-                    //     var path = data["features"][0]["geometry"]["coordinates"];
-                    //     path = orderCoords(path);
-                    //     for (var p of path) {
-                    //         walkingPath.push(p);
-                    //     }
-                    //     var tourPolyline = new L.Polyline(walkingPath, {
-                    //         color: value["Color"],
-                    //         weight: 3,
-                    //         opacity: 1,
-                    //         smoothFactor: 1
-                    //     });
-                    //     markerData[tourId].walkingPath = tourPolyline;
-                    //     resolve()
-                    // });
+                    markerData[tourId].geoJson = geoJsonLayer;
+
+                    resolve();
                 });
             })
             Promise.all(requests).then(() => {
                 createCustomCSS();
-                // doFilters();
+                doFilters();
             });
+        }).fail(function () {
+            $('#modern-map-status').text('Walking tours could not be loaded. The maps remain available.');
         });
     }
 
@@ -1019,6 +477,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
      * This must be called on every form change.
      */
     function doFilters() {
+        if (!map || !markerData) { return; }
         // Remove the current markers.
         if (markers) {
             map.removeLayer(markers);
@@ -1042,7 +501,6 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
             toursToPlot = Object.keys(markerData);
         }
 
-        var pathToPlot = [];
         var markerLayers = [];
         var numMarkers = 0;
 
@@ -1050,7 +508,6 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
         toursToPlot.forEach(ele => {
             numMarkers += markerData[ele].Data.features.length;
             markerLayers.push(markerData[ele].geoJson);
-            pathToPlot.push(markerData[ele].walkingPath);
         });
         //response is an array of coordinate;
         var item = (1 == numMarkers) ? 'item' : 'items';
@@ -1065,9 +522,6 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
 
         markerLayers.forEach(ele => {
             markers.addLayer(ele);
-        })
-        pathToPlot.forEach(ele => {
-            ele.addTo(markers);
         })
         map.addLayer(markers);
     }
@@ -1146,23 +600,26 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
         var infoContent = ""
         var rightContent = "";
         // click title to show the popup on map
-        if (value.Description != "") {
+        if (value.Description) {
             rightContent += '<p>' + value.Description + '</p>'
         } else {
             rightContent += "<p> No descriptions available. </p>"
         }
 
-        if (value.Credits != "") {
+        if (value.Credits) {
             rightContent += "<h2 class = credits> Credits </h2>"
             rightContent += '<p>' + value.Credits + '</p>'
         }
-        rightContent += '<p><a href="#" class="button" id="start-tour" target="_blank">Start Tour</a></p>';
-        window.setTimeout(function () {
-            $('#start-tour').click(function (e) {
-                var newId = itemIDList[0]
-                popupButtonEvent(e, newId, itemIDList, value, tour_id);
-            })
-        }, 500)
+        if (itemIDList.length) {
+            rightContent += '<p><a href="#" class="button" id="start-tour">Start Tour</a></p>';
+            window.setTimeout(function () {
+                $('#start-tour').click(function (e) {
+                    popupButtonEvent(e, itemIDList[0], itemIDList, value, tour_id);
+                });
+            }, 500);
+        } else {
+            rightContent += '<p>This tour has no mapped stops yet.</p>';
+        }
         infoContent += '<div class = "content-container"> <div class ="article">' + rightContent + '</div></div>';
 
         content.append('<div class = "info-content">' + infoContent + '</div>')
@@ -1254,7 +711,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
         e.preventDefault();
         var response = allItems[`${tour_id}:${id}`]
         if (response == undefined) {
-            $.post('walking-tour/index/get-item', { id: id, tour: tour_id }, function (response) {
+            $.post(apiBase + 'get-item', { id: id, tour: tour_id }, function (response) {
                 allItems[`${tour_id}:${id}`] = response;
                 populatePopup(itemIDList, value, response, itemIDList.findIndex((ele) => ele == response.id), tour_id);
             })
@@ -1270,7 +727,7 @@ function walkingTourJs(allmapsAnnotation, allmapsTransform, iiif) {
     function addHistoricMapLayer() {
         // Get the historic map data
         var getData = { 'text': $('#map-coverage').val() };
-        $.get('walking-tour/index/historic-map-data', getData, function (response) {
+        $.get(apiBase + 'historic-map-data', getData, function (response) {
             historicMapLayer = L.tileLayer(
                 response.url,
                 { tms: true, opacity: 1.00 }

@@ -29,8 +29,9 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $results = $tour_table->fetchObjects($select);
         // Build an array with 
         $_tourTypes = array('id' => array(), 'color' => array());
+        $user = current_user();
         foreach ($results as $tour) {
-            if ($tour['public'] == 1 || current_user()->role == "super") {
+            if ($tour['public'] == 1 || ($user && $user->role == "super")) {
                 $_tourTypes['id'][$tour['id']] = $tour['title'];
                 $_tourTypes['color'][$tour['id']] = $tour['color'];
                 $_tourTypes['description'][$tour['id']] = $tour['description'];
@@ -49,22 +50,43 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $_tourTypes = $this->publicTours();
         $this->view->tour_types = $_tourTypes;
 
+        $assetVersion = get_plugin_ini('WalkingTour', 'version');
+
         // Set the JS and CSS files.
         $this->view->headScript()
             ->appendFile('//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js')
             ->appendFile('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js')
             ->appendFile(src('jquery.cookie', 'javascripts', 'js'))
-            ->appendFile(src('/leaflet/leaflet', 'javascripts', 'js'))
+            ->appendFile(src('leaflet/leaflet', 'javascripts', 'js'))
             ->appendFile(src('modernizr.custom.63332', 'javascripts', 'js'))
             ->appendFile(src('Polyline.encoded', 'javascripts', 'js'))
-            ->appendFile('//cdn.jsdelivr.net/npm/@allmaps/leaflet/dist/bundled/allmaps-leaflet-1.9.umd.js')
-            ->appendFile(src('leaflet-iiif', 'javascripts', 'js'))
-            ->appendFile(src('walking-tour', 'javascripts', 'js'));
+            ->appendFile(src('historical-maps', 'javascripts', 'js', $assetVersion))
+            ->appendFile(src('walking-tour', 'javascripts', 'js', $assetVersion));
         $this->view->headLink()
             ->appendStylesheet('//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css', 'all')
             // ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.css', 'all')
             // ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.ie.css', 'all', 'lte IE 8')
-            ->appendStylesheet(src('walking-tour', 'css', 'css'));
+            ->appendStylesheet(src('walking-tour', 'css', 'css'))
+            ->appendStylesheet(src('leaflet/leaflet', 'javascripts', 'css'))
+            ->appendStylesheet(src('historical-maps', 'css', 'css', $assetVersion));
+    }
+
+    public function historicalMapsAction()
+    {
+        if (!$this->getRequest()->isGet()) {
+            $this->getResponse()->setHttpResponseCode(405)->setHeader('Allow', 'GET', true);
+            $this->_helper->json(array('error' => 'Use GET to browse historical maps.'));
+            return;
+        }
+        try {
+            require_once dirname(__FILE__) . '/../models/HistoricalMapRepository.php';
+            $repository = new WalkingTour_HistoricalMapRepository(get_db());
+            $this->_helper->json(array('maps' => $repository->all()));
+        } catch (Exception $exception) {
+            _log($exception, Zend_Log::ERR);
+            $this->getResponse()->setHttpResponseCode(503);
+            $this->_helper->json(array('error' => 'Historical maps are unavailable. Please try again later.'));
+        }
     }
 
     public function mapConfigAction()
@@ -123,7 +145,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
 
         foreach ($tourItemsIDs as $tour_id => $item_array) {
 
-            $tourItemsID = implode(", ", $item_array);
+            $tourItemsID = $item_array ? implode(", ", $item_array) : 'NULL';
             $wheres = array("items.public = 1");
             $wheres[] = $db->quoteInto("items.id IN ($tourItemsID)", Zend_Db::INT_TYPE);
 
