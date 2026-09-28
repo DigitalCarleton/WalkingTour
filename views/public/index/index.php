@@ -2,6 +2,7 @@
 <?php echo link_to_home_page('<span class="screen-reader-text">Home</span>', array('id' => 'home-button')); ?>
 <div id="dialog"></div>
 <div role="main">
+    <?php if (false): // Legacy tour controls are retained for future restoration. ?>
     <div class="map-title">
         <h1 id="marker-count"></h1>
         <a href="#" id="toggle-map-button" class="on" style="display: none;"><span class="screen-reader-text">Map
@@ -49,6 +50,7 @@
         </div>
     </div>
 
+    <?php endif; ?>
     <section id="dual-map" aria-label="Historical and modern maps"
         data-locations-url="<?php echo html_escape(src('omeka-locations', 'data', 'geojson')); ?>"
         data-catalog-url="<?php echo html_escape(url('walking-tour/index/historical-maps')); ?>"
@@ -74,11 +76,11 @@
                     <h2 id="modern-map-heading">Modern map</h2>
                     <button type="button" id="control-points-fit" disabled>View control points</button>
                 </div>
-                <div id="map" role="region" aria-label="Modern map with walking tours and control points">
+                <div id="map" role="region" aria-label="Modern map with historical-map control points">
                     <a href="#" id="locate-button" aria-label="Show my location"><span class="screen-reader-text">Show my location</span></a>
                 </div>
                 <p id="omeka-locations-status" class="dual-map-feedback" role="status" hidden>Loading Omeka locations…</p>
-                <p id="modern-map-status" class="dual-map-feedback" role="status">Walking tours and shared control points</p>
+                <p id="modern-map-status" class="dual-map-feedback" role="status">Shared control points for the selected historical map</p>
             </section>
             <aside id="historical-map-catalog" aria-labelledby="map-catalog-heading">
                 <h2 id="map-catalog-heading">Map library</h2>

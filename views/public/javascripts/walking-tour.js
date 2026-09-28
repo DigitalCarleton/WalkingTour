@@ -31,7 +31,7 @@ function walkingTourJs() {
      */
 
     // Check for user's first time visiting. Wait to locate the user after displaying tooltip on the first visit.
-    if (!($.cookie('myCookie'))) {
+    if ($('#first-time').length && !($.cookie('myCookie'))) {
         $('#first-time').show();
         $('.tooltip-locate').toggle();
         $.cookie('myCookie', 'visited', { path: '/', expires: 10000 });
@@ -241,7 +241,8 @@ function walkingTourJs() {
     jqXhr = $.post(apiBase + 'map-config', function (response) {
         mapSetUp(response);
         WalkingTourHistoricalMaps.start(map);
-        doQuery();
+        // Keep legacy tour loading available, but show only historical-map control points.
+        // doQuery();
         // Keep the legacy locations snapshot available, but hide it for this release.
         // loadOmekaLocationsGeojson();
     }).fail(function () {
