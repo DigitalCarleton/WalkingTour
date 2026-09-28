@@ -61,7 +61,9 @@ class WalkingTour_HistoricalMapRepository
         $source = $annotation['target']['source'];
         $body = $annotation['body'];
 
-        $this->db->query('START TRANSACTION');
+        // MySQL cannot prepare START TRANSACTION; use the driver's transaction API.
+        $adapter = $this->db->getAdapter();
+        $adapter->beginTransaction();
         try {
             $this->db->query("INSERT INTO `{$this->maps}`
                 (slug, title, image_service, image_width, image_height, manifest_url,
@@ -82,9 +84,9 @@ class WalkingTour_HistoricalMapRepository
                     $mapId, $index + 1, $image[0], $image[1], $geo[0], $geo[1]
                 ));
             }
-            $this->db->query('COMMIT');
+            $adapter->commit();
         } catch (Exception $exception) {
-            $this->db->query('ROLLBACK');
+            $adapter->rollBack();
             throw $exception;
         }
     }
