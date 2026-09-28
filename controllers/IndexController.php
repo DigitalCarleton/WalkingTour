@@ -50,7 +50,9 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $_tourTypes = $this->publicTours();
         $this->view->tour_types = $_tourTypes;
 
-        $assetVersion = get_plugin_ini('WalkingTour', 'version');
+        // Refresh viewer assets after deployment without requiring a database upgrade.
+        $assetVersion = get_plugin_ini('WalkingTour', 'version') . '-' .
+            filemtime(WALKINGTOUR_PLUGIN_DIR . '/views/public/javascripts/walking-tour.js');
 
         // Set the JS and CSS files.
         $this->view->headScript()
