@@ -24,7 +24,7 @@
             tools.forEach(function (tool) {
                 tool.button.disabled = !canEdit || !record || busy;
                 tool.button.setAttribute('aria-pressed', String(mode === tool.mode));
-                tool.button.title = canEdit ? tool.label : 'Sign in with an editor account to edit maps';
+                tool.button.title = canEdit ? tool.label : 'Map editing is currently unavailable';
             });
             cancelButton.disabled = busy;
             undo.disabled = busy || !vertices.length;
@@ -219,7 +219,7 @@
         return {
             access: function (allowed, token) {
                 canEdit = !!allowed; csrf = token;
-                document.getElementById('map-editor-access').textContent = canEdit ? 'Editor tools enabled.' : 'Sign in with an editor account to add points or draw a mask.';
+                document.getElementById('map-editor-access').textContent = canEdit ? 'Add points or draw a mask. No sign-in required.' : 'Map editing is currently unavailable. Please reload the page.';
                 updateTools();
             },
             canSwitch: function () {

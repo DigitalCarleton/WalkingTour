@@ -93,18 +93,13 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             require_once dirname(__FILE__) . '/../models/HistoricalMapRepository.php';
             $repository = new WalkingTour_HistoricalMapRepository(get_db());
             $this->_helper->json(array('maps' => $repository->all(),
-                'can_edit' => $this->canEditHistoricalMaps(),
-                'csrf_token' => $this->canEditHistoricalMaps() ? (new Omeka_Form_SessionCsrf())->getElement('csrf_token')->getToken() : null));
+                'can_edit' => true,
+                'csrf_token' => (new Omeka_Form_SessionCsrf())->getElement('csrf_token')->getToken()));
         } catch (Exception $exception) {
             _log($exception, Zend_Log::ERR);
             $this->getResponse()->setHttpResponseCode(503);
             $this->_helper->json(array('error' => 'Historical maps are unavailable. Please try again later.'));
         }
-    }
-
-    private function canEditHistoricalMaps()
-    {
-        return current_user() && is_allowed('WalkingTourBuilder_Tours', 'edit');
     }
 
     public function historicalMapEstimateAction()
@@ -140,17 +135,12 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             $this->_helper->json(array('error' => 'Use POST to save a map edit.'));
             return;
         }
-        if (!$this->canEditHistoricalMaps()) {
-            $this->getResponse()->setHttpResponseCode(403);
-            $this->_helper->json(array('error' => 'Sign in with an editor account to save map edits. Your draft has been kept.'));
-            return;
-        }
         $raw = $this->getRequest()->getRawBody();
         $data = strlen($raw) <= 65536 ? json_decode($raw, true) : null;
         $csrf = new Omeka_Form_SessionCsrf();
         if (!is_array($data) || !$csrf->isValid(array('csrf_token' => $data['csrf_token'] ?? null))) {
             $this->getResponse()->setHttpResponseCode(403);
-            $this->_helper->json(array('error' => 'Your editing session is invalid. Reload the page and sign in again.'));
+            $this->_helper->json(array('error' => 'Your editing session is invalid. Reload the page and try again.'));
             return;
         }
         try {
