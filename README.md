@@ -12,7 +12,9 @@ This increment is based on `add-historic-maps1`. It adds a persistent BnF map ca
 ten paired control points, and side-by-side historical and modern maps. The existing
 Omeka locations snapshot is retained but hidden by default. Run the plugin upgrade
 in Omeka; do not uninstall to upgrade.
-Point creation and calibration editing remain later batches.
+Stage 2 now adds saved estimated annotations, imported geographic footprints, custom polygon masks. Calibration editing remains a later batch.
+
+Upgrade to **1.2.0** in Omeka's Plugins page. See the [map editor guide](docs/map-editor.md) for usage, permissions, and API details. All new interface text is English.
 
 ## Configuration
 

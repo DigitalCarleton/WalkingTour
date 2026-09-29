@@ -34,7 +34,7 @@
             var root = document.getElementById('dual-map');
             if (!root) { return; }
             var historicalMap = L.map('historical-map', {
-                crs: L.CRS.Simple, minZoom: -7, maxZoom: 1, attributionControl: true
+                crs: L.CRS.Simple, minZoom: -7, maxZoom: 1, zoomSnap: .1, zoomDelta: .5, attributionControl: true
             });
             historicalMap.setView([0, 0], -5);
             var imageLayer;
@@ -47,6 +47,17 @@
             var status = document.getElementById('historical-map-status');
             var retry = document.getElementById('historical-map-retry');
             var loadGeneration = 0;
+            var editor = window.WalkingTourMapEditor({root: root, historical: historicalMap, modern: modernMap,
+                onSaved: function (record) { activeMap = record; updateGeographicBounds(record); }});
+
+            function updateGeographicBounds(record) {
+                geographicBounds = L.latLngBounds();
+                if (record.mask && record.mask.geographic_ring) {
+                    record.mask.geographic_ring.forEach(function (p) { geographicBounds.extend([p[1], p[0]]); });
+                }
+                record.control_points.forEach(function (p) { geographicBounds.extend([p.latitude, p.longitude]); });
+                document.getElementById('control-points-fit').disabled = !geographicBounds.isValid();
+            }
 
             function setStatus(message, error) {
                 status.textContent = message;
@@ -127,6 +138,7 @@
             }
 
             function showMap(record) {
+                if (!editor.canSwitch()) { return; }
                 var generation = ++loadGeneration;
                 activeMap = record;
                 if (imageLayer) { historicalMap.removeLayer(imageLayer); }
@@ -165,6 +177,8 @@
                     modernMarker.addTo(modernPoints);
                     geographicBounds.extend(modernMarker.getLatLng());
                 });
+                updateGeographicBounds(record);
+                editor.load(record);
                 document.getElementById('historical-map-fit').disabled = false;
                 document.getElementById('control-points-fit').disabled = !geographicBounds.isValid();
                 document.getElementById('historical-map-heading').title = record.title;
@@ -186,6 +200,7 @@
                 setStatus('Loading historical maps…', false);
                 $.ajax({url: root.dataset.catalogUrl, dataType: 'json', timeout: 15000})
                     .done(function (response) {
+                        editor.access(response.can_edit, response.csrf_token);
                         var list = document.getElementById('historical-map-list');
                         list.textContent = '';
                         if (!response.maps || !response.maps.length) {

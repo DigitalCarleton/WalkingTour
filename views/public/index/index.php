@@ -59,6 +59,15 @@
             <p>Explore the same places across two maps.</p>
             <button type="button" id="map-list-toggle" aria-controls="historical-map-catalog" aria-expanded="true">Hide map list</button>
         </div>
+        <div id="map-edit-panel" class="map-edit-panel" hidden>
+            <p id="map-edit-status" role="status" aria-live="polite"></p>
+            <div class="map-edit-actions">
+                <button type="button" id="map-edit-save" disabled>Save</button>
+                <button type="button" id="map-edit-undo" hidden>Undo last vertex</button>
+                <button type="button" id="map-edit-reload" hidden>Reload latest data</button>
+                <button type="button" id="map-edit-cancel">Cancel</button>
+            </div>
+        </div>
         <div class="dual-map-layout">
             <section class="dual-map-pane" aria-labelledby="historical-map-heading">
                 <div class="dual-map-heading">
@@ -74,7 +83,7 @@
             <section class="dual-map-pane" aria-labelledby="modern-map-heading">
                 <div class="dual-map-heading">
                     <h2 id="modern-map-heading">Modern map</h2>
-                    <button type="button" id="control-points-fit" disabled>View control points</button>
+                    <button type="button" id="control-points-fit" disabled>View map area</button>
                 </div>
                 <div id="map" role="region" aria-label="Modern map with historical-map control points">
                     <a href="#" id="locate-button" aria-label="Show my location"><span class="screen-reader-text">Show my location</span></a>
@@ -86,6 +95,9 @@
                 <h2 id="map-catalog-heading">Map library</h2>
                 <div id="historical-map-list"></div>
                 <p class="control-point-key"><span aria-hidden="true">●</span> Control points</p>
+                <p class="mask-key"><span aria-hidden="true">▱</span> Map footprint / saved mask</p>
+                <p class="annotation-key"><span aria-hidden="true">●</span> Estimated annotations</p>
+                <p id="map-editor-access" role="status"></p>
                 <p>Matching numbers identify the same place on both maps.</p>
                 <p id="control-point-selection" role="status" aria-live="polite">Select a numbered point to locate its pair.</p>
                 <div id="historical-map-sources"></div>
