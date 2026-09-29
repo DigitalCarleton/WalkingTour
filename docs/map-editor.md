@@ -23,7 +23,7 @@ coordinates. On storage initialization its boundary is sampled along each edge a
 using the ten imported control-point pairs. The resulting estimated geographic footprint is
 saved and displayed as a pink outline. Transforming only the four corners would omit its curved edges.
 
-No sign-in is required to add points or save masks. Select **Draw a map mask** in the modern map's
+Sign in using an existing Omeka editor account. Select **Draw a map mask** in the modern map's
 upper-right controls. Click at least three vertices, then select the first vertex to close the
 polygon. Choose **Save** to replace the displayed geographic mask or **Cancel** to retain the
 saved mask. **Undo last vertex** reopens a closed draft and removes the most recent vertex.
@@ -49,8 +49,7 @@ forward spline from multiple initial positions; they do not establish historical
 mathematically guarantee global invertibility. Automatic annotations never become calibration
 points. Manual pairing, adjustment, confirmation, and calibration undo belong to the next stage.
 
-All visitors can save edits, including visitors who are not signed in. The page obtains a session
-CSRF token automatically; saving does not check Omeka account roles. Each edit carries the
+Writes require existing Omeka editing privileges and a session CSRF token. Each edit carries the
 map's revision; outdated edits return a conflict and retain the draft. Choose **Reload latest data**,
 review the refreshed estimate or mask, then explicitly save again. Retried point saves use a request
 identifier to avoid duplicates if the previous response was lost.
@@ -76,7 +75,7 @@ Original image tiles still depend on the BnF IIIF service.
 All paths are relative to the Omeka site root:
 
 - `GET walking-tour/index/historical-maps`: catalog, control points, masks, annotations, editing
-  availability, and a CSRF token for every visitor. Responses are private and not cached.
+  availability, and a CSRF token for signed-in editors. Responses are private and not cached.
 - `GET walking-tour/index/historical-map-estimate`: `map_id`, `side` (`image` or `modern`), `x`, `y`.
   Image coordinates use a top-left origin; modern coordinates use longitude, latitude.
 - `POST walking-tour/index/historical-map-edit`: JSON with `map_id`, `revision`, `csrf_token`, and
