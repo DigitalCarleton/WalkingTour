@@ -54,6 +54,7 @@
     <section id="dual-map" aria-label="Historical and modern maps"
         data-locations-url="<?php echo html_escape(src('omeka-locations', 'data', 'geojson')); ?>"
         data-catalog-url="<?php echo html_escape(url('walking-tour/index/historical-maps')); ?>"
+        data-search-endpoint="<?php echo html_escape(get_option('walking_tour_search_endpoint') ?: 'https://photon.komoot.io/api/'); ?>"
         data-api-base="<?php echo html_escape(url('walking-tour/index/')); ?>">
         <div class="dual-map-toolbar">
             <p>Explore the same places across two maps.</p>

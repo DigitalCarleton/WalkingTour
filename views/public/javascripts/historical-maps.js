@@ -49,6 +49,7 @@
             var loadGeneration = 0;
             var editor = window.WalkingTourMapEditor({root: root, historical: historicalMap, modern: modernMap,
                 onSaved: function (record) { activeMap = record; updateGeographicBounds(record); }});
+            window.WalkingTourPlaceSearch(modernMap, root.dataset.searchEndpoint);
 
             function updateGeographicBounds(record) {
                 geographicBounds = L.latLngBounds();

@@ -105,3 +105,10 @@
         </div>
     </div>
 </div>
+<div class="field">
+    <div class="two columns alpha"><label for="walking_tour_search_endpoint">Place search endpoint</label></div>
+    <div class="inputs five columns omega">
+        <p class="explanation">Photon-compatible URL for modern-map place search. The public Photon service is intended for moderate traffic; configure your own provider for larger deployments.</p>
+        <?php echo get_view()->formText('walking_tour_search_endpoint', get_option('walking_tour_search_endpoint') ?: 'https://photon.komoot.io/api/'); ?>
+    </div>
+</div>

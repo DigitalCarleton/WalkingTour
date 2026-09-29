@@ -45,6 +45,20 @@ map's revision; outdated edits return a conflict and retain the draft. Choose **
 review the refreshed estimate or mask, then explicitly save again. Retried point saves use a request
 identifier to avoid duplicates if the previous response was lost.
 
+## Place search
+
+The modern map's search field offers suggestions after three characters, or on Search/Enter.
+Select a result to move the map; this does not create a saved annotation or change the mask.
+Clear removes the search marker. Arrow keys can navigate results, and Escape closes them.
+
+Search uses [Photon](https://github.com/komoot/photon) with English result preferences, a typing
+delay, and a small per-page query cache. Queries are sent to the configured provider. Photon may
+return an original place name when no English translation exists. The default public demo service
+permits reasonable traffic but does not guarantee availability. For larger deployments use a
+self-hosted or managed Photon-compatible service via **Place search endpoint** in the plugin settings.
+Its URL must allow browser requests from the site's origin (CORS); use HTTPS on HTTPS sites.
+Original image tiles still depend on the BnF IIIF service.
+
 ## Data interfaces
 
 All paths are relative to the Omeka site root:

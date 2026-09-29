@@ -56,6 +56,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
                 WALKINGTOUR_PLUGIN_DIR . '/views/public/javascripts/walking-tour.js',
                 WALKINGTOUR_PLUGIN_DIR . '/views/public/javascripts/historical-maps.js',
                 WALKINGTOUR_PLUGIN_DIR . '/views/public/javascripts/historical-map-editor.js',
+                WALKINGTOUR_PLUGIN_DIR . '/views/public/javascripts/map-place-search.js',
                 WALKINGTOUR_PLUGIN_DIR . '/views/public/css/historical-maps.css'
             )));
 
@@ -67,6 +68,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             ->appendFile(src('leaflet/leaflet', 'javascripts', 'js'))
             ->appendFile(src('modernizr.custom.63332', 'javascripts', 'js'))
             ->appendFile(src('Polyline.encoded', 'javascripts', 'js'))
+            ->appendFile(src('map-place-search', 'javascripts', 'js', $assetVersion))
             ->appendFile(src('historical-map-editor', 'javascripts', 'js', $assetVersion))
             ->appendFile(src('historical-maps', 'javascripts', 'js', $assetVersion))
             ->appendFile(src('walking-tour', 'javascripts', 'js', $assetVersion));

@@ -59,6 +59,18 @@
 #dual-map .annotation-marker.is-selected { outline: 3px solid #ffc857; }
 #dual-map .mask-key span { color: #e02b9e; font-size: 23px; vertical-align: middle; }
 #dual-map .annotation-key span { color: #16779c; font-size: 22px; vertical-align: middle; }
+#dual-map .map-place-search { width: 280px; max-width: calc(100vw - 85px); background: white; border: 1px solid #c2cfd2; border-radius: 10px; box-shadow: 0 2px 8px #263e4333; color: #263e43; overflow: hidden; }
+#dual-map .map-place-search form { display: flex; align-items: center; margin: 0; padding: 3px; }
+#dual-map .map-place-search input { min-width: 0; flex: 1; width: 100%; margin: 0; padding: 10px 8px; border: 0; box-shadow: none; background: white; color: #263e43; font: 15px/1.4 sans-serif; height: 44px; }
+#dual-map .map-place-search form button { width: 36px; min-height: 40px; padding: 0; border: 0; font-size: 24px; flex-shrink: 0; }
+#dual-map .map-place-results { max-height: 230px; overflow-y: auto; border-top: 1px solid #d8e1e3; }
+#dual-map .map-place-results button { display: block; width: 100%; border: 0; border-radius: 0; text-align: left; font-size: 13px; line-height: 1.4; }
+#dual-map .search-attribution { display: block; padding: 4px 8px; font: 10px/1.4 sans-serif; color: #456974; text-align: right; }
+#dual-map .search-feedback { padding: 6px 9px; font-size: 12px; line-height: 1.4; }
 @media (max-width: 1100px) {
     #dual-map .map-edit-panel { flex-direction: column; align-items: flex-start; }
+    #dual-map .map-place-search { width: 230px; }
+}
+@media (max-width: 640px) {
+    #dual-map .map-place-search { width: 260px; }
 }

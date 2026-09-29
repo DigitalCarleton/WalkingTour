@@ -41,6 +41,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
     );
 
     protected $_options = array(
+        'walking_tour_search_endpoint' => 'https://photon.komoot.io/api/',
         'walking_tour_filter_tooltip' => '',
         'walking_tour_tooltip_button' => 'OK',
         'walking_tour_center' => '41.895, 12.48',
@@ -138,6 +139,11 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
 
     public function hookConfig()
     {
+        $searchEndpoint = trim($_POST['walking_tour_search_endpoint'] ?? 'https://photon.komoot.io/api/');
+        if (filter_var($searchEndpoint, FILTER_VALIDATE_URL) && preg_match('#^https?://#i', $searchEndpoint)) {
+            set_option('walking_tour_search_endpoint', $searchEndpoint);
+        }
+
         set_option('walking_tour_filter_tooltip', $_POST['walking_tour_filter_tooltip']);
         set_option('walking_tour_tooltip_button', $_POST['walking_tour_tooltip_button']);
         set_option('walking_tour_center', $_POST['walking_tour_center']);
