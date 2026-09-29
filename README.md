@@ -6,15 +6,15 @@ A fork of the Omeka team's MallMap plugin to be used for the Carleton Guide to M
 
 See [WalkingTour architecture and next steps](docs/architecture/README.md) for the current Archify diagram, an explanation of how it was generated, and a proposed migration from the static locations GeoJSON overlay to live queries of Omeka's Geolocation table.
 
-## Dual-map viewer (1.1.1)
+## Dual-map viewer
 
 This increment is based on `add-historic-maps1`. It adds a persistent BnF map catalog,
 ten paired control points, and side-by-side historical and modern maps. The existing
-Omeka locations snapshot is retained but hidden by default. Run the plugin upgrade
-in Omeka; do not uninstall to upgrade.
+Omeka locations snapshot is retained but hidden by default. The plugin version remains
+**0.2.3**; do not uninstall to update it.
 Stage 2 now adds saved estimated annotations, imported geographic footprints, custom polygon masks, and place search. Calibration editing remains a later batch.
 
-Upgrade to **1.2.0** in Omeka's Plugins page. See the [map editor guide](docs/map-editor.md) for usage, permissions, search configuration, and API details. All new interface text is English.
+After pulling the code, run `php scripts/initialize-map-storage.php` from the WalkingTour plugin directory to initialize the new tables without changing the plugin version. See the [map editor guide](docs/map-editor.md) for usage, permissions, search configuration, and API details. All new interface text is English.
 
 ## Configuration
 

@@ -1,8 +1,17 @@
 # Historical map editing (Stage 2)
 
-Upgrade WalkingTour to **1.2.0** through Omeka's Plugins page after copying the updated plugin.
-Do not uninstall to upgrade: uninstalling removes plugin-owned data. The upgrade adds mask and
-annotation storage, preserving existing tours, imported control points, and any saved masks.
+The plugin version stays at **0.2.3**. After copying or pulling the updated plugin,
+run this command from the WalkingTour plugin directory using the server's PHP CLI
+with its MySQL extension enabled:
+
+```sh
+php scripts/initialize-map-storage.php
+```
+
+This command reads the existing Omeka database configuration, adds missing map, mask, and
+annotation storage, and preserves existing tours, control points, and saved masks. It can
+be run again safely and does not change the installed plugin version. No version-based
+upgrade prompt is required. Do not uninstall/reinstall: uninstalling removes plugin-owned data.
 
 The two maps remain independently navigable. Existing legacy tour layers remain hidden as in
 Stage 1; this release does not restore or edit those layers.
@@ -10,7 +19,7 @@ Stage 1; this release does not restore or edit those layers.
 ## Map footprint and custom mask
 
 The supplied Allmaps snapshot contains an SVG polygon in **image pixels**, not geographic
-coordinates. On installation or upgrade its boundary is sampled along each edge and transformed
+coordinates. On storage initialization its boundary is sampled along each edge and transformed
 using the ten imported control-point pairs. The resulting estimated geographic footprint is
 saved and displayed as a pink outline. Transforming only the four corners would omit its curved edges.
 
@@ -21,7 +30,7 @@ saved mask. **Undo last vertex** reopens a closed draft and removes the most rec
 Open, crossing, degenerate, or out-of-range polygons cannot be saved. One simple polygon with
 up to 500 vertices is supported; polygons crossing the international date line are not supported.
 
-Custom mask coordinates become authoritative for the modern-map outline. Repeated upgrades do
+Custom mask coordinates become authoritative for the modern-map outline. Repeated initialization does
 not overwrite them. Mask vertices are separate from calibration control points: drawing a mask
 does not improve or change the coordinate transform. The original image boundary remains visible
 on the historical image; a custom geographic mask does not crop or distort that image.
