@@ -74,3 +74,8 @@
 @media (max-width: 640px) {
     #dual-map .map-place-search { width: 260px; }
 }
+
+#dual-map .map-place-search.is-collapsed { width: 44px; border: 0; border-radius: 7px; }
+#dual-map .map-place-search .search-toggle { display: block; width: 44px; height: 44px; padding: 10px; }
+#dual-map .search-toggle svg { display: block; width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+#dual-map .map-place-search .clear-search { min-height: 32px; margin: 0 6px; padding: 4px 6px; border: 0; font-size: 12px; text-decoration: underline; }

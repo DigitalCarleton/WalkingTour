@@ -56,9 +56,11 @@ identifier to avoid duplicates if the previous response was lost.
 
 ## Place search
 
-The modern map's search field offers suggestions after three characters, or on Search/Enter.
+Place search starts collapsed as a magnifying-glass button. Select it to open the search field;
+use the close button or Escape to collapse it again without losing the query or selected location.
+The search field offers suggestions after three characters, or on Search/Enter.
 Select a result to move the map; this does not create a saved annotation or change the mask.
-Clear removes the search marker. Arrow keys can navigate results, and Escape closes them.
+Clear removes the search marker. Arrow keys can navigate results, and Escape collapses the search panel.
 
 Search uses [Photon](https://github.com/komoot/photon) with English result preferences, a typing
 delay, and a small per-page query cache. Queries are sent to the configured provider. Photon may
