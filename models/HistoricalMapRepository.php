@@ -11,6 +11,7 @@ class WalkingTour_HistoricalMapRepository
     private $points;
     private $masks;
     private $annotations;
+    private $changes;
 
     public function __construct($db)
     {
@@ -19,6 +20,7 @@ class WalkingTour_HistoricalMapRepository
         $this->points = $db->prefix . 'walking_tour_control_points';
         $this->masks = $db->prefix . 'walking_tour_map_masks';
         $this->annotations = $db->prefix . 'walking_tour_annotations';
+        $this->changes = $db->prefix . 'walking_tour_map_changes';
     }
 
     public function install()
@@ -52,6 +54,11 @@ class WalkingTour_HistoricalMapRepository
         if (!$this->db->fetchOne("SHOW COLUMNS FROM `{$this->maps}` LIKE 'calibration_revision'")) {
             $this->db->query("ALTER TABLE `{$this->maps}` ADD calibration_revision INT UNSIGNED NOT NULL DEFAULT 1");
         }
+        if (!$this->db->fetchOne("SHOW COLUMNS FROM `{$this->maps}` LIKE 'next_control_ordinal'")) {
+            $this->db->query("ALTER TABLE `{$this->maps}` ADD next_control_ordinal INT UNSIGNED NOT NULL DEFAULT 1");
+            $this->db->query("UPDATE `{$this->maps}` m SET next_control_ordinal =
+                (SELECT COALESCE(MAX(p.ordinal), 0) + 1 FROM `{$this->points}` p WHERE p.map_id = m.id)");
+        }
         $this->db->query("CREATE TABLE IF NOT EXISTS `{$this->masks}` (
             map_id INT UNSIGNED NOT NULL PRIMARY KEY,
             image_ring MEDIUMTEXT NULL,
@@ -70,6 +77,16 @@ class WalkingTour_HistoricalMapRepository
             request_id VARCHAR(64) NOT NULL,
             UNIQUE KEY request_per_map (map_id, request_id),
             KEY map_annotations (map_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        $this->db->query("CREATE TABLE IF NOT EXISTS `{$this->changes}` (
+            id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            map_id INT UNSIGNED NOT NULL,
+            request_id VARCHAR(64) NOT NULL,
+            operation VARCHAR(24) NOT NULL,
+            calibration_before MEDIUMTEXT NULL,
+            undone TINYINT UNSIGNED NOT NULL DEFAULT 0,
+            UNIQUE KEY request_per_map (map_id, request_id),
+            KEY map_changes (map_id, id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         $this->seed();
         $this->importMasks();
@@ -115,6 +132,8 @@ class WalkingTour_HistoricalMapRepository
                     $mapId, $index + 1, $image[0], $image[1], $geo[0], $geo[1]
                 ));
             }
+            $this->db->query("UPDATE `{$this->maps}` SET next_control_ordinal = ? WHERE id = ?",
+                array(count($body['features']) + 1, $mapId));
             $adapter->commit();
         } catch (Exception $exception) {
             $adapter->rollBack();
@@ -125,10 +144,10 @@ class WalkingTour_HistoricalMapRepository
     public function all()
     {
         $maps = $this->db->fetchAll("SELECT id, slug, title, image_service, image_width,
-            image_height, manifest_url, source_url, transformation, revision, calibration_revision
+            image_height, manifest_url, source_url, transformation, revision, calibration_revision, next_control_ordinal
             FROM `{$this->maps}` ORDER BY id");
         foreach ($maps as &$map) {
-            foreach (array('id', 'image_width', 'image_height', 'revision', 'calibration_revision') as $key) {
+            foreach (array('id', 'image_width', 'image_height', 'revision', 'calibration_revision', 'next_control_ordinal') as $key) {
                 $map[$key] = (int) $map[$key];
             }
             $map['control_points'] = $this->db->fetchAll("SELECT id, ordinal, image_x, image_y,
@@ -157,6 +176,8 @@ class WalkingTour_HistoricalMapRepository
                 }
             }
             unset($annotation);
+            $change = $this->latestCalibrationChange($map['id']);
+            $map['undo_calibration'] = $change && !$change['undone'] ? array('change_id' => (int) $change['id']) : null;
         }
         unset($map);
         return $maps;
@@ -190,7 +211,7 @@ class WalkingTour_HistoricalMapRepository
         throw new InvalidArgumentException('Historical map not found.');
     }
 
-    public function estimate(array $map, $side, $coordinates)
+    public function estimate(array $map, $side, $coordinates, $transform = null)
     {
         if (!in_array($side, array('image', 'modern'), true)) { throw new InvalidArgumentException('Choose an image or modern map position.'); }
         $coordinates = WalkingTour_HistoricalMapGeometry::coordinate($coordinates,
@@ -200,7 +221,8 @@ class WalkingTour_HistoricalMapRepository
         $geo = $side === 'modern' ? $coordinates : null;
         $status = 'unavailable';
         try {
-            $transform = new WalkingTour_HistoricalMapTransform($map);
+            if ($transform === false) { throw new RuntimeException('Calibration is unavailable.'); }
+            if ($transform === null) { $transform = new WalkingTour_HistoricalMapTransform($map); }
             if ($image) {
                 $candidate = $transform->forward($image);
                 $roundtrip = $candidate ? $transform->inverse($candidate) : null;
@@ -214,6 +236,108 @@ class WalkingTour_HistoricalMapRepository
             'calibration_revision' => $map['calibration_revision']);
     }
 
+    private function latestCalibrationChange($id)
+    {
+        return $this->db->fetchRow("SELECT id, calibration_before, undone FROM `{$this->changes}`
+            WHERE map_id = ? AND calibration_before IS NOT NULL ORDER BY id DESC LIMIT 1", array($id));
+    }
+
+    private function target(array $map, $type, $pointId)
+    {
+        if (!is_int($pointId) || $pointId <= 0 || !in_array($type, array('annotation', 'control'), true)) {
+            throw new InvalidArgumentException('Choose a saved annotation or control point.');
+        }
+        $points = $type === 'control' ? $map['control_points'] : $map['annotations'];
+        foreach ($points as $point) { if ($point['id'] === $pointId) { return $point; } }
+        throw new InvalidArgumentException('This point no longer exists on the selected map. Reload the latest data.');
+    }
+
+    private function confirmPair(array $map, array $payload)
+    {
+        $type = $payload['point_type'] ?? 'new';
+        if (!in_array($type, array('new', 'annotation', 'control'), true)) {
+            throw new InvalidArgumentException('Choose a valid point type.');
+        }
+        $target = $type === 'new' ? null : $this->target($map, $type, $payload['point_id'] ?? null);
+        $image = WalkingTour_HistoricalMapGeometry::coordinate($payload['image'] ?? null, $map['image_width'], $map['image_height']);
+        $geo = WalkingTour_HistoricalMapGeometry::coordinate($payload['geographic'] ?? null, 180, 85);
+        if (min($image) < 0) { throw new InvalidArgumentException('Choose a position inside the original image.'); }
+        if ($type !== 'control' && count($map['control_points']) >= 200) {
+            throw new InvalidArgumentException('A map supports up to 200 control points.');
+        }
+        foreach ($map['control_points'] as $point) {
+            if ($type === 'control' && $point['id'] === $target['id']) { continue; }
+            if (hypot($point['image_x'] - $image[0], $point['image_y'] - $image[1]) < .01 ||
+                hypot($point['longitude'] - $geo[0], $point['latitude'] - $geo[1]) < 1e-10) {
+                throw new InvalidArgumentException('This position already belongs to another control point. Adjust that point instead.');
+            }
+        }
+        if ($type === 'control') {
+            $this->db->query("UPDATE `{$this->points}` SET image_x = ?, image_y = ?, longitude = ?, latitude = ? WHERE map_id = ? AND id = ?",
+                array($image[0], $image[1], $geo[0], $geo[1], $map['id'], $target['id']));
+        } else {
+            $this->db->query("INSERT INTO `{$this->points}` (map_id, ordinal, image_x, image_y, longitude, latitude) VALUES (?, ?, ?, ?, ?, ?)",
+                array($map['id'], $map['next_control_ordinal'], $image[0], $image[1], $geo[0], $geo[1]));
+            $this->db->query("UPDATE `{$this->maps}` SET next_control_ordinal = next_control_ordinal + 1 WHERE id = ?", array($map['id']));
+            if ($type === 'annotation') {
+                $this->db->query("DELETE FROM `{$this->annotations}` WHERE map_id = ? AND id = ?", array($map['id'], $target['id']));
+            }
+        }
+        // Invalid fits must roll back both the promotion and its allocated number.
+        $updated = $this->find($map['id']);
+        if (count($updated['control_points']) >= 3) {
+            try { new WalkingTour_HistoricalMapTransform($updated); }
+            catch (RuntimeException $error) { throw new InvalidArgumentException('These control points cannot form a stable calibration. Adjust the pair before confirming.'); }
+        }
+    }
+
+    private function annotationSnapshot($mapId, array $point)
+    {
+        // Retain the original annotation and request ID before promotion, for undo/retry.
+        return $this->db->fetchRow("SELECT * FROM `{$this->annotations}` WHERE map_id = ? AND id = ?", array($mapId, $point['id']));
+    }
+
+    private function recalibrate($id)
+    {
+        $this->db->query("UPDATE `{$this->maps}` SET calibration_revision = calibration_revision + 1 WHERE id = ?", array($id));
+        $map = $this->find($id);
+        try { $transform = new WalkingTour_HistoricalMapTransform($map); }
+        catch (RuntimeException $error) { $transform = false; }
+        foreach ($map['annotations'] as $point) {
+            $coordinates = $point['source_side'] === 'image' ? array($point['image_x'], $point['image_y']) : array($point['longitude'], $point['latitude']);
+            $estimated = $this->estimate($map, $point['source_side'], $coordinates, $transform);
+            $this->db->query("UPDATE `{$this->annotations}` SET image_x = ?, image_y = ?, longitude = ?, latitude = ?, status = ?, calibration_revision = ? WHERE map_id = ? AND id = ?",
+                array($estimated['image_x'], $estimated['image_y'], $estimated['longitude'], $estimated['latitude'], $estimated['status'], $map['calibration_revision'], $id, $point['id']));
+        }
+        if ($map['mask'] && $map['mask']['source'] === 'imported') {
+            $geo = $transform && $map['mask']['image_ring'] ? $transform->footprint($map['mask']['image_ring']) : null;
+            $this->db->query("UPDATE `{$this->masks}` SET geographic_ring = ?, calibration_revision = ? WHERE map_id = ?",
+                array($geo ? json_encode($geo) : null, $map['calibration_revision'], $id));
+        }
+    }
+
+    private function undoCalibration(array $map, array $payload)
+    {
+        $change = $this->latestCalibrationChange($map['id']);
+        if (!$change || $change['undone'] || !is_int($payload['change_id'] ?? null) || $payload['change_id'] !== (int) $change['id']) {
+            throw new InvalidArgumentException('The latest calibration change is no longer available to undo. Reload the latest data.');
+        }
+        $snapshot = json_decode($change['calibration_before'], true);
+        if (!is_array($snapshot) || !isset($snapshot['control_points'])) { throw new RuntimeException('The calibration history is invalid.'); }
+        $this->db->query("DELETE FROM `{$this->points}` WHERE map_id = ?", array($map['id']));
+        foreach ($snapshot['control_points'] as $point) {
+            $this->db->query("INSERT INTO `{$this->points}` (id, map_id, ordinal, image_x, image_y, longitude, latitude) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                array($point['id'], $map['id'], $point['ordinal'], $point['image_x'], $point['image_y'], $point['longitude'], $point['latitude']));
+        }
+        if (!empty($snapshot['annotation'])) {
+            $p = $snapshot['annotation'];
+            $this->db->query("INSERT INTO `{$this->annotations}` (id, map_id, source_side, image_x, image_y, longitude, latitude, status, calibration_revision, request_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                array($p['id'], $map['id'], $p['source_side'], $p['image_x'], $p['image_y'], $p['longitude'], $p['latitude'], $p['status'], $p['calibration_revision'], $p['request_id']));
+        }
+        // Keep the numbering high-water mark: deleted or undone numbers are not reused.
+        $this->db->query("UPDATE `{$this->changes}` SET undone = 1 WHERE map_id = ? AND id = ?", array($map['id'], $change['id']));
+    }
+
     /** One map lock serializes point and mask writes; a stale client never overwrites a new revision. */
     public function mutate($id, $revision, $operation, array $payload)
     {
@@ -225,12 +349,20 @@ class WalkingTour_HistoricalMapRepository
             if (!$current) { throw new InvalidArgumentException('Historical map not found.'); }
             // An annotation retry after a lost response must not create a duplicate point.
             $requestId = $payload['request_id'] ?? '';
+            $validRequest = is_string($requestId) && preg_match('/^[a-zA-Z0-9_-]{16,64}$/D', $requestId);
+            if (in_array($operation, array('confirm', 'delete', 'undo_calibration'), true) && !$validRequest) {
+                throw new InvalidArgumentException('A valid request ID is required.');
+            }
+            if ($validRequest && $this->db->fetchOne("SELECT id FROM `{$this->changes}` WHERE map_id = ? AND request_id = ?", array($id, $requestId))) {
+                $adapter->commit(); return $this->find($id);
+            }
             if ($operation === 'annotation' && is_string($requestId) && preg_match('/^[a-zA-Z0-9_-]{16,64}$/D', $requestId)) {
                 $existing = $this->db->fetchOne("SELECT id FROM `{$this->annotations}` WHERE map_id = ? AND request_id = ?", array($id, $requestId));
                 if ($existing) { $adapter->commit(); return $this->find($id); }
             }
             if ((int) $current !== $revision) { throw new RuntimeException('This map was updated by another editor. Your draft has been kept. Reload the latest data and review before saving.', 409); }
             $map = $this->find($id);
+            $calibrationBefore = null;
             if ($operation === 'mask') {
                 $ring = WalkingTour_HistoricalMapGeometry::ring($payload['ring'] ?? null);
                 $this->db->query("INSERT INTO `{$this->masks}` (map_id, image_ring, geographic_ring, source, calibration_revision) VALUES (?, NULL, ?, 'custom', ?) ON DUPLICATE KEY UPDATE geographic_ring = VALUES(geographic_ring), source = 'custom', calibration_revision = VALUES(calibration_revision)",
@@ -240,7 +372,32 @@ class WalkingTour_HistoricalMapRepository
                 $point = $this->estimate($map, $payload['side'] ?? null, $payload['coordinates'] ?? null);
                 $this->db->query("INSERT INTO `{$this->annotations}` (map_id, source_side, image_x, image_y, longitude, latitude, status, calibration_revision, request_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     array($id, $point['source_side'], $point['image_x'], $point['image_y'], $point['longitude'], $point['latitude'], $point['status'], $point['calibration_revision'], $requestId));
+            } elseif ($operation === 'confirm') {
+                $restoredAnnotation = null;
+                if (($payload['point_type'] ?? null) === 'annotation') {
+                    $target = $this->target($map, 'annotation', $payload['point_id'] ?? null);
+                    $restoredAnnotation = $this->annotationSnapshot($id, $target);
+                }
+                $calibrationBefore = array('control_points' => $map['control_points'], 'annotation' => $restoredAnnotation);
+                $this->confirmPair($map, $payload);
+                $this->recalibrate($id);
+            } elseif ($operation === 'delete') {
+                $type = $payload['point_type'] ?? null;
+                $target = $this->target($map, $type, $payload['point_id'] ?? null);
+                $table = $type === 'control' ? $this->points : $this->annotations;
+                $this->db->query("DELETE FROM `{$table}` WHERE map_id = ? AND id = ?", array($id, $target['id']));
+                if ($type === 'control') {
+                    $calibrationBefore = array('control_points' => $map['control_points'], 'annotation' => null);
+                    $this->recalibrate($id);
+                }
+            } elseif ($operation === 'undo_calibration') {
+                $this->undoCalibration($map, $payload);
+                $this->recalibrate($id);
             } else { throw new InvalidArgumentException('Unknown map operation.'); }
+            if ($validRequest) {
+                $this->db->query("INSERT INTO `{$this->changes}` (map_id, request_id, operation, calibration_before) VALUES (?, ?, ?, ?)",
+                    array($id, $requestId, $operation, $calibrationBefore !== null ? json_encode($calibrationBefore) : null));
+            }
             $this->db->query("UPDATE `{$this->maps}` SET revision = revision + 1 WHERE id = ?", array($id));
             $adapter->commit();
         } catch (Exception $error) { $adapter->rollBack(); throw $error; }
@@ -249,6 +406,7 @@ class WalkingTour_HistoricalMapRepository
 
     public function uninstall()
     {
+        $this->db->query("DROP TABLE IF EXISTS `{$this->changes}`");
         $this->db->query("DROP TABLE IF EXISTS `{$this->annotations}`");
         $this->db->query("DROP TABLE IF EXISTS `{$this->masks}`");
         $this->db->query("DROP TABLE IF EXISTS `{$this->points}`");

@@ -57,6 +57,15 @@
 #dual-map .annotation-marker { border: 2px dashed #fff; border-radius: 14px; background: #16779c; color: white; text-align: center; font: bold 11px/24px sans-serif; box-shadow: 0 1px 5px #3338; }
 #dual-map .annotation-marker.is-draft { background: #a65c10; }
 #dual-map .annotation-marker.is-selected { outline: 3px solid #ffc857; }
+#dual-map .control-point-marker.is-draft { border-style: dashed; }
+#dual-map .is-draft.leaflet-marker-draggable { cursor: move; }
+#dual-map.is-deleting-points .control-point-marker, #dual-map.is-deleting-points .annotation-marker { cursor: crosshair; outline: 2px solid #b23232; }
+#dual-map.is-deleting-points .map-drawing-tool button[aria-pressed="true"] { background: #ffe7e7; border-color: #b23232; }
+#dual-map #map-edit-confirm { background: #663a71; color: white !important; border-color: #663a71; }
+#dual-map .map-edit-panel { flex-wrap: wrap; }
+#dual-map .map-point-adjustments { display: flex; flex-wrap: wrap; gap: 8px; }
+#dual-map .map-point-adjustments label { font: 12px/1.5 sans-serif; }
+#dual-map .map-point-adjustments input { display: block; width: 120px; height: 36px; padding: 6px; margin: 0; border: 1px solid #c2cfd2; border-radius: 4px; background: #fff; color: #263e43; font: 13px sans-serif; }
 #dual-map .mask-key span { color: #e02b9e; font-size: 23px; vertical-align: middle; }
 #dual-map .annotation-key span { color: #16779c; font-size: 22px; vertical-align: middle; }
 #dual-map .map-place-search { width: 280px; max-width: calc(100vw - 85px); background: white; border: 1px solid #c2cfd2; border-radius: 10px; box-shadow: 0 2px 8px #263e4333; color: #263e43; overflow: hidden; }

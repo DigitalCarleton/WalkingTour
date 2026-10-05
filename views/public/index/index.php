@@ -58,12 +58,22 @@
         data-api-base="<?php echo html_escape(url('walking-tour/index/')); ?>">
         <div class="dual-map-toolbar">
             <p>Explore the same places across two maps.</p>
+            <button type="button" id="map-calibration-undo" hidden>Undo calibration change</button>
             <button type="button" id="map-list-toggle" aria-controls="historical-map-catalog" aria-expanded="true">Hide map list</button>
         </div>
         <div id="map-edit-panel" class="map-edit-panel" hidden>
             <p id="map-edit-status" role="status" aria-live="polite"></p>
+            <div id="map-point-adjustments" class="map-point-adjustments" hidden>
+                <label>Image X<input id="map-point-x" type="number" step="1" min="0"></label>
+                <label>Image Y<input id="map-point-y" type="number" step="1" min="0"></label>
+                <label>Longitude<input id="map-point-longitude" type="number" step="0.00001" min="-180" max="180"></label>
+                <label>Latitude<input id="map-point-latitude" type="number" step="0.00001" min="-85" max="85"></label>
+                <button type="button" id="map-point-apply">Apply coordinates</button>
+            </div>
             <div class="map-edit-actions">
                 <button type="button" id="map-edit-save" disabled>Save</button>
+                <button type="button" id="map-edit-confirm" hidden>Confirm pair</button>
+                <button type="button" id="map-edit-adjust" hidden>Adjust pair</button>
                 <button type="button" id="map-edit-undo" hidden>Undo last vertex</button>
                 <button type="button" id="map-edit-reload" hidden>Reload latest data</button>
                 <button type="button" id="map-edit-cancel">Cancel</button>

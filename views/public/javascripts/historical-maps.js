@@ -41,14 +41,16 @@
             var activeMap;
             var imageBounds;
             var geographicBounds;
-            var pairs = [];
-            var imagePoints = L.layerGroup().addTo(historicalMap);
-            var modernPoints = L.layerGroup().addTo(modernMap);
             var status = document.getElementById('historical-map-status');
             var retry = document.getElementById('historical-map-retry');
             var loadGeneration = 0;
             var editor = window.WalkingTourMapEditor({root: root, historical: historicalMap, modern: modernMap,
-                onSaved: function (record) { activeMap = record; updateGeographicBounds(record); }});
+                onSaved: function (record) {
+                    activeMap = record; updateGeographicBounds(record);
+                    if (!status.classList.contains('is-error')) {
+                        setStatus('Original image · ' + record.control_points.length + ' shared control points', false);
+                    }
+                }});
             window.WalkingTourPlaceSearch(modernMap, root.dataset.searchEndpoint);
 
             function updateGeographicBounds(record) {
@@ -94,39 +96,6 @@
                 }
             });
 
-            function selectPair(index) {
-                pairs.forEach(function (pair, i) {
-                    pair.forEach(function (marker) {
-                        var element = marker.getElement();
-                        if (element) {
-                            element.classList.toggle('is-selected', i === index);
-                            element.setAttribute('aria-pressed', String(i === index));
-                        }
-                        marker.setZIndexOffset(i === index ? 1000 : 0);
-                    });
-                });
-                historicalMap.panTo(pairs[index][0].getLatLng());
-                modernMap.panTo(pairs[index][1].getLatLng());
-                document.getElementById('control-point-selection').textContent =
-                    'Control point ' + activeMap.control_points[index].ordinal + ' selected on both maps.';
-            }
-
-            function markerAt(position, number, index) {
-                var marker = L.marker(position, {
-                    icon: L.divIcon({className: 'control-point-marker', html: String(number),
-                        iconSize: [30, 30], iconAnchor: [15, 15]}),
-                    title: 'Control point ' + number, alt: 'Control point ' + number,
-                    keyboard: true, riseOnHover: true
-                });
-                marker.on('click', function () { selectPair(index); });
-                marker.on('add', function () {
-                    marker.getElement().setAttribute('aria-label', 'Control point ' + number);
-                    marker.getElement().setAttribute('role', 'button');
-                    marker.getElement().setAttribute('aria-pressed', 'false');
-                });
-                return marker;
-            }
-
             function sourceLink(container, label, url) {
                 // Catalog data is text. Only expose HTTP(S) links, never raw HTML.
                 if (!/^https?:\/\//i.test(url)) { return; }
@@ -143,9 +112,6 @@
                 var generation = ++loadGeneration;
                 activeMap = record;
                 if (imageLayer) { historicalMap.removeLayer(imageLayer); }
-                imagePoints.clearLayers();
-                modernPoints.clearLayers();
-                pairs = [];
                 imageBounds = L.latLngBounds(imageLatLng(0, record.image_height), imageLatLng(record.image_width, 0));
                 geographicBounds = L.latLngBounds();
                 historicalMap.setMaxBounds(imageBounds.pad(.2));
@@ -170,14 +136,6 @@
                 });
                 imageLayer.addTo(historicalMap);
 
-                record.control_points.forEach(function (point, index) {
-                    var imageMarker = markerAt(imageLatLng(point.image_x, point.image_y), point.ordinal, index);
-                    var modernMarker = markerAt([point.latitude, point.longitude], point.ordinal, index);
-                    pairs.push([imageMarker, modernMarker]);
-                    imageMarker.addTo(imagePoints);
-                    modernMarker.addTo(modernPoints);
-                    geographicBounds.extend(modernMarker.getLatLng());
-                });
                 updateGeographicBounds(record);
                 editor.load(record);
                 document.getElementById('historical-map-fit').disabled = false;

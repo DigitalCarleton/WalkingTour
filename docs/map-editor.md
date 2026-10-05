@@ -1,4 +1,4 @@
-# Historical map editing (Stage 2)
+# Historical map editing (Stages 2–4)
 
 The plugin version stays at **0.2.3**. After copying or pulling the updated plugin,
 run this command from the WalkingTour plugin directory using the server's PHP CLI
@@ -12,6 +12,9 @@ This command reads the existing Omeka database configuration, adds missing map, 
 annotation storage, and preserves existing tours, control points, and saved masks. It can
 be run again safely and does not change the installed plugin version. No version-based
 upgrade prompt is required. Do not uninstall/reinstall: uninstalling removes plugin-owned data.
+
+Run the initialization command again when deploying Stages 3–4. It adds persistent control-point
+numbering and calibration change history without replacing existing points, annotations, or masks.
 
 The two maps remain independently navigable. Existing legacy tour layers remain hidden as in
 Stage 1; this release does not restore or edit those layers.
@@ -46,8 +49,50 @@ event from the map container, with `mapId` and an `annotation` object for future
 A position outside the control-point hull is marked as extrapolated. If no stable, unique image
 counterpart is found, only the original position is saved. Inverse estimates numerically solve the
 forward spline from multiple initial positions; they do not establish historical accuracy or
-mathematically guarantee global invertibility. Automatic annotations never become calibration
-points. Manual pairing, adjustment, confirmation, and calibration undo belong to the next stage.
+mathematically guarantee global invertibility. Automatic estimates never become calibration
+points unless an editor explicitly confirms both positions.
+
+## Adjust and confirm a pair
+
+Select a saved annotation or control point on either map, then choose **Adjust pair**. Drag either
+endpoint while keeping the other fixed, or edit **Image X**, **Image Y**, **Longitude**, and
+**Latitude**, then choose **Apply coordinates** for numerical adjustment. If a counterpart is
+missing, click the other map to supply it or enter its coordinates. Image pixels use a top-left
+origin. Coordinates are validated on
+the server as well as in the editor.
+
+Choose **Confirm pair** to promote an annotation into a shared control point, or **Save calibration
+pair** to save adjustments to an existing control. A new draft may also be confirmed directly;
+**Save** preserves an untouched draft as an ordinary estimated annotation. After manual adjustment,
+explicit confirmation is required to save the corrected pair. **Cancel** discards the draft.
+
+With the ten original controls, confirming **A1** removes its blue annotation markers and displays
+the same purple circular marker style as the imported controls, numbered **11** on both maps.
+Numbers are persistent and allocated monotonically; deleting or undoing a control does not renumber
+other points or reuse its number. The displayed shared-control count reflects the currently saved controls.
+
+A calibration save keeps all confirmed endpoint pairs fixed and recomputes only the predicted
+side of ordinary annotations. Their source side and original source click remain unchanged. The
+imported geographic footprint is recomputed; a hand-drawn custom mask stays authoritative.
+Duplicate or unsolvable control arrangements are rejected without changing saved data or numbering.
+With too few controls, estimates are marked unavailable and source clicks remain available for manual pairing.
+
+## Delete points and undo calibration
+
+Select the **Delete a point pair** trash icon on either map, then select a saved point. This saves
+the deletion and removes both markers. Delete mode stays active for further deletions; select the
+trash tool again or **Cancel** to exit. A failed deletion preserves the point and offers retry;
+a conflict keeps the intended deletion for review against the latest data.
+
+Deleting an ordinary annotation does not alter calibration. Deleting a control pair recomputes
+predictions and makes **Undo calibration change** available in the top toolbar. That action restores
+the latest calibration addition, adjustment, or deletion and persists the result. Undoing promotion
+of a saved annotation restores its original annotation ID. Later ordinary annotations and custom
+masks are preserved. This is one-change calibration undo, not a general annotation trash or undo stack.
+
+Calibration writes, deletions, and undo use map revisions, transaction locking, and request identifiers.
+A retry after a lost response cannot create another control point or delete another pair. All writes
+continue to require existing Omeka editing privileges and a valid session CSRF token.
 
 Writes require existing Omeka editing privileges and a session CSRF token. Each edit carries the
 map's revision; outdated edits return a conflict and retain the draft. Choose **Reload latest data**,
@@ -81,6 +126,15 @@ All paths are relative to the Omeka site root:
 - `POST walking-tour/index/historical-map-edit`: JSON with `map_id`, `revision`, `csrf_token`, and
   `operation`. A `mask` operation includes a closed `ring` in longitude/latitude order. An
   `annotation` operation includes `side`, `coordinates`, and a unique `request_id`.
+- `confirm`: `point_type` (`new`, `annotation`, or `control`), `point_id` for a saved point,
+  `image` in pixel order and `geographic` in longitude/latitude order, plus a unique `request_id`.
+- `delete`: `point_type` (`annotation` or `control`), `point_id`, and a unique `request_id`.
+- `undo_calibration`: the catalog's latest `undo_calibration.change_id` and a unique `request_id`.
+
+All edit operations share `map_id`, `revision`, and `csrf_token`. Catalog records now include
+`next_control_ordinal` and `undo_calibration` (null when the latest calibration change cannot be undone).
+`walkingtour:control-point-selected` and `walkingtour:calibration-updated` events provide extension hooks.
 
 Coordinates and geometry are validated on the server. Annotation estimates are calculated by the
-server again when saving; a client cannot inject predicted coordinates or calibration points.
+server again when saving an ordinary annotation. Only an explicit, authorized `confirm` operation
+can introduce manually reviewed calibration endpoints.
