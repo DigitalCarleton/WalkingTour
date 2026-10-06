@@ -122,6 +122,13 @@ in the Omeka admin navigation. The list shows each map's control-point and annot
 and calibration revision. Select a map title to inspect its source metadata, or choose
 **Open map editor** to open that specific map in the public dual-map editor.
 
+Map detail pages also list confirmed control coordinates, ordinary annotation coordinates and
+prediction status, and paginated calibration history (50 changes per page). **Locate on maps**
+opens the selected map and highlights that specific saved point pair. Missing counterparts stay
+explicitly unavailable. Coordinate edits and calibration undo are performed in the shared map
+editor so they continue to use its transactional calibration and conflict handling. History lists
+recorded changes and undone state; the existing records do not contain timestamps or editor identities.
+
 Choose **Add a historical map** to import an HTTPS IIIF Presentation API 2/3 manifest or
 Image API 1/2/3 `info.json`. Image services must support level 1 or 2 region requests. Select the
 image's position in the manifest (starting at 1; Presentation 2 uses the first sequence), and

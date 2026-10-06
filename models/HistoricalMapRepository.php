@@ -274,6 +274,30 @@ class WalkingTour_HistoricalMapRepository
         return $this->find($id);
     }
 
+    /** Read a bounded calibration history; request receipts and ordinary deletions stay internal. */
+    public function calibrationHistory($id, $before = null)
+    {
+        if (!is_int($id) || $id < 1 || ($before !== null && (!is_int($before) || $before < 1))) {
+            throw new InvalidArgumentException('Choose a valid map and history page.');
+        }
+        $params = array($id);
+        $where = '';
+        if ($before !== null) { $where = ' AND id < ?'; $params[] = $before; }
+        $rows = $this->db->fetchAll("SELECT id, operation, calibration_before, undone FROM `{$this->changes}`
+            WHERE map_id = ? AND (calibration_before IS NOT NULL OR operation = 'undo_calibration'){$where} ORDER BY id DESC LIMIT 51", $params);
+        $more = count($rows) > 50;
+        if ($more) { array_pop($rows); }
+        foreach ($rows as &$row) {
+            $snapshot = json_decode($row['calibration_before'] ?: 'null', true);
+            $row['id'] = (int) $row['id'];
+            $row['undone'] = (bool) $row['undone'];
+            $row['controls_before'] = isset($snapshot['control_points']) ? count($snapshot['control_points']) : null;
+            unset($row['calibration_before']);
+        }
+        unset($row);
+        return array('changes' => $rows, 'older_than' => $more ? end($rows)['id'] : null);
+    }
+
     public function estimate(array $map, $side, $coordinates, $transform = null)
     {
         if (!in_array($side, array('image', 'modern'), true)) { throw new InvalidArgumentException('Choose an image or modern map position.'); }

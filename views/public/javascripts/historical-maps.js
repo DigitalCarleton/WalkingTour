@@ -186,6 +186,13 @@
                         var requestedMap = new URLSearchParams(window.location.search).get('map_id');
                         var selectedMap = response.maps.filter(function (record) { return String(record.id) === requestedMap; })[0];
                         showMap(selectedMap || response.maps[0]);
+                        var parameters = new URLSearchParams(window.location.search);
+                        var pointType = parameters.get('point_type'), pointId = Number(parameters.get('point_id'));
+                        if (selectedMap && (pointType === 'control' || pointType === 'annotation') && Number.isInteger(pointId) && pointId > 0) {
+                            if (!editor.focus(pointType, pointId)) {
+                                document.getElementById('control-point-selection').textContent = 'The linked point is no longer available on this map.';
+                            }
+                        }
                     }).fail(function () {
                         setStatus('Historical maps could not be loaded. Please retry or contact the site administrator.', true);
                     });

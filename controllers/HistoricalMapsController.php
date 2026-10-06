@@ -28,7 +28,14 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
 
     public function showAction()
     {
-        $this->view->map = $this->findMap();
+        $map = $this->findMap();
+        $this->view->map = $map;
+        $before = $this->getRequest()->getQuery('before');
+        if ($before !== null && (!is_string($before) || !ctype_digit($before) || (int) $before < 1)) {
+            throw new Omeka_Controller_Exception_404;
+        }
+        $this->view->history = $this->maps->calibrationHistory($map['id'], $before === null ? null : (int) $before);
+        $this->view->olderPage = $before !== null;
     }
 
     private function findMap()

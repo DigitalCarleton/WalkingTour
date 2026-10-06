@@ -4,7 +4,7 @@
     window.WalkingTourMapEditor = function (options) {
         var L = window.L, root = options.root, historical = options.historical, modern = options.modern;
         var record, canEdit = false, csrf, mode = null, draft = null, busy = false, pending = null, generation = 0;
-        var selected = null, draftPoint = null, draftMarkers = [];
+        var selected = null, draftPoint = null, draftMarkers = [], savedPairs = {};
         var vertices = [], closed = false, restoreDoubleClick = false;
         var imageSaved = L.layerGroup().addTo(historical), modernSaved = L.layerGroup().addTo(modern);
         var imageDraft = L.layerGroup().addTo(historical), modernDraft = L.layerGroup().addTo(modern);
@@ -199,6 +199,7 @@
                         });
                     }
                 });
+            if (!isDraft) { savedPairs[type + ':' + point.id] = pair; }
         }
         function renderDraft() {
             imageDraft.clearLayers(); modernDraft.clearLayers(); draftMarkers = [];
@@ -250,6 +251,7 @@
         applyCoordinates.addEventListener('click', readCoordinates);
         function renderSaved() {
             imageSaved.clearLayers(); modernSaved.clearLayers(); footprint.clearLayers(); imageOutline.clearLayers();
+            savedPairs = {};
             if (!record) { return; }
             if (record.mask) {
                 if (record.mask.geographic_ring) {
@@ -394,7 +396,15 @@
                 if (hasDraft() || busy) { message('Save or cancel the current draft before switching maps.'); return false; }
                 return true;
             },
-            load: function (map) { reset(); record = map; renderSaved(); updateTools(); }
+            load: function (map) { reset(); record = map; renderSaved(); updateTools(); },
+            focus: function (type, id) {
+                if (!record || !savedPairs[type + ':' + id]) { return false; }
+                var points = type === 'control' ? record.control_points : record.annotations;
+                var point = points.filter(function (entry) { return entry.id === id; })[0];
+                if (!point) { return false; }
+                selectPoint(point, type, savedPairs[type + ':' + id]);
+                return true;
+            }
         };
     };
 }(window, jQuery));
