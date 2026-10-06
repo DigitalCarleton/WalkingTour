@@ -13,5 +13,6 @@
         <p>The saved image and pixel dimensions remain fixed so saved coordinates continue to refer to the same image. Use the map editor to adjust point pairs.</p>
         <input class="submit big green button" type="submit" value="Save map information">
     </form>
+    <p><a class="button red" href="<?php echo html_escape(url('historical-maps/delete/' . $map['id'])); ?>">Delete map</a></p>
 </div>
 <?php echo foot(); ?>

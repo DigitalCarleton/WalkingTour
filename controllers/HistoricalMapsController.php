@@ -17,7 +17,7 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
         if (!is_admin_theme() || !current_user() || !is_allowed('WalkingTourBuilder_Tours', 'edit')) {
             throw new Omeka_Controller_Exception_403;
         }
-        if (!in_array($this->getRequest()->getActionName(), array('browse', 'show', 'add', 'upload', 'edit'), true)) { throw new Omeka_Controller_Exception_404; }
+        if (!in_array($this->getRequest()->getActionName(), array('browse', 'show', 'add', 'upload', 'edit', 'delete'), true)) { throw new Omeka_Controller_Exception_404; }
         $this->getResponse()->setHeader('Cache-Control', 'private, no-store', true);
     }
 
@@ -74,12 +74,12 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
         return true;
     }
 
-    private function formError($error)
+    private function formError($error, $unavailable = 'The map could not be saved. Your entered values have been kept. Please try again.')
     {
         $status = $error instanceof InvalidArgumentException ? 422 : ($error->getCode() === 409 ? 409 : 503);
         $this->getResponse()->setHttpResponseCode($status);
         if ($status === 503) { _log($error, Zend_Log::ERR); }
-        $this->view->error = $status === 503 ? 'The map could not be saved. Your entered values have been kept. Please try again.' : $error->getMessage();
+        $this->view->error = $status === 503 ? $unavailable : $error->getMessage();
     }
 
     public function addAction()
@@ -120,5 +120,27 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
             $this->_helper->flashMessenger('Image uploaded. Open the map editor to establish its control-point pairs.', 'success');
             $this->_redirect(url('historical-maps/show/' . $map['id']), array('prependBase' => false));
         } catch (Exception $error) { $this->formError($error); }
+    }
+
+    public function deleteAction()
+    {
+        $map = $this->findMap();
+        $this->view->map = $map;
+        $values = array('revision' => $this->getRequest()->isPost() ? $this->text('revision') : (string) $map['revision']);
+        if (!$this->form($values)) { return; }
+        try {
+            if (!ctype_digit($values['revision'])) { throw new InvalidArgumentException('The saved map revision is required.'); }
+            if ($this->text('confirm_delete') !== '1') {
+                throw new InvalidArgumentException('Confirm that you want to permanently delete this map and its saved data.');
+            }
+            $result = $this->maps->deleteMap($map['id'], (int) $values['revision'], Zend_Registry::get('storage'));
+            $this->_helper->flashMessenger('Historical map deleted.', 'success');
+            if ($result['image_cleanup_failed']) {
+                $this->_helper->flashMessenger('The map was deleted, but its staged image file could not be removed. Ask the server administrator to check the application log and finish file cleanup.', 'error');
+            }
+            $this->_redirect(url('historical-maps'), array('prependBase' => false));
+        } catch (Exception $error) {
+            $this->formError($error, 'Deletion could not finish. Reload the latest record and try again, or contact the server administrator.');
+        }
     }
 }

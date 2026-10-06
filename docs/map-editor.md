@@ -16,8 +16,8 @@ upgrade prompt is required. Do not uninstall/reinstall: uninstalling removes plu
 Run the initialization command again when deploying Stages 3–4. It adds persistent control-point
 numbering and calibration change history without replacing existing points, annotations, or masks.
 
-The two maps remain independently navigable. Existing legacy tour layers remain hidden as in
-Stage 1; this release does not restore or edit those layers.
+The two maps remain independently navigable on Historical Maps. Walking Tour separately
+displays its original tour map, filters, numbered stops, and details.
 
 ## Map footprint and custom mask
 
@@ -167,6 +167,22 @@ points are needed for a solvable transform, but that minimum does not establish 
 or uploaded file and dimensions stay fixed to preserve saved coordinates. Metadata updates use
 the same map revision lock as point edits; a conflict retains the entered values and requires
 review before another save.
+
+The editing page also has a separate **Delete map** button. It opens a confirmation page
+with the current control-point and annotation counts. **Cancel and return to editing** leaves
+the map unchanged. Permanent deletion requires the acknowledgement checkbox and a POST
+with a valid editing session, CSRF token, and current map revision. If someone changes the
+map after the confirmation page opens, reload and review the latest data before deleting.
+
+Deletion removes that map's record, control points, annotations, mask, and calibration history.
+Uploaded image files are removed through Omeka's configured storage adapter; external IIIF
+images remain at their source. Other maps and Walking Tour records are preserved. There is
+no editor undo for deleting an entire map. The default example also stays deleted when the
+initialization command is rerun. This feature requires no new database migration.
+
+Uploads are staged before the database transaction commits, so a database failure can restore
+the original image path. If final file cleanup fails after the records have been deleted, the
+admin page reports it and the application log identifies the staged file for server cleanup.
 
 The server requires PHP cURL and outbound HTTPS access for import. Metadata requests have size,
 timeout, redirect, and public-address limits; images themselves remain at the source provider and

@@ -101,6 +101,10 @@ class WalkingTour_HistoricalMapRepository
         if ($this->db->fetchOne("SELECT id FROM `{$this->maps}` WHERE slug = ?", array($slug))) {
             return;
         }
+        // Retain an internal receipt so initialization does not resurrect a deleted seed.
+        if ($this->db->fetchOne("SELECT id FROM `{$this->changes}` WHERE map_id = 0 AND request_id = 'deleted-default-map' AND operation = 'delete_map_seed'")) {
+            return;
+        }
 
         $snapshot = file_get_contents(dirname(__FILE__) . '/../data/rome-allmaps-annotation.json');
         $page = json_decode($snapshot, true);
@@ -287,6 +291,58 @@ class WalkingTour_HistoricalMapRepository
             $adapter->commit();
         } catch (Exception $error) { $adapter->rollBack(); throw $error; }
         return $this->find($id);
+    }
+
+    /** Delete one map and its children; stage uploads so a failed transaction can restore them. */
+    public function deleteMap($id, $revision, $storage)
+    {
+        if (!is_int($id) || $id < 1 || !is_int($revision) || $revision < 1) {
+            throw new InvalidArgumentException('A map ID and revision are required.');
+        }
+        $adapter = $this->db->getAdapter();
+        $original = null;
+        $staged = null;
+        $adapter->beginTransaction();
+        try {
+            $map = $this->db->fetchRow("SELECT slug, revision, source_snapshot FROM `{$this->maps}` WHERE id = ? FOR UPDATE", array($id));
+            if (!$map) { throw new InvalidArgumentException('Historical map not found.'); }
+            if ((int) $map['revision'] !== $revision) {
+                throw new RuntimeException('This map changed after you opened the confirmation page. Reload this page and review its latest points before deleting.', 409);
+            }
+            $snapshot = json_decode($map['source_snapshot'], true);
+            if (($snapshot['source_kind'] ?? '') === 'upload') {
+                $original = WalkingTour_HistoricalMapUpload::storagePath($snapshot);
+                $destination = 'original/walkingtour-deleting-' . bin2hex(random_bytes(16)) . '.' . pathinfo($original, PATHINFO_EXTENSION);
+                $storage->move($original, $destination);
+                $staged = $destination;
+            }
+            foreach (array($this->points, $this->annotations, $this->masks, $this->changes) as $table) {
+                $this->db->query("DELETE FROM `{$table}` WHERE map_id = ?", array($id));
+            }
+            $this->db->query("DELETE FROM `{$this->maps}` WHERE id = ?", array($id));
+            if ($map['slug'] === 'bnf-rome-btv1b53119597n') {
+                $this->db->query("INSERT INTO `{$this->changes}` (map_id, request_id, operation) VALUES (0, 'deleted-default-map', 'delete_map_seed')
+                    ON DUPLICATE KEY UPDATE operation = VALUES(operation)");
+            }
+            $adapter->commit();
+        } catch (Exception $error) {
+            $adapter->rollBack();
+            if ($staged) {
+                try { $storage->move($staged, $original); }
+                catch (Exception $restoreError) {
+                    _log('Historical map deletion rolled back; restore ' . $staged . ' to ' . $original . ': ' . $restoreError->getMessage(), Zend_Log::ERR);
+                }
+            }
+            throw $error;
+        }
+        if ($staged) {
+            try { $storage->delete($staged); }
+            catch (Exception $error) {
+                _log('Historical map deleted; uploaded image cleanup failed for ' . $staged . ': ' . $error->getMessage(), Zend_Log::ERR);
+                return array('image_cleanup_failed' => true);
+            }
+        }
+        return array('image_cleanup_failed' => false);
     }
 
     /** Read a bounded calibration history; request receipts and ordinary deletions stay internal. */
