@@ -157,15 +157,19 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
 
     public function hookDefineRoutes($args)
     {
-        $args['router']->addConfig(
-            new Zend_Config_Ini(
-                WALKINGTOUR_PLUGIN_DIR .
-                DIRECTORY_SEPARATOR .
-                'routes.ini',
-                'routes'
-            )
+        $admin = is_admin_theme();
+        $routes = new Zend_Config_Ini(
+            WALKINGTOUR_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'routes.ini',
+            'routes'
         );
-        if (is_admin_theme()) {
+        if (!$admin) {
+            // Keep the admin catalog from shadowing a public Simple Pages slug.
+            $routes = $routes->toArray();
+            unset($routes['historicalMaps'], $routes['historicalMapAction']);
+            $routes = new Zend_Config($routes);
+        }
+        $args['router']->addConfig($routes);
+        if ($admin) {
             return;
         } else {
             $args['router']->addRoute(

@@ -122,6 +122,11 @@ in the Omeka admin navigation. The list shows each map's control-point and annot
 and calibration revision. Select a map title to inspect its source metadata, or choose
 **Open map editor** to open that specific map in the public dual-map editor.
 
+The catalog routes are registered only in the admin theme (`admin/historical-maps`).
+An existing public Simple Pages page with the `historical-maps` slug keeps its own route;
+the dual-map viewer remains at `walking-tour`. Updating this routing behavior requires
+only the plugin code update, not database initialization or a plugin reinstall.
+
 Map detail pages also list confirmed control coordinates, ordinary annotation coordinates and
 prediction status, and paginated calibration history (50 changes per page). **Locate on maps**
 opens the selected map and highlights that specific saved point pair. Missing counterparts stay
