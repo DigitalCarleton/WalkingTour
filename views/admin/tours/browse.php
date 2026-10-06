@@ -1,6 +1,6 @@
 <?php
 $pageTitle = __('Browse Tours') . ' ' . __('(%s total)', $total_results );
-$editable = is_allowed( 'WalkingTourBuilder_Tours', 'edit' );
+$editable = is_allowed( 'WalkingTour_Tours', 'edit' );
 $addUrl = url( array( 'action' => 'add' ) );
 
 echo head( array( 'title' => $pageTitle, 'bodyid'=>'tour','bodyclass' => 'tours browse' ) );
@@ -10,7 +10,7 @@ echo flash();
 <?php if( $total_results ): ?>
 
 <div class="table-actions">
-  <?php if( is_allowed( 'WalkingTourBuilder_Tours', 'add' ) ): ?>
+  <?php if( is_allowed( 'WalkingTour_Tours', 'add' ) ): ?>
   <a class="add button small green" href="<?php echo $addUrl; ?>">
     <?php echo __('Add a Tour'); ?>
   </a>
@@ -20,10 +20,10 @@ echo flash();
 <div id="primary">
 		<?php
 		echo flash();
-		if( has_tours() ):
+		if( has_walking_tours() ):
 		?>
 		<div class="pagination"><?php echo pagination_links(); ?></div>
-		<?php if( has_tours_for_loop() ): ?>
+		<?php if( has_walking_tours_for_loop() ): ?>
 		 <table id="tours" class="simple" cellspacing="0" cellpadding="0">
 		    <thead>
 		       <tr>
@@ -38,7 +38,7 @@ echo flash();
                
                <?php $key = 0;
 
-				foreach( $tours as $tour ):
+				foreach( $walking_tours as $tour ):
 					$oddness = ((++$key % 2) == 1) ? 'odd' : 'even';
 					$showUrl = url( array( 'action' => 'show','id' => $tour->id ), 'tourAction' );
 					$editUrl = url( array( 'action' => 'edit','id' => $tour->id ), 'tourAction' );
@@ -72,9 +72,9 @@ echo flash();
 
 <?php else: ?>
 
-  <?php if( total_records( 'Tour' ) === 0 ): ?>
+  <?php if( total_records( 'WalkingTour' ) === 0 ): ?>
     <h2><?php echo __('You have no tours.'); ?></h2>
-    <?php if( is_allowed( 'WalkingTourBuilder_Tours', 'add' ) ): ?>
+    <?php if( is_allowed( 'WalkingTour_Tours', 'add' ) ): ?>
     <p><?php echo __('Get started by adding your first tour.'); ?></p>
     <a class="add big green button" href="<?php echo $addUrl; ?>">
       <?php echo __('Add a Tour'); ?>
@@ -84,7 +84,7 @@ echo flash();
     <p><?php echo __('The query searched %s tours and returned no results.',
 		total_records( 'Tour' ));
 echo __('Would you like to %s?',
-	link_to_tour_search( __('refine your search') ) ); ?></p>
+	link_to_walking_tour_search( __('refine your search') ) ); ?></p>
   <?php endif; ?>
 
 <?php endif; ?>
