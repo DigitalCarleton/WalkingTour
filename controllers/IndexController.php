@@ -19,15 +19,10 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
      */
     public function publicTours()
     {
-        // Get the database.
         $db = get_db();
-        // Get the Walking Tour table.
         $tour_table = $db->getTable('WalkingTour');
-        // Build the select query.
         $select = $tour_table->getSelect();
-        // Fetch some items with our select.
         $results = $tour_table->fetchObjects($select);
-        // Build an array with 
         $_tourTypes = array('id' => array(), 'color' => array());
         foreach ($results as $tour) {
             if ($tour['public'] == 1 || current_user()->role == "super") {
@@ -41,7 +36,6 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         return $_tourTypes;
     }
 
-    // Save the route for a tour
     public function saveRouteAction() {
         $tourId = $this->getRequest()->getParam('tour_id');
         $route = $this->getRequest()->getParam('route');
@@ -175,7 +169,6 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
      */
     public function queryAction()
     {
-        // Process only AJAX requests.
         if (!$this->_request->isXmlHttpRequest()) {
             throw new Omeka_Controller_Exception_403;
         }
@@ -287,7 +280,6 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
      */
     public function getItemAction()
     {
-        // Process only AJAX requests.
         if (!$this->_request->isXmlHttpRequest()) {
             throw new Omeka_Controller_Exception_403;
         }

@@ -102,7 +102,8 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
         $oldTourItemTable = "{$db->prefix}tour_items";
         $newWalkingTourItemTable = "{$db->prefix}walking_tour_items";
 
-        $db->query("CREATE TABLE IF NOT EXISTS `$newWalkingTourTable` (
+        $db->query(
+            "CREATE TABLE IF NOT EXISTS `$newWalkingTourTable` (
             `id` int( 10 ) unsigned NOT NULL auto_increment,
             `title` varchar( 255 ) collate utf8_unicode_ci default NULL,
             `description` text collate utf8_unicode_ci NOT NULL,
@@ -116,7 +117,8 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
         );
 
-        $db->query("CREATE TABLE IF NOT EXISTS `$newWalkingTourItemTable` (
+        $db->query(
+            "CREATE TABLE IF NOT EXISTS `$newWalkingTourItemTable` (
             `id` INT( 10 ) UNSIGNED NOT NULL AUTO_INCREMENT,
             `tour_id` INT( 10 ) UNSIGNED NOT NULL,
             `ordinal` INT NOT NULL,
@@ -129,7 +131,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
 
         if (version_compare($oldVersion, '2.0.0', '<')) {
             $checkOldTourTable = $db->query("SHOW TABLES LIKE '$oldTourTable'")->fetchAll();
-            
+
             if (!empty($checkOldTourTable)) {
                 $migrateTourSql = "INSERT INTO `$newWalkingTourTable` (
                         id, title, description, route, credits, postscript_text, featured, public, color) 
@@ -143,7 +145,7 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
             }
 
             $checkOldTourItemTable = $db->query("SHOW TABLES LIKE '$oldTourItemTable'")->fetchAll();
-            
+
             if (!empty($checkOldTourItemTable)) {
                 $migrateItemSql = "INSERT INTO `$newWalkingTourItemTable` (
                         id, tour_id, ordinal, item_id, exhibit_id) 
@@ -282,8 +284,8 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
     public function filterPublicNavigationMain($nav)
     {
         $nav[] = array(
-            'label' => 'Map', 
-            'uri' => url('map')
+            'label' => 'Walking Tours',
+            'uri' => url('walking-tour')
         );
         return $nav;
     }

@@ -52,7 +52,7 @@ class WalkingTourTable extends Omeka_Db_Table
 		$select = parent::getSelect()->order('walking_tours.id');
 
 		$permissions = new Omeka_Db_Select_PublicPermissions( 'WalkingTour_Tours' );
-		$permissions->apply( $select, 'tours', null );
+		$permissions->apply( $select, $this->getTableAlias(), null );
 		$acl = Zend_Registry::get('bootstrap')->getResource('Acl');
 /*
 		if( $acl &&  ! is_allowed( 'WalkingTour_Tours', 'show-unpublished' ) )
