@@ -1,6 +1,7 @@
 <?php echo head(array('title' => 'Historical Maps', 'bodyclass' => 'historical-maps browse')); ?>
 <?php echo flash(); ?>
-<div class="table-actions"><a class="add button small green" href="<?php echo html_escape(url('historical-maps/add')); ?>">Add a historical map</a></div>
+<div class="table-actions"><a class="add button small green" href="<?php echo html_escape(url('historical-maps/upload')); ?>">Upload image</a>
+    <a class="button small" href="<?php echo html_escape(url('historical-maps/add')); ?>">Import from IIIF</a></div>
 <div id="primary">
     <p>Manage historical maps and open their paired image and geographic map.</p>
     <?php if (!$maps): ?>

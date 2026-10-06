@@ -3,6 +3,7 @@
 require_once __DIR__ . "/HistoricalMapTransform.php";
 require_once __DIR__ . "/HistoricalMapGeometry.php";
 require_once __DIR__ . "/HistoricalMapIiif.php";
+require_once __DIR__ . "/HistoricalMapUpload.php";
 
 /** Persistent catalog and independently editable copies of imported control points. */
 class WalkingTour_HistoricalMapRepository
@@ -149,6 +150,8 @@ class WalkingTour_HistoricalMapRepository
             FROM `{$this->maps}` ORDER BY id");
         foreach ($maps as &$map) {
             $snapshot = json_decode($map['source_snapshot'], true);
+            $map['source_kind'] = ($snapshot['source_kind'] ?? '') === 'upload' ? 'upload' : 'iiif';
+            $map['image_url'] = $map['source_kind'] === 'upload' ? Zend_Registry::get('storage')->getUri(WalkingTour_HistoricalMapUpload::storagePath($snapshot)) : null;
             $map['image_quality'] = ($snapshot['image_quality'] ?? '') === 'native' ? 'native' : 'default';
             unset($map['source_snapshot']);
             foreach (array('id', 'image_width', 'image_height', 'revision', 'calibration_revision', 'next_control_ordinal') as $key) {
@@ -229,8 +232,6 @@ class WalkingTour_HistoricalMapRepository
     public function createMap(array $image)
     {
         list($title, $source) = $this->metadata($image['title'] ?? null, $image['source_url'] ?? '');
-        $service = rtrim(WalkingTour_HistoricalMapIiif::url($image['image_service'] ?? ''), '/');
-        $manifest = WalkingTour_HistoricalMapIiif::url($image['manifest_url'] ?? '');
         foreach (array('image_width', 'image_height') as $field) {
             if (!is_int($image[$field] ?? null) || $image[$field] < 1 || $image[$field] > 1000000) {
                 throw new InvalidArgumentException('Valid original image dimensions are required.');
@@ -238,7 +239,21 @@ class WalkingTour_HistoricalMapRepository
         }
         $snapshot = $image['source_snapshot'] ?? '';
         if (!is_string($snapshot) || strlen($snapshot) > 6500000 || !is_array(json_decode($snapshot, true))) {
-            throw new InvalidArgumentException('Valid IIIF source metadata is required.');
+            throw new InvalidArgumentException('Valid image source metadata is required.');
+        }
+        $metadata = json_decode($snapshot, true);
+        $uploaded = ($metadata['source_kind'] ?? '') === 'upload';
+        if ($uploaded) {
+            WalkingTour_HistoricalMapUpload::storagePath($metadata);
+            $checksum = $metadata['sha256'] ?? '';
+            if (!is_string($checksum) || !preg_match('/^[a-f0-9]{64}$/D', $checksum) || ($image['image_service'] ?? '') !== 'upload:' . $checksum) {
+                throw new InvalidArgumentException('Invalid uploaded image reference.');
+            }
+            $service = 'upload:' . $checksum;
+            $manifest = '';
+        } else {
+            $service = rtrim(WalkingTour_HistoricalMapIiif::url($image['image_service'] ?? ''), '/');
+            $manifest = WalkingTour_HistoricalMapIiif::url($image['manifest_url'] ?? '');
         }
         $adapter = $this->db->getAdapter();
         $adapter->beginTransaction();
@@ -248,7 +263,7 @@ class WalkingTour_HistoricalMapRepository
             }
             $this->db->query("INSERT INTO `{$this->maps}` (slug, title, image_service, image_width, image_height, manifest_url,
                 source_url, source_snapshot, transformation, next_control_ordinal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'thinPlateSpline', 1)",
-                array('iiif-' . substr(hash('sha256', $service), 0, 32), $title, $service, $image['image_width'], $image['image_height'], $manifest, $source, $snapshot));
+                array(($uploaded ? 'upload-' : 'iiif-') . substr(hash('sha256', $service), 0, 32), $title, $service, $image['image_width'], $image['image_height'], $manifest, $source, $snapshot));
             $id = (int) $this->db->fetchOne('SELECT LAST_INSERT_ID()');
             $ring = array(array(0, 0), array($image['image_width'], 0), array($image['image_width'], $image['image_height']), array(0, $image['image_height']), array(0, 0));
             $this->db->query("INSERT INTO `{$this->masks}` (map_id, image_ring, geographic_ring, source, calibration_revision) VALUES (?, ?, NULL, 'imported', 1)",

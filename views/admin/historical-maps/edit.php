@@ -10,7 +10,7 @@
         <div class="field"><div class="two columns alpha"><label for="source-url">Provenance source URL</label></div>
             <div class="inputs five columns omega"><input id="source-url" name="source_url" type="url" value="<?php echo html_escape($values['source_url']); ?>">
                 <p class="explanation">Optional HTTPS link to the source or catalog record.</p></div></div>
-        <p>The original image service and pixel dimensions remain fixed so saved coordinates continue to refer to the same image. Use the map editor to adjust point pairs.</p>
+        <p>The saved image and pixel dimensions remain fixed so saved coordinates continue to refer to the same image. Use the map editor to adjust point pairs.</p>
         <input class="submit big green button" type="submit" value="Save map information">
     </form>
 </div>

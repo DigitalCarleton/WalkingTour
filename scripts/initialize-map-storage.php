@@ -18,6 +18,7 @@ try {
     require $omekaRoot . '/bootstrap.php';
     $application = new Omeka_Application('production');
     $application->bootstrap('Db');
+    $application->bootstrap('Storage');
     require_once $pluginRoot . '/models/HistoricalMapRepository.php';
     $repository = new WalkingTour_HistoricalMapRepository(get_db());
     $repository->install();

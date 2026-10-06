@@ -14,9 +14,14 @@ echo head(array('title' => html_escape($map['title']), 'bodyclass' => 'historica
         <dt>Control points</dt><dd><?php echo count($map['control_points']); ?></dd>
         <dt>Annotations</dt><dd><?php echo count($map['annotations']); ?></dd>
         <dt>Calibration revision</dt><dd><?php echo $map['calibration_revision']; ?></dd>
+        <dt>Image source</dt><dd><?php echo $map['source_kind'] === 'upload' ? 'Uploaded image' : 'IIIF'; ?></dd>
+        <?php if ($map['source_kind'] === 'upload'): ?>
+        <dt>Saved image</dt><dd><a href="<?php echo html_escape($map['image_url']); ?>" target="_blank" rel="noopener noreferrer">View uploaded image</a></dd>
+        <?php else: ?>
         <dt>IIIF image service</dt><dd><?php echo html_escape($map['image_service']); ?></dd>
         <dt>IIIF source</dt><dd><?php echo html_escape($map['manifest_url']); ?></dd>
-        <dt>Provenance source</dt><dd><?php echo html_escape($map['source_url']); ?></dd>
+        <?php endif; ?>
+        <dt>Provenance source</dt><dd><?php echo $map['source_url'] === '' ? 'Not provided' : html_escape($map['source_url']); ?></dd>
     </dl>
     <p><a href="#map-controls">Control points</a> · <a href="#map-annotations">Annotations</a> · <a href="#map-history">Calibration history</a></p>
 

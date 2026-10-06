@@ -92,13 +92,13 @@
             });
             $('#control-points-fit').on('click', function () {
                 if (geographicBounds && geographicBounds.isValid()) {
-                    modernMap.fitBounds(geographicBounds, {padding: [40, 40]});
+                    modernMap.fitBounds(geographicBounds, {padding: [40, 40], maxZoom: 16});
                 }
             });
 
             function sourceLink(container, label, url) {
-                // Catalog data is text. Only expose HTTP(S) links, never raw HTML.
-                if (!/^https?:\/\//i.test(url)) { return; }
+                // Catalog data is text. Only expose HTTP(S) or local file links, never raw HTML.
+                if (!/^(?:https?:\/\/|\/(?!\/))/i.test(url)) { return; }
                 var link = document.createElement('a');
                 link.textContent = label;
                 link.href = url;
@@ -124,19 +124,21 @@
                 var failedTiles = new Set();
                 var attribution = document.createElement('a');
                 attribution.textContent = record.title;
-                attribution.href = /^https?:\/\//i.test(record.source_url) ? record.source_url : record.manifest_url;
+                attribution.href = /^https?:\/\//i.test(record.source_url) ? record.source_url : (record.image_url || record.manifest_url);
                 attribution.target = '_blank'; attribution.rel = 'noopener noreferrer';
-                imageLayer = new OriginalImageTiles(record.image_service, {
+                var uploaded = record.source_kind === 'upload';
+                imageLayer = uploaded ? L.imageOverlay(record.image_url, imageBounds, {attribution: 'Image: ' + attribution.outerHTML}) : new OriginalImageTiles(record.image_service, {
                     imageWidth: record.image_width, imageHeight: record.image_height,
                     imageQuality: record.image_quality,
                     tileSize: 256, minZoom: minimumZoom, maxZoom: 1, maxNativeZoom: 0,
                     bounds: imageBounds, noWrap: true,
                     attribution: 'Image: ' + attribution.outerHTML
                 });
-                imageLayer.on('tileerror', function (event) {
+                imageLayer.on(uploaded ? 'error' : 'tileerror', function (event) {
                     if (generation !== loadGeneration) { return; }
                     failedTiles.add(event.tile);
-                    setStatus('Some historical image tiles could not load. The modern map remains available.', true);
+                    setStatus(uploaded ? 'The uploaded image could not load. Please retry or contact the site administrator.' :
+                        'Some historical image tiles could not load. The modern map remains available.', true);
                 });
                 imageLayer.on('tileload tileunload', function (event) { failedTiles.delete(event.tile); });
                 imageLayer.on('load', function () {
@@ -153,14 +155,15 @@
                 document.getElementById('control-point-selection').textContent = 'Select a numbered point to locate its pair.';
                 var sources = document.getElementById('historical-map-sources');
                 sources.textContent = '';
-                sourceLink(sources, 'Image source (IIIF)', record.manifest_url);
+                sourceLink(sources, uploaded ? 'Uploaded image' : 'Image source (IIIF)', uploaded ? record.image_url : record.manifest_url);
                 sourceLink(sources, 'Provenance source', record.source_url);
                 $('#historical-map-list button').each(function () {
                     this.setAttribute('aria-pressed', String(this.dataset.mapId === String(record.id)));
                 });
                 // Start at the seeded map's area; tour auto-fit may subsequently show the selected route.
                 if (geographicBounds.isValid()) {
-                    modernMap.fitBounds(geographicBounds, {padding: [40, 40]});
+                    // One initial control has zero-area bounds; keep surrounding streets visible.
+                    modernMap.fitBounds(geographicBounds, {padding: [40, 40], maxZoom: 16});
                 }
             }
 

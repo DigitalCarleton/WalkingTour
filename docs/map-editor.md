@@ -129,7 +129,22 @@ explicitly unavailable. Coordinate edits and calibration undo are performed in t
 editor so they continue to use its transactional calibration and conflict handling. History lists
 recorded changes and undone state; the existing records do not contain timestamps or editor identities.
 
-Choose **Add a historical map** to import an HTTPS IIIF Presentation API 2/3 manifest or
+Choose **Upload image** to add a JPEG or PNG from your computer, with a title and optional
+HTTPS provenance link. No IIIF service is required. Uploaded maps start with no control points,
+use the same dual-map editor, and appear in the public map library. The image is decoded and
+re-encoded, with JPEG EXIF orientation applied when PHP EXIF is available; metadata is stripped.
+The stored pixel dimensions define the fixed coordinate space for all later annotations.
+Identical uploaded files are rejected. Uploading a replacement for an existing map is not supported.
+
+Uploads require PHP GD with JPEG/PNG support and working Omeka file storage. Images are stored
+through Omeka's configured storage adapter (under `files/original/` for the default filesystem
+adapter), independently of Omeka Items. Back up these files along with the Omeka database.
+The application limit is 20 MiB, 25 million pixels, and 20,000 pixels per side. PHP
+`upload_max_filesize`, `post_max_size`, memory limits, and web-server request limits may be lower.
+The first version loads the entire uploaded image as a zoomable original-image layer; it does not
+generate image tiles. Use IIIF import for very large scans that exceed the upload limits.
+
+Choose **Import from IIIF** to import an HTTPS IIIF Presentation API 2/3 manifest or
 Image API 1/2/3 `info.json`. Image services must support level 1 or 2 region requests. Select the
 image's position in the manifest (starting at 1; Presentation 2 uses the first sequence), and
 optionally provide a title. The original IIIF metadata is retained as provenance. Duplicate
@@ -138,13 +153,14 @@ use the map editor to place both endpoints and confirm initial pairs. Three non-
 points are needed for a solvable transform, but that minimum does not establish historical accuracy.
 
 **Edit map information** changes the title and optional provenance URL. The original image service
-and dimensions stay fixed to preserve saved coordinates. Metadata updates use the same map revision
-lock as point edits; a conflict retains the entered values and requires review before another save.
+or uploaded file and dimensions stay fixed to preserve saved coordinates. Metadata updates use
+the same map revision lock as point edits; a conflict retains the entered values and requires
+review before another save.
 
 The server requires PHP cURL and outbound HTTPS access for import. Metadata requests have size,
 timeout, redirect, and public-address limits; images themselves remain at the source provider and
-are loaded by the browser. Private sources, authentication-only image services, and file upload
-are outside this interface. IIIF compatibility follows the official
+are loaded by the browser. Private sources and authentication-only image services
+are outside the IIIF importer. IIIF compatibility follows the official
 [Image API](https://iiif.io/api/image/3.0/) and
 [Presentation API](https://iiif.io/api/presentation/3.0/) structures, including older versions.
 

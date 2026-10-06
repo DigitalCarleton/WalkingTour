@@ -17,7 +17,7 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
         if (!is_admin_theme() || !current_user() || !is_allowed('WalkingTourBuilder_Tours', 'edit')) {
             throw new Omeka_Controller_Exception_403;
         }
-        if (!in_array($this->getRequest()->getActionName(), array('browse', 'show', 'add', 'edit'), true)) { throw new Omeka_Controller_Exception_404; }
+        if (!in_array($this->getRequest()->getActionName(), array('browse', 'show', 'add', 'upload', 'edit'), true)) { throw new Omeka_Controller_Exception_404; }
         $this->getResponse()->setHeader('Cache-Control', 'private, no-store', true);
     }
 
@@ -61,6 +61,11 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
             return false;
         }
         if (!$this->getRequest()->isPost()) { return false; }
+        if (empty($this->getRequest()->getPost()) && (int) $this->getRequest()->getServer('CONTENT_LENGTH') > 0) {
+            $this->getResponse()->setHttpResponseCode(413);
+            $this->view->error = 'The request exceeds the server upload limit. Choose a smaller image and reload the form.';
+            return false;
+        }
         if (!$this->view->csrf->isValid($this->getRequest()->getPost())) {
             $this->getResponse()->setHttpResponseCode(403);
             $this->view->error = 'Your editing session is invalid. Reload this form and sign in again.';
@@ -102,6 +107,17 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
             if (!ctype_digit($values['revision'])) { throw new InvalidArgumentException('The saved map revision is required.'); }
             $this->maps->updateMetadata($map['id'], (int) $values['revision'], $values['title'], $values['source_url']);
             $this->_helper->flashMessenger('Map information saved.', 'success');
+            $this->_redirect(url('historical-maps/show/' . $map['id']), array('prependBase' => false));
+        } catch (Exception $error) { $this->formError($error); }
+    }
+
+    public function uploadAction()
+    {
+        $values = array('title' => $this->text('title'), 'source_url' => $this->text('source_url'));
+        if (!$this->form($values)) { return; }
+        try {
+            $map = (new WalkingTour_HistoricalMapUpload)->save($_FILES['image'] ?? null, $values['title'], $values['source_url'], $this->maps, Zend_Registry::get('storage'));
+            $this->_helper->flashMessenger('Image uploaded. Open the map editor to establish its control-point pairs.', 'success');
             $this->_redirect(url('historical-maps/show/' . $map['id']), array('prependBase' => false));
         } catch (Exception $error) { $this->formError($error); }
     }

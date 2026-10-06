@@ -1,6 +1,7 @@
-<?php echo head(array('title' => 'Add a Historical Map', 'bodyclass' => 'historical-maps add')); ?>
+<?php echo head(array('title' => 'Import a Historical Map from IIIF', 'bodyclass' => 'historical-maps add')); ?>
 <div id="primary">
-    <p><a href="<?php echo html_escape(url('historical-maps')); ?>">Back to Historical Maps</a></p>
+    <p><a href="<?php echo html_escape(url('historical-maps')); ?>">Back to Historical Maps</a> ·
+        <a href="<?php echo html_escape(url('historical-maps/upload')); ?>">Upload an image instead</a></p>
     <?php if ($error): ?><p class="error" role="alert"><?php echo html_escape($error); ?></p><?php endif; ?>
     <form method="post" action="<?php echo html_escape(url('historical-maps/add')); ?>">
         <?php echo $csrf; ?>
@@ -13,7 +14,7 @@
         <div class="field"><div class="two columns alpha"><label for="map-title">Title</label></div>
             <div class="inputs five columns omega"><input id="map-title" name="title" type="text" maxlength="255" value="<?php echo html_escape($values['title']); ?>">
                 <p class="explanation">Leave blank to use the source title. The new map starts without control points.</p></div></div>
-        <input class="submit big green button" type="submit" value="Add historical map">
+        <input class="submit big green button" type="submit" value="Import from IIIF">
     </form>
 </div>
 <?php echo foot(); ?>
