@@ -174,7 +174,9 @@
                             button.addEventListener('click', function () { showMap(record); });
                             list.appendChild(button);
                         });
-                        showMap(response.maps[0]);
+                        var requestedMap = new URLSearchParams(window.location.search).get('map_id');
+                        var selectedMap = response.maps.filter(function (record) { return String(record.id) === requestedMap; })[0];
+                        showMap(selectedMap || response.maps[0]);
                     }).fail(function () {
                         setStatus('Historical maps could not be loaded. Please retry or contact the site administrator.', true);
                     });

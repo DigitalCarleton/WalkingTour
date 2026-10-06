@@ -1,0 +1,24 @@
+<?php echo head(array('title' => 'Historical Maps', 'bodyclass' => 'historical-maps browse')); ?>
+<?php echo flash(); ?>
+<div id="primary">
+    <p>Manage historical maps and open their paired image and geographic map.</p>
+    <?php if (!$maps): ?>
+        <p>No historical maps are available yet.</p>
+    <?php else: ?>
+    <table class="simple">
+        <thead><tr><th scope="col">Title</th><th scope="col">Control points</th><th scope="col">Annotations</th><th scope="col">Calibration revision</th><th scope="col">Actions</th></tr></thead>
+        <tbody>
+        <?php foreach ($maps as $map): ?>
+            <tr>
+                <td><a href="<?php echo html_escape(url('historical-maps/show/' . $map['id'])); ?>"><?php echo html_escape($map['title']); ?></a></td>
+                <td><?php echo count($map['control_points']); ?></td>
+                <td><?php echo count($map['annotations']); ?></td>
+                <td><?php echo $map['calibration_revision']; ?></td>
+                <td><a href="<?php echo html_escape(public_url('walking-tour') . '?map_id=' . $map['id']); ?>">Open map editor</a></td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php endif; ?>
+</div>
+<?php echo foot(); ?>

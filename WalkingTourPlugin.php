@@ -259,6 +259,12 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
             'action' => 'browse',
             'controller' => 'tours'
         );
+        if (current_user() && is_allowed('WalkingTourBuilder_Tours', 'edit')) {
+            $nav['Historical Maps'] = array(
+                'label' => 'Historical Maps',
+                'uri' => url('historical-maps')
+            );
+        }
         return $nav;
     }
 

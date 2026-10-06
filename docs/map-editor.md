@@ -115,6 +115,17 @@ self-hosted or managed Photon-compatible service via **Place search endpoint** i
 Its URL must allow browser requests from the site's origin (CORS); use HTTPS on HTTPS sites.
 Original image tiles still depend on the BnF IIIF service.
 
+## Omeka administration
+
+Signed-in users with the existing WalkingTour editing permission can open **Historical Maps**
+in the Omeka admin navigation. The list shows each map's control-point and annotation counts
+and calibration revision. Select a map title to inspect its source metadata, or choose
+**Open map editor** to open that specific map in the public dual-map editor.
+
+The admin catalog is not exposed to public visitors. These records use WalkingTour's dedicated
+tables in the existing Omeka database; they do not appear as Omeka Items. This admin interface
+does not require an additional storage migration after Stages 3–4 have been initialized.
+
 ## Data interfaces
 
 All paths are relative to the Omeka site root:
