@@ -16,7 +16,7 @@
                 <td><?php echo count($map['control_points']); ?></td>
                 <td><?php echo count($map['annotations']); ?></td>
                 <td><?php echo $map['calibration_revision']; ?></td>
-                <td><a href="<?php echo html_escape(public_url('walking-tour') . '?map_id=' . $map['id']); ?>">Open map editor</a></td>
+                <td><a href="<?php echo html_escape(public_url('historical-maps') . '?map_id=' . $map['id']); ?>">Open map editor</a></td>
             </tr>
         <?php endforeach; ?>
         </tbody>

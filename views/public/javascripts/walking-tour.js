@@ -3,9 +3,12 @@ $(document).ready(function () {
 });
 
 function walkingTourJs() {
-    var apiBase = document.getElementById('dual-map').dataset.apiBase.replace(/\/?$/, '/');
+    var root = document.getElementById('walking-tour');
+    if (!root) { return; }
+    var apiBase = root.dataset.apiBase.replace(/\/?$/, '/');
+    var transformer;
+    var imageZoom;
 
-    var MAP_URL_TEMPLATE = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
 
     var MAP_CENTER;
     var MAP_ZOOM;  // MAP_ZOOM controls the default zoom of the map
@@ -82,6 +85,7 @@ function walkingTourJs() {
     $('#tour-confirm-button').click(function (e) {
         e.preventDefault();
         var filterButton = $('#filter-button');
+        if (!map || !markerData) { return; }
         var tourSelected = []
         var tourTypeCheck = $('input[name=place-type]:checked')
         var curTourSelected;
@@ -237,17 +241,28 @@ function walkingTourJs() {
      * Query backend
      */
 
-    // DOM-ready initialization also works when the window load event has already fired.
-    jqXhr = $.post(apiBase + 'map-config', function (response) {
-        mapSetUp(response);
-        WalkingTourHistoricalMaps.start(map);
-        // Keep legacy tour loading available, but show only historical-map control points.
-        // doQuery();
-        // Keep the legacy locations snapshot available, but hide it for this release.
-        // loadOmekaLocationsGeojson();
-    }).fail(function () {
-        $('#modern-map-status').text('Map settings could not be loaded. Please reload the page.');
-        $('#historical-map-status').text('Maps could not start. Please reload the page.');
+    // Restore the original Walking Tour source independently of the editable map catalog.
+    $('#map').css('height', Math.max(360, $(window).height() - 54));
+    Promise.all([
+        import('https://unpkg.com/@allmaps/annotation@1.0.0-beta.38/dist/index.js?module'),
+        import('https://unpkg.com/@allmaps/transform@1.0.0-beta.53/dist/index.js?module'),
+        fetch(root.dataset.annotationUrl).then(function (response) {
+            if (!response.ok) { throw new Error('The walking tour map source could not load.'); }
+            return response.json();
+        }),
+        $.post(apiBase + 'map-config')
+    ]).then(function (results) {
+        var record = results[0].parseAnnotation(results[2])[0];
+        var Transform = results[1].GcpTransformer;
+        transformer = Transform.fromGeoreferencedMap ? Transform.fromGeoreferencedMap(record) :
+            new Transform(record.gcps, record.transformation && record.transformation.type);
+        imageZoom = record.resource.height / $('#map').height();
+        mapSetUp(record, results[3]);
+        doQuery();
+        loadOmekaLocationsGeojson();
+    }).catch(function (error) {
+        $('#walking-tour-status').text('The walking tour map could not load. Please reload the page.');
+        console.error('Walking Tour:', error);
     });
 
     // Retain previous form state, if needed.
@@ -262,98 +277,49 @@ function walkingTourJs() {
      *
      * Call only once during set up
      */
-    function mapSetUp(response) {
-        EXHIBIT_BUTTON_TEXT = response.walking_tour_exhibit_button || 'See Exhibit';
-        DETAIL_BUTTON_TEXT = response.walking_tour_detail_button || 'Full Details';
-        MAP_ZOOM = Number(response.walking_tour_default_zoom) || 13;
-        MAP_MAX_ZOOM = Number(response.walking_tour_max_zoom) || 19;
-        MAP_MIN_ZOOM = Number(response.walking_tour_min_zoom) || 2;
-        if (MAP_MAX_ZOOM < MAP_ZOOM) { MAP_MAX_ZOOM = 19; }
-        if (MAP_MIN_ZOOM > MAP_ZOOM) { MAP_MIN_ZOOM = 2; }
-        MAP_CENTER = parse1DArrayPoint(response.walking_tour_center || '41.895, 12.48');
-        if (MAP_CENTER.length !== 2 || !MAP_CENTER.every(Number.isFinite)) { MAP_CENTER = [41.895, 12.48]; }
-        var minZoom = MAP_MIN_ZOOM;
-        map = L.map('map', {
-            center: MAP_CENTER,
-            minZoom: MAP_MIN_ZOOM,
-            maxZoom: MAP_MAX_ZOOM,
-            zoom: minZoom,
-            zoomControl: false
-        });
-        LOCATE_BOUNDS = map.getBounds();
-        map.setZoom(MAP_ZOOM);
+    function geographicToImageLatLng(coordinates) {
+        var point = transformer.transformToResource ? transformer.transformToResource(coordinates) :
+            transformer.transformBackward(coordinates);
+        return L.latLng(-point[1] / imageZoom, point[0] / imageZoom);
+    }
 
-        map.addLayer(L.tileLayer(MAP_URL_TEMPLATE));
-        map.addControl(L.control.zoom({ position: 'topleft' }));
-        var extentControl = L.Control.extend({
-            options: {
-                position: 'topleft'
-            },
-            onAdd: function (map) {
-                var container = L.DomUtil.create('div', 'extentControl');
-                $(container).attr('id', 'extent-control');
-                $(container).css('width', '26px').css('height', '26px').css('outline', '1px black');
-                $(container).addClass('extentControl-disabled')
-                $(container).addClass('leaflet-bar')
-                $(container).on('click', function () {
-                    mapLocateCenter(map);
-                });
-                return container;
-            }
-        })
-        map.addControl(new extentControl());
-        map.attributionControl.setPrefix('Tiles &copy; Esri');
-
-        map.on('zoomend', function () {
-            if (map.getZoom() == minZoom) {
-                $('#extent-control').addClass('extentControl-disabled')
-            } else {
-                $('#extent-control').removeClass('extentControl-disabled')
-            }
-        })
-
-        // Handle location found.
-        map.on('locationfound', function (e) {
-            if (!locationMarker) {
-                $("#locate-button").toggleClass('loading');
-            }
-            // User within location bounds. Set the location marker.
-            if (L.latLngBounds(LOCATE_BOUNDS).contains(e.latlng)) {
-                if (locationMarker) {
-                    // Remove the existing location marker before adding to map.
-                    map.removeLayer(locationMarker);
-                } else {
-                    // Pan to location only on first locate.
-                    map.panTo(e.latlng);
-                }
-                locationMarker = L.marker(e.latlng, {
-                    icon: L.icon({
-                        iconUrl: 'plugins/WalkingTour/views/public/images/location.png',
-                        iconSize: [25, 25]
-                    })
-                });
-                locationMarker.addTo(map).bindPopup("You are within " + e.accuracy / 2 + " meters from this point");
-                // User outside location bounds.
-            } else {
-                var locateMeters = e.latlng.distanceTo(map.options.center);
-                var locateMiles = Math.ceil((locateMeters * 0.000621371) * 100) / 100;
-                alert('Cannot locate your location. You are ' + locateMiles + ' miles from the map bounds.');
+    function mapSetUp(record, config) {
+        EXHIBIT_BUTTON_TEXT = config.walking_tour_exhibit_button || 'See Exhibit';
+        DETAIL_BUTTON_TEXT = config.walking_tour_detail_button || 'Full Details';
+        MAP_MIN_ZOOM = -3;
+        MAP_MAX_ZOOM = 4;
+        var bounds = L.latLngBounds([-record.resource.height / imageZoom, 0], [0, record.resource.width / imageZoom]);
+        MAP_CENTER = bounds.getCenter();
+        map = L.map('map', {crs: L.CRS.Simple, minZoom: MAP_MIN_ZOOM, maxZoom: MAP_MAX_ZOOM, maxBounds: bounds.pad(.2)});
+        map.fitBounds(bounds);
+        MAP_ZOOM = map.getZoom();
+        LOCATE_BOUNDS = bounds;
+        var sourceWidth = Math.min(record.resource.width, Math.ceil($('#map').width() * 2));
+        historicMapLayer = L.imageOverlay(record.resource.id + '/full/' + sourceWidth + ',/0/default.jpg', bounds)
+            .on('error', function () { $('#walking-tour-status').text('The original tour image could not load. Please reload the page.'); })
+            .addTo(map);
+        map.on('locationfound', function (event) {
+            $('#locate-button').removeClass('loading');
+            var position = geographicToImageLatLng([event.latlng.lng, event.latlng.lat]);
+            if (!LOCATE_BOUNDS.contains(position)) {
+                $('#walking-tour-status').text('Your location is outside this historical map.');
                 map.stopLocate();
+                return;
             }
+            if (locationMarker) { map.removeLayer(locationMarker); }
+            locationMarker = L.circleMarker(position, {radius: 7, color: '#247eae', fillOpacity: 1}).addTo(map);
+            map.panTo(position);
         });
-
-        // Handle location error.
         map.on('locationerror', function () {
-            $("#locate-button").toggleClass('loading');
+            $('#locate-button').removeClass('loading');
             map.stopLocate();
-            alert('Location Error, Please try again.');
-            console.log('location error')
+            $('#walking-tour-status').text('Your location could not be determined. You can still explore the tour.');
         });
     }
 
     function loadOmekaLocationsGeojson() {
         $('#omeka-locations-status').prop('hidden', false);
-        var source = document.getElementById('dual-map').dataset.locationsUrl;
+        var source = root.dataset.locationsUrl;
         $.ajax({url: source, dataType: 'json', timeout: 15000}).done(function (geojson) {
             var features = (geojson.features || []).filter(function (feature) {
                 var coordinates = feature.geometry && feature.geometry.coordinates;
@@ -363,6 +329,7 @@ function walkingTourJs() {
                     Math.abs(coordinates[1]) <= 90;
             });
             L.geoJson(features, {
+                coordsToLatLng: geographicToImageLatLng,
                 pointToLayer: function (feature, latlng) {
                     var properties = feature.properties || {};
                     var content = document.createElement('div');
@@ -421,6 +388,7 @@ function walkingTourJs() {
                     tourToItem[tourId] = itemIDList;
                     markerList = []
                     var geoJsonLayer = L.geoJson(response.features, {
+                        coordsToLatLng: geographicToImageLatLng,
                         // adds the correct number to each marker based on order of tour
                         pointToLayer: function (feature, latlng) {
                             var numberIcon = L.divIcon({
@@ -438,7 +406,7 @@ function walkingTourJs() {
                                 // center click location
                                 map.flyTo(e.latlng,MAP_MAX_ZOOM);
                                 // Close the filtering
-                                var filterButton = $('filter-button');
+                                var filterButton = $('#filter-button');
                                 filterButton.removeClass('on').
                                     find('.screen-reader-text').
                                     html('Filters');
@@ -468,9 +436,10 @@ function walkingTourJs() {
             Promise.all(requests).then(() => {
                 createCustomCSS();
                 doFilters();
+                $('#walking-tour-status').text('');
             });
         }).fail(function () {
-            $('#modern-map-status').text('Walking tours could not be loaded. The maps remain available.');
+            $('#walking-tour-status').text('Walking tours could not be loaded. The map remains available.');
         });
     }
 
@@ -631,7 +600,7 @@ function walkingTourJs() {
     function populatePopup(itemIDList, value, response, numPopup, tour_id) {
         var numPopup = itemIDList.findIndex((ele) => ele == response.id);
         var coor = value.Data.features[numPopup].geometry.coordinates;
-        map.flyTo([coor[1], coor[0]], MAP_MAX_ZOOM);
+        map.flyTo(geographicToImageLatLng(coor), MAP_MAX_ZOOM);
 
         $('.next-button').unbind("click");
         $('.prev-button').unbind("click");

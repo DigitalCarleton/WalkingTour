@@ -47,38 +47,55 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
      */
     public function indexAction()
     {
+        // Preserve bookmarks created while the historical editor lived here.
+        $mapId = $this->getRequest()->getQuery('map_id');
+        if (is_string($mapId) && ctype_digit($mapId) && (int) $mapId > 0) {
+            $parameters = array('map_id' => $mapId);
+            $pointType = $this->getRequest()->getQuery('point_type');
+            $pointId = $this->getRequest()->getQuery('point_id');
+            if (in_array($pointType, array('control', 'annotation'), true) &&
+                is_string($pointId) && ctype_digit($pointId) && (int) $pointId > 0) {
+                $parameters['point_type'] = $pointType;
+                $parameters['point_id'] = $pointId;
+            }
+            $this->_redirect(public_url('historical-maps') . '?' . http_build_query($parameters), array('prependBase' => false));
+            return;
+        }
         $_tourTypes = $this->publicTours();
         $this->view->tour_types = $_tourTypes;
 
-        // Refresh viewer assets after deployment without requiring a database upgrade.
-        $assetVersion = get_plugin_ini('WalkingTour', 'version') . '-' .
-            max(array_map('filemtime', array(
-                WALKINGTOUR_PLUGIN_DIR . '/views/public/javascripts/walking-tour.js',
-                WALKINGTOUR_PLUGIN_DIR . '/views/public/javascripts/historical-maps.js',
-                WALKINGTOUR_PLUGIN_DIR . '/views/public/javascripts/historical-map-editor.js',
-                WALKINGTOUR_PLUGIN_DIR . '/views/public/javascripts/map-place-search.js',
-                WALKINGTOUR_PLUGIN_DIR . '/views/public/css/historical-maps.css'
-            )));
+        $this->viewerAssets(array('walking-tour'), array('walking-tour'));
+    }
 
-        // Set the JS and CSS files.
+    /** Public Historical Maps viewer; the similarly named action below is the JSON catalog. */
+    public function mapViewerAction()
+    {
+        $this->viewerAssets(
+            array('map-place-search', 'historical-map-editor', 'historical-maps', 'historical-map-page'),
+            array('walking-tour', 'historical-maps')
+        );
+    }
+
+    private function viewerAssets($scripts, $styles)
+    {
+        $files = array();
+        foreach ($scripts as $script) { $files[] = WALKINGTOUR_PLUGIN_DIR . '/views/public/javascripts/' . $script . '.js'; }
+        foreach ($styles as $style) { $files[] = WALKINGTOUR_PLUGIN_DIR . '/views/public/css/' . $style . '.css'; }
+        $assetVersion = get_plugin_ini('WalkingTour', 'version') . '-' . max(array_map('filemtime', $files));
         $this->view->headScript()
             ->appendFile('//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js')
-            ->appendFile('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js')
-            ->appendFile(src('jquery.cookie', 'javascripts', 'js'))
-            ->appendFile(src('leaflet/leaflet', 'javascripts', 'js'))
-            ->appendFile(src('modernizr.custom.63332', 'javascripts', 'js'))
-            ->appendFile(src('Polyline.encoded', 'javascripts', 'js'))
-            ->appendFile(src('map-place-search', 'javascripts', 'js', $assetVersion))
-            ->appendFile(src('historical-map-editor', 'javascripts', 'js', $assetVersion))
-            ->appendFile(src('historical-maps', 'javascripts', 'js', $assetVersion))
-            ->appendFile(src('walking-tour', 'javascripts', 'js', $assetVersion));
-        $this->view->headLink()
-            ->appendStylesheet('//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css', 'all')
-            // ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.css', 'all')
-            // ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.ie.css', 'all', 'lte IE 8')
-            ->appendStylesheet(src('walking-tour', 'css', 'css'))
-            ->appendStylesheet(src('leaflet/leaflet', 'javascripts', 'css'))
-            ->appendStylesheet(src('historical-maps', 'css', 'css', $assetVersion));
+            ->appendFile(src('leaflet/leaflet', 'javascripts', 'js'));
+        if (in_array('walking-tour', $scripts, true)) {
+            $this->view->headScript()
+                ->appendFile('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js')
+                ->appendFile(src('jquery.cookie', 'javascripts', 'js'))
+                ->appendFile(src('modernizr.custom.63332', 'javascripts', 'js'))
+                ->appendFile(src('Polyline.encoded', 'javascripts', 'js'));
+            $this->view->headLink()->appendStylesheet('//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css', 'all');
+        }
+        foreach ($scripts as $script) { $this->view->headScript()->appendFile(src($script, 'javascripts', 'js', $assetVersion)); }
+        $this->view->headLink()->appendStylesheet(src('leaflet/leaflet', 'javascripts', 'css'));
+        foreach ($styles as $style) { $this->view->headLink()->appendStylesheet(src($style, 'css', 'css', $assetVersion)); }
     }
 
     public function historicalMapsAction()

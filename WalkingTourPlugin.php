@@ -172,6 +172,13 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
         if ($admin) {
             return;
         } else {
+            // Run after every plugin has registered routes so the old placeholder
+            // page cannot replace the Historical Maps viewer, regardless of load order.
+            require_once WALKINGTOUR_PLUGIN_DIR . '/controllers/plugins/PublicRoutes.php';
+            $front = Zend_Controller_Front::getInstance();
+            if (!$front->hasPlugin('WalkingTour_Controller_Plugin_PublicRoutes')) {
+                $front->registerPlugin(new WalkingTour_Controller_Plugin_PublicRoutes);
+            }
             $args['router']->addRoute(
                 'walking_tour',
                 new Zend_Controller_Router_Route(

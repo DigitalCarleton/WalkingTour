@@ -123,9 +123,15 @@ and calibration revision. Select a map title to inspect its source metadata, or 
 **Open map editor** to open that specific map in the public dual-map editor.
 
 The catalog routes are registered only in the admin theme (`admin/historical-maps`).
-An existing public Simple Pages page with the `historical-maps` slug keeps its own route;
-the dual-map viewer remains at `walking-tour`. Updating this routing behavior requires
-only the plugin code update, not database initialization or a plugin reinstall.
+The public dual-map viewer is at `historical-maps`, replacing that address's former
+Simple Pages placeholder without deleting its stored page. The `walking-tour` page
+again displays the original Digital Commonwealth tour image, tour filters, numbered
+stops, detail panels, and the retained Omeka locations snapshot. Each page loads its
+own viewer scripts. Older editor bookmarks with `walking-tour?map_id=...` redirect
+to Historical Maps and retain valid point links. Existing map API paths remain
+compatible. No map, annotation, calibration, upload, or tour data is migrated.
+Deploying this change requires only the plugin code update, not database initialization
+or a plugin reinstall.
 
 Map detail pages also list confirmed control coordinates, ordinary annotation coordinates and
 prediction status, and paginated calibration history (50 changes per page). **Locate on maps**
