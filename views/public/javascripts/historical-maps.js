@@ -20,7 +20,7 @@
                 var width = Math.min(span, this.options.imageWidth - x);
                 var height = Math.min(span, this.options.imageHeight - y);
                 return this._url + '/' + [x, y, width, height].join(',') + '/' +
-                    Math.ceil(width / scale) + ',' + Math.ceil(height / scale) + '/0/default.jpg';
+                    Math.ceil(width / scale) + ',/0/' + (this.options.imageQuality === 'native' ? 'native' : 'default') + '.jpg';
             },
             _initTile: function (tile) {
                 L.TileLayer.prototype._initTile.call(this, tile);
@@ -114,15 +114,24 @@
                 if (imageLayer) { historicalMap.removeLayer(imageLayer); }
                 imageBounds = L.latLngBounds(imageLatLng(0, record.image_height), imageLatLng(record.image_width, 0));
                 geographicBounds = L.latLngBounds();
+                var size = historicalMap.getSize();
+                var minimumZoom = Math.min(-7, Math.floor(Math.log(Math.max(1, Math.min(size.x, size.y) - 40) /
+                    Math.max(record.image_width, record.image_height)) / Math.LN2) - 1);
+                historicalMap.setMinZoom(minimumZoom);
                 historicalMap.setMaxBounds(imageBounds.pad(.2));
                 historicalMap.fitBounds(imageBounds, {padding: [20, 20]});
                 setStatus('Loading the original historical image…', false);
                 var failedTiles = new Set();
+                var attribution = document.createElement('a');
+                attribution.textContent = record.title;
+                attribution.href = /^https?:\/\//i.test(record.source_url) ? record.source_url : record.manifest_url;
+                attribution.target = '_blank'; attribution.rel = 'noopener noreferrer';
                 imageLayer = new OriginalImageTiles(record.image_service, {
                     imageWidth: record.image_width, imageHeight: record.image_height,
-                    tileSize: 256, minZoom: -7, maxZoom: 1, maxNativeZoom: 0,
+                    imageQuality: record.image_quality,
+                    tileSize: 256, minZoom: minimumZoom, maxZoom: 1, maxNativeZoom: 0,
                     bounds: imageBounds, noWrap: true,
-                    attribution: 'Image: <a href="https://gallica.bnf.fr/">Bibliothèque nationale de France</a>'
+                    attribution: 'Image: ' + attribution.outerHTML
                 });
                 imageLayer.on('tileerror', function (event) {
                     if (generation !== loadGeneration) { return; }
@@ -145,7 +154,7 @@
                 var sources = document.getElementById('historical-map-sources');
                 sources.textContent = '';
                 sourceLink(sources, 'Image source (IIIF)', record.manifest_url);
-                sourceLink(sources, 'Imported calibration source', record.source_url);
+                sourceLink(sources, 'Provenance source', record.source_url);
                 $('#historical-map-list button').each(function () {
                     this.setAttribute('aria-pressed', String(this.dataset.mapId === String(record.id)));
                 });

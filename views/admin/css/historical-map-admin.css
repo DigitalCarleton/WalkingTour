@@ -1,0 +1,8 @@
+/* Keep long source URLs and coordinate tables within the host admin layout. */
+.historical-maps #primary { box-sizing: border-box; width: 100%; }
+.historical-maps #primary dd { margin-bottom: 16px; overflow-wrap: anywhere; }
+.historical-maps .map-data-table { max-width: 100%; overflow-x: auto; margin-bottom: 24px; }
+.historical-maps .map-data-table table { min-width: 650px; }
+.historical-maps .map-data-table td { overflow-wrap: anywhere; }
+.historical-maps .map-data-table:focus-visible { outline: 2px solid #2469a1; }
+.historical-maps input[type="url"], .historical-maps input[type="text"] { box-sizing: border-box; max-width: 100%; width: 100%; }

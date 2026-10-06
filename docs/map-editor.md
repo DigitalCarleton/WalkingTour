@@ -122,6 +122,25 @@ in the Omeka admin navigation. The list shows each map's control-point and annot
 and calibration revision. Select a map title to inspect its source metadata, or choose
 **Open map editor** to open that specific map in the public dual-map editor.
 
+Choose **Add a historical map** to import an HTTPS IIIF Presentation API 2/3 manifest or
+Image API 1/2/3 `info.json`. Image services must support level 1 or 2 region requests. Select the
+image's position in the manifest (starting at 1; Presentation 2 uses the first sequence), and
+optionally provide a title. The original IIIF metadata is retained as provenance. Duplicate
+images are rejected. New maps start with no control points and no predicted geographic footprint;
+use the map editor to place both endpoints and confirm initial pairs. Three non-collinear image
+points are needed for a solvable transform, but that minimum does not establish historical accuracy.
+
+**Edit map information** changes the title and optional provenance URL. The original image service
+and dimensions stay fixed to preserve saved coordinates. Metadata updates use the same map revision
+lock as point edits; a conflict retains the entered values and requires review before another save.
+
+The server requires PHP cURL and outbound HTTPS access for import. Metadata requests have size,
+timeout, redirect, and public-address limits; images themselves remain at the source provider and
+are loaded by the browser. Private sources, authentication-only image services, and file upload
+are outside this interface. IIIF compatibility follows the official
+[Image API](https://iiif.io/api/image/3.0/) and
+[Presentation API](https://iiif.io/api/presentation/3.0/) structures, including older versions.
+
 The admin catalog is not exposed to public visitors. These records use WalkingTour's dedicated
 tables in the existing Omeka database; they do not appear as Omeka Items. This admin interface
 does not require an additional storage migration after Stages 3–4 have been initialized.
