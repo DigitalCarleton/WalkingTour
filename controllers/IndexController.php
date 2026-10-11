@@ -71,8 +71,8 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
     public function mapViewerAction()
     {
         $this->viewerAssets(
-            array('allmaps-transform', 'map-place-search', 'historical-map-places', 'historical-maps', 'historical-map-page'),
-            array('walking-tour', 'historical-maps')
+            array('allmaps-transform', 'historical-map-cluster', 'map-place-search', 'historical-map-places', 'historical-maps', 'historical-map-page'),
+            array('walking-tour', 'historical-map-cluster', 'historical-maps')
         );
     }
 

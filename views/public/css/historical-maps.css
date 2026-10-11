@@ -69,3 +69,5 @@
 #historical-place-details { margin: 16px 0; padding: 12px; background: #edf4f5; }
 #historical-place-details p, #historical-place-details a, #historical-place-details button { margin-top: 10px !important; }
 #historical-place-select { width: 100%; margin: 8px 0; min-height: 44px; }
+
+#dual-map .historical-place-cluster {background: #29677c; border: 3px solid #fff; border-radius: 50%; color: #fff; text-align: center; line-height: 32px; font-weight: bold; box-shadow: 0 1px 4px #333;}

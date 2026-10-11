@@ -130,3 +130,14 @@ Rebuild bundled assets only during development: run `npm ci` then `npm run build
 PHP hosts need neither npm nor a Node service. Dependency notices are included in that folder.
 The dedicated `GET walking-tour/index/historical-map-places?after=<Item ID>` interface
 returns public Item positions and plain-text excerpts with no shared response cache.
+
+### Clustered place browsing
+
+Historical Maps uses the existing Leaflet 1.6 instance and locally bundled
+Leaflet.markercluster 1.5.3 (rebuilt by the same asset command). Each pane clusters
+its own positions, including negative image Y values and negative image zooms.
+Click a cluster to expand or spiderfy coincident places. The Find a place selector
+and Locate on both maps button reveal a selected Item inside either cluster.
+Thirty-place batches yield between conversion passes; old groups are detached
+when the map changes, so obsolete asynchronous work cannot repaint the viewer.
+Original Walking Tour assets and layers remain separate.
