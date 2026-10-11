@@ -52,24 +52,15 @@
                 geographicBounds = L.latLngBounds();
                 if (historicalMask) { historicalMap.removeLayer(historicalMask); historicalMask = null; }
                 if (modernMask) { modernMap.removeLayer(modernMask); modernMask = null; }
-                var imageRing, geographicRing;
-                if (record.source_kind === 'allmaps') {
-                    imageRing = record.georeference.resourceMask;
-                    try {
-                        geographicRing = window.WalkingTourAllmaps.create(record).footprint();
-                    } catch (e) { /* Legacy/invalid calibration has no geographic footprint. */ }
-                } else if (record.display_mask) {
-                    // Existing stored pairs are display geometry, never a fallback
-                    // estimator or a request to recalculate the retired calibration.
-                    imageRing = record.display_mask.image_ring;
-                    geographicRing = record.display_mask.geographic_ring;
-                }
+                var imageRing = record.georeference.resourceMask, geographicRing;
+                try { geographicRing = window.WalkingTourAllmaps.create(record).footprint(); }
+                catch (e) { /* Invalid imported calibration has no geographic footprint. */ }
                 function validRing(ring) {
                     return Array.isArray(ring) && ring.length >= 3 && ring.length <= 8193 && ring.every(function (p) {
                         return Array.isArray(p) && p.length === 2 && p.every(Number.isFinite);
                     });
                 }
-                var boundaryClass = 'map-mask-boundary' + (record.source_kind === 'allmaps' ? ' allmaps-mask-boundary' : '');
+                var boundaryClass = 'map-mask-boundary allmaps-mask-boundary';
                 if (validRing(imageRing)) {
                     historicalMask = L.polygon(imageRing.map(function (p) { return imageLatLng(p[0],p[1]); }),
                         {color: '#f549b2', weight: 3, fill: false, interactive: false, className: boundaryClass}).addTo(historicalMap);
@@ -146,27 +137,24 @@
                 var failedTiles = new Set();
                 var attribution = document.createElement('a');
                 attribution.textContent = record.title;
-                attribution.href = /^https?:\/\//i.test(record.source_url) ? record.source_url : (record.image_url || record.manifest_url);
+                attribution.href = record.source_url;
                 attribution.target = '_blank'; attribution.rel = 'noopener noreferrer';
-                var uploaded = record.source_kind === 'upload';
-                imageLayer = uploaded ? L.imageOverlay(record.image_url, imageBounds, {attribution: 'Image: ' + attribution.outerHTML}) : new OriginalImageTiles(record.image_service, {
+                imageLayer = new OriginalImageTiles(record.image_service, {
                     imageWidth: record.image_width, imageHeight: record.image_height,
                     imageQuality: record.image_quality,
                     tileSize: 256, minZoom: minimumZoom, maxZoom: 1, maxNativeZoom: 0,
                     bounds: imageBounds, noWrap: true,
                     attribution: 'Image: ' + attribution.outerHTML
                 });
-                imageLayer.on(uploaded ? 'error' : 'tileerror', function (event) {
+                imageLayer.on('tileerror', function (event) {
                     if (generation !== loadGeneration) { return; }
                     failedTiles.add(event.tile);
-                    setStatus(uploaded ? 'The uploaded image could not load. Please retry or contact the site administrator.' :
-                        'Some historical image tiles could not load. The modern map remains available.', true);
+                    setStatus('Some historical image tiles could not load. The modern map remains available.', true);
                 });
                 imageLayer.on('tileload tileunload', function (event) { failedTiles.delete(event.tile); });
                 imageLayer.on('load', function () {
                     if (generation !== loadGeneration || failedTiles.size) { return; }
-                    setStatus(record.source_kind === 'allmaps' ? 'Original image · Calibrated in Allmaps · Pink outline: map coverage' :
-                        (historicalMask ? 'Original image · Saved mask outline · Allmaps migration pending' : 'Original historical image'), false);
+                    setStatus('Original image · Calibrated in Allmaps · Pink outline: map coverage', false);
                 });
                 imageLayer.addTo(historicalMap);
 
@@ -176,8 +164,8 @@
                 document.getElementById('historical-map-heading').title = record.title;
                 var sources = document.getElementById('historical-map-sources');
                 sources.textContent = '';
-                sourceLink(sources, uploaded ? 'Uploaded image' : 'Image source (IIIF)', uploaded ? record.image_url : (record.manifest_url || record.image_service + '/info.json'));
-                sourceLink(sources, record.source_kind === 'allmaps' ? 'Allmaps annotation' : 'Provenance source', record.source_url);
+                sourceLink(sources, 'Image source (IIIF)', record.manifest_url || record.image_service + '/info.json');
+                sourceLink(sources, 'Allmaps annotation', record.source_url);
                 $('#historical-map-list button').each(function () {
                     this.setAttribute('aria-pressed', String(this.dataset.mapId === String(record.id)));
                 });
@@ -193,7 +181,7 @@
                         var list = document.getElementById('historical-map-list');
                         list.textContent = '';
                         if (!response.maps || !response.maps.length) {
-                            setStatus('No historical maps are available yet.', false);
+                            setStatus('No imported historical maps are available yet. Ask a map editor to import from Allmaps or migrate the existing records.', false);
                             return;
                         }
                         response.maps.forEach(function (record) {
@@ -213,6 +201,10 @@
                         });
                         var requestedMap = new URLSearchParams(window.location.search).get('map_id');
                         var selectedMap = response.maps.filter(function (record) { return String(record.id) === requestedMap; })[0];
+                        if (requestedMap && !selectedMap) {
+                            setStatus('This map is unavailable or pending Allmaps migration. Choose an imported map from the library.', false);
+                            return;
+                        }
                         showMap(selectedMap || response.maps[0]);
                     }).fail(function () {
                         setStatus('Historical maps could not be loaded. Please retry or contact the site administrator.', true);

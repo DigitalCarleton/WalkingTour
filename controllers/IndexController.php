@@ -51,13 +51,6 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $mapId = $this->getRequest()->getQuery('map_id');
         if (is_string($mapId) && ctype_digit($mapId) && (int) $mapId > 0) {
             $parameters = array('map_id' => $mapId);
-            $pointType = $this->getRequest()->getQuery('point_type');
-            $pointId = $this->getRequest()->getQuery('point_id');
-            if (in_array($pointType, array('control', 'annotation'), true) &&
-                is_string($pointId) && ctype_digit($pointId) && (int) $pointId > 0) {
-                $parameters['point_type'] = $pointType;
-                $parameters['point_id'] = $pointId;
-            }
             $this->_redirect(public_url('historical-maps') . '?' . http_build_query($parameters), array('prependBase' => false));
             return;
         }

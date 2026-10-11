@@ -166,7 +166,20 @@ class WalkingTour_HistoricalMapMigration
         return $review;
     }
 
+    public function withLock($callback)
+    {
+        $name = 'wt-migration-' . substr(hash('sha256', $this->db->prefix), 0, 48);
+        if ((int) $this->db->fetchOne('SELECT GET_LOCK(?, 0)', array($name)) !== 1) { throw new RuntimeException('Another map migration or cleanup is running. Retry after it finishes.'); }
+        try { return $callback(); }
+        finally { $this->db->fetchOne('SELECT RELEASE_LOCK(?)', array($name)); }
+    }
+
     public function apply($backup, $review, $hash)
+    {
+        return $this->withLock(function () use ($backup, $review, $hash) { return $this->applyReviewed($backup, $review, $hash); });
+    }
+
+    private function applyReviewed($backup, $review, $hash)
     {
         if (!is_string($hash) || !hash_equals(self::hash($review), $hash) || ($review['format'] ?? null) !== 1 || ($review['backup_hash'] ?? '') !== self::hash($backup)) { throw new InvalidArgumentException('Review the exact preview hash and its recovery export before applying.'); }
         // Recheck provider availability before any database mutation. Same saved annotation is used.
@@ -208,5 +221,59 @@ class WalkingTour_HistoricalMapMigration
             $adapter->commit();
         } catch (Exception $error) { $adapter->rollBack(); throw $error; }
         return $result;
+    }
+
+    /** Exact cleanup preview, including protected orphan rows; never invoked by install/upgrade. */
+    public function contractionPreview($backup, $recoveries = array())
+    {
+        foreach (array('models/HistoricalMapTransform.php', 'views/public/javascripts/historical-map-editor.js',
+            'views/public/data/omeka-locations.geojson') as $path) {
+            if (is_file(dirname(__DIR__) . '/' . $path)) { throw new RuntimeException('Deploy the complete new runtime before cleanup: old consumer ' . $path . ' remains.'); }
+        }
+        $this->legacyUnchanged($backup);
+        $protectedHashes = array_merge(array(self::hash($backup)),array_map(array(__CLASS__,'hash'),$recoveries));
+        $protectedHashes = array_values(array_unique($protectedHashes)); sort($protectedHashes);
+        $current = $this->rows('walking_tour_maps');
+        foreach ($current as $map) {
+            $snapshot = json_decode($map['source_snapshot'], true);
+            $receipt = json_decode($map['migration_receipt'] ?? 'null', true);
+            if (($snapshot['source_kind'] ?? '') !== 'allmaps' && ($receipt['state'] ?? '') !== 'archived') { throw new RuntimeException('Map ' . $map['id'] . ' is unresolved. Migrate or explicitly archive it before cleanup.'); }
+            $hasChildren = false;
+            foreach (self::LEGACY as $table) { if ($this->children($backup,$table,$map['id'])) { $hasChildren = true; } }
+            if ($hasChildren && !in_array($receipt['state'] ?? '',array('migrated','archived'),true)) { throw new RuntimeException('Map ' . $map['id'] . ' has legacy data without a reviewed completion receipt.'); }
+            if ($receipt && !in_array($receipt['backup_hash'] ?? '',$protectedHashes,true)) { throw new RuntimeException('Retain and supply the original recovery export for map ' . $map['id'] . ' with --recovery. Its former source snapshot must remain recoverable.'); }
+        }
+        $preview = array('format'=>1,'backup_hash'=>self::hash($backup),'maps_hash'=>self::hash(array_map(function ($map) { unset($map['calibration_revision'],$map['next_control_ordinal']); return $map; },$current)),
+            'recovery_hashes'=>$protectedHashes,'tables'=>array(),'columns'=>array(),'orphan_rows'=>0,'uploads_preserved'=>count($backup['uploads']));
+        $ids = array_map('intval',array_column($current,'id'));
+        foreach (self::LEGACY as $name) {
+            if (!$this->exists($name)) { continue; }
+            $rows = $this->rows($name);
+            $preview['tables'][$name] = count($rows);
+            foreach ($rows as $row) { if (!in_array((int)$row['map_id'],$ids,true)) { $preview['orphan_rows']++; } }
+        }
+        foreach (array('calibration_revision','next_control_ordinal') as $column) {
+            if ($this->db->fetchOne('SHOW COLUMNS FROM `' . $this->db->prefix . "walking_tour_maps` LIKE '$column'")) { $preview['columns'][]=$column; }
+        }
+        return $preview;
+    }
+
+    public function contract($backup, $review, $hash, $recoveries = array())
+    {
+        return $this->withLock(function () use ($backup, $review, $hash, $recoveries) {
+            if (!is_string($hash) || !hash_equals(self::hash($review),$hash) || ($review['backup_hash'] ?? '') !== self::hash($backup)) { throw new InvalidArgumentException('Review the exact cleanup preview and recovery export before dropping legacy storage.'); }
+            $current = $this->contractionPreview($backup,$recoveries);
+            if ($current['maps_hash'] !== $review['maps_hash'] || $current['recovery_hashes'] !== $review['recovery_hashes']) { throw new RuntimeException('Maps changed after cleanup preview. Review cleanup again.',409); }
+            // DDL autocommits. On interruption the same reviewed operation can resume:
+            // absent tables/columns are skipped; every remaining table must still match backup.
+            foreach ($current['tables'] as $name=>$count) {
+                if (!array_key_exists($name,$review['tables']) || $review['tables'][$name] !== $count) { throw new RuntimeException('Cleanup storage changed after preview.'); }
+            }
+            foreach ($current['columns'] as $column) { if (!in_array($column,$review['columns'],true)) { throw new RuntimeException('Cleanup columns changed after preview.'); } }
+            foreach (array_keys($current['tables']) as $name) { $this->db->query('DROP TABLE `' . $this->db->prefix . $name . '`'); }
+            foreach ($current['columns'] as $column) { $this->db->query('ALTER TABLE `' . $this->db->prefix . 'walking_tour_maps` DROP COLUMN `' . $column . '`'); }
+            return array('dropped_tables'=>array_keys($current['tables']),'dropped_columns'=>$current['columns'],
+                'historical_map_tables'=>array('walking_tour_maps','walking_tour_place_annotations'),'uploads_preserved'=>$current['uploads_preserved']);
+        });
     }
 }

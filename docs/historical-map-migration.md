@@ -8,7 +8,8 @@ production migration automatically during install or upgrade.
 
 ## Export and review
 
-Run the storage initializer first. Then make a new, private recovery export:
+After deploying 0.3.0, complete **Plugins → Walking Tour → Upgrade** in Omeka before
+opening the public pages. Then initialize/check schema and make a new, private recovery export:
 
 ```sh
 php scripts/initialize-map-storage.php
@@ -96,3 +97,44 @@ replacing live records. Restore uploaded bytes to their recorded `path` through 
 configured storage adapter. Do not roll back only a map while leaving newer Item decisions
 or child tables at a different version. This tool intentionally does not expose a public
 restore endpoint or silently overwrite a database from an export.
+
+## Contract retired storage after verification
+
+Deploy all 0.3.0 files, finish migration/archive for every old record, and verify the new
+viewer. Keep the original recovery export used for each completed migration. Run:
+
+```sh
+php scripts/migrate-historical-maps.php --cleanup-preview=/private/wt-backup
+php scripts/migrate-historical-maps.php --cleanup=/private/wt-backup --review=CLEANUP_SHA256
+php scripts/initialize-map-storage.php
+```
+
+The preview reports the four tables, row counts (including orphan rows), obsolete map
+columns and upload count. Review unmatched annotations and all exported material before
+applying. Cleanup refuses unresolved maps, legacy rows changed since export, missing upload
+backup copies, or a missing original recovery export. If multiple exports were used,
+supply each additional original directory with `--recovery=/private/earlier-backup` to both
+cleanup commands; each receipt must match one verified export. A fresh export made after
+migration alone cannot protect a replaced original source snapshot.
+
+Cleanup drops only `walking_tour_control_points`, `walking_tour_map_masks`,
+`walking_tour_annotations`, `walking_tour_map_changes`, and the obsolete
+`calibration_revision`/`next_control_ordinal` map columns when present. It never deletes
+images, Items, Geolocation, Tours or TourItems. Map snapshots, period metadata, migration
+receipts and Item decisions remain. Install/upgrade/initialization cannot recreate the
+retired tables or old seed. Explicit plugin uninstall still removes plugin-owned tables.
+
+Use a maintenance window with a current full database backup. MySQL DDL commits per
+operation; a disconnect may leave only some tables removed. The same reviewed cleanup
+can resume: absent tables/columns are skipped and surviving rows are rechecked against
+the export. No table is recreated to recover from interruption. New map edits invalidate
+the cleanup preview and require review again. Operator migration/cleanup operations share
+a database advisory lock so concurrent batches cannot race.
+
+After cleanup, inspect the actual table names in MySQL. Exactly the two Historical Maps
+business tables remain; original Omeka and Walking Tour tables remain separately. Repeat
+initialization and verify the counts/snapshots/decisions again. Old calibration API URLs
+return 410; old map bookmarks retain map IDs through migration, but retired point selection
+parameters are ignored. A pending/archived/missing requested map displays explicit feedback
+instead of selecting an unrelated map. Retired editor assets and bundled static exports
+are no longer part of the deployment.

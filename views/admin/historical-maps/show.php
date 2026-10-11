@@ -3,12 +3,12 @@
 <div id="primary">
     <p><a href="<?php echo html_escape(url('historical-maps')); ?>">Back to Historical Maps</a></p>
     <p><a class="button" href="<?php echo html_escape(url('historical-maps/edit/' . $map['id'])); ?>">Edit map information</a>
-        <a class="button green" href="<?php echo html_escape(public_url('historical-maps') . '?map_id=' . $map['id']); ?>">View maps</a></p>
+        <?php if ($map['source_kind'] === 'allmaps'): ?><a class="button green" href="<?php echo html_escape(public_url('historical-maps') . '?map_id=' . $map['id']); ?>">View maps</a><?php endif; ?></p>
     <?php if ($map['source_kind'] === 'allmaps'): ?>
         <p><a class="button" href="<?php echo html_escape(url('historical-maps/refresh/' . $map['id'])); ?>">Refresh from Allmaps</a></p>
         <p>Calibration is imported from Allmaps and is read-only on this website. The saved snapshot stays fixed until an explicit refresh.</p>
     <?php else: ?>
-        <p>This legacy map remains readable. Its saved calibration and annotations are retained for migration. Website calibration editing and direct uploads are retired.</p>
+        <p>This record is pending migration or archived and is not in the public library. Ask the server operator to export/review it with migrate-historical-maps.php. Existing uploaded images remain stored; calibration and unmatched free points belong in the private recovery export.</p>
     <?php endif; ?>
     <?php if ($map['migration']): ?>
         <p>Migration status: <?php echo html_escape($map['migration']['state']); ?> · <?php echo html_escape($map['migration']['reason']); ?></p>
@@ -31,10 +31,6 @@
         <dt>Content hash (SHA-256)</dt><dd><?php echo html_escape($map['allmaps']['content_hash']); ?></dd>
         <dt>Imported at (UTC)</dt><dd><?php echo html_escape($map['allmaps']['imported_at']); ?></dd>
         <dt>Transformation</dt><dd><?php echo html_escape($map['transformation']); ?></dd>
-        <?php else: ?>
-        <dt>Retained legacy control points</dt><dd><?php echo count($map['control_points']); ?></dd>
-        <dt>Retained legacy annotations</dt><dd><?php echo count($map['annotations']); ?></dd>
-        <dt>Legacy calibration revision</dt><dd><?php echo $map['calibration_revision']; ?></dd>
         <?php endif; ?>
     </dl>
 </div>

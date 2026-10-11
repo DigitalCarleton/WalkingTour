@@ -50,35 +50,37 @@ CSRF, revision checks, and transactional cleanup. An external Allmaps/IIIF sourc
 deleted. Legacy uploaded images can still be inspected and deleted; their server files
 are removed through Omeka's configured storage adapter.
 
-The IIIF-only and direct-upload actions are retired. Legacy map records remain readable
-for reviewed migration, but their control markers are hidden and public calibration writes
-are disabled. Previously saved image/geographic mask rings remain visible as read-only
-outlines using the original pink styling (3px image outline; 4px geographic outline with
-4% fill). The catalog supplies only these rings as `display_mask`, without mask editing
-or calibration state. They are not recalculated by the retired engine or used as a
-fallback estimator. Allmaps imports always draw their own imported resource mask and
-transformed footprint. Ticket 07 migrates reviewed legacy data; ticket 09 removes retired tables,
-editor assets, and example/static files once their remaining consumers are replaced.
-Five legacy Historical Maps tables are temporarily retained alongside the new Item-bound
-annotations table. Tickets 07/09 handle reviewed migration and contraction to two business
-tables; this batch does not drop legacy data.
+The IIIF-only and direct-upload actions are retired. Pending/archived records are available
+in admin for source/image inspection and deletion, but only validated imported Allmaps
+records enter the public catalog. The public runtime never reads retired controls, free
+points, mask rows, history or recovery exports. Imported masks and calibration live inside
+the map snapshot. Use [the migration guide](historical-map-migration.md) to export and review
+old records, preserve unmatched points/uploads, migrate stable map IDs, and explicitly
+contract the old storage. No migration or table drop runs automatically during upgrade.
+
+Final Historical Maps storage has two business tables: `walking_tour_maps` and
+`walking_tour_place_annotations`. Fresh installation creates only these two; populated
+upgrades retain old tables until the reviewed cleanup command removes them. Existing Omeka,
+Geolocation, Tour and TourItem storage is independent and remains in place.
 
 ## Deployment and initialization
 
-The plugin version remains **0.2.3**. For a site already initialized with the previous
-map storage, deploy the updated plugin code and run the initializer below to add the
-Item decisions table and map period columns. Do not uninstall/reinstall: uninstall removes plugin-owned data.
-
-For a fresh site or missing storage, run from the installed WalkingTour plugin directory
-using the server's PHP CLI with MySQL support:
+The plugin version is **0.3.0**. After deploying the complete plugin code, open Omeka
+**Plugins → Walking Tour → Upgrade**. Omeka does not load a plugin with a pending version
+upgrade, so this step is required. The hook adds new storage fields without migrating or
+dropping old data. The storage initializer can then be rerun from the installed plugin directory:
 
 ```sh
 php scripts/initialize-map-storage.php
 ```
 
-The installation/upgrade hooks and this command preserve existing records. Rerunning does
-not seed the former BnF example, import masks, or recalibrate legacy records. Back up the
-Omeka database and existing uploaded image files before later migration tickets.
+Both schema paths add missing new storage/metadata without modifying maps or Item decisions.
+The standalone initializer does not update Omeka's installed plugin version or replace the Upgrade action.
+Rerunning never creates retired tables/columns or seeds an example. Do not uninstall/reinstall:
+uninstall removes plugin-owned data. For a populated upgrade, follow export → preview →
+reviewed migration/archive → viewer verification → cleanup preview → reviewed cleanup in
+[the migration guide](historical-map-migration.md). Do not drop tables manually. The uploaded
+files stay at their configured storage locations until their own map is explicitly deleted.
 
 Import requires PHP cURL, DOM, JSON, and mbstring, plus outbound HTTPS. Fetches accept only
 public HTTPS destinations on port 443, pin resolved public IPs, revalidate redirects, disable
@@ -101,8 +103,8 @@ Paths are relative to the Omeka site root:
 - `GET walking-tour/index/historical-maps` returns the read-only catalog, image metadata,
   provenance, geographic viewport bounds, and normalized Allmaps calculation inputs.
   It returns `can_edit: false`, `workflow: allmaps`, and no editor CSRF token. Legacy editable
-  editable control/annotation/mask state, calibration counters, and undo state are omitted.
-  Existing legacy outlines are exposed separately as read-only `display_mask` rings.
+  control/annotation/mask editing state, calibration counters, and undo state are omitted.
+  Pending and archived records are omitted; imported masks are inside their source snapshots.
 - `historical-map-edit` and `historical-map-estimate` at the same API base return **410 Gone**
   without executing the former calibration or mutation engine, including old direct requests.
 - `admin/historical-maps/import` implements authorized, CSRF-protected preview and import.
@@ -111,8 +113,8 @@ Paths are relative to the Omeka site root:
 Place search remains on the modern map. It uses the configured Photon-compatible endpoint
 (default `https://photon.komoot.io/api/`) and does not save locations or change calibration.
 Live Geolocation Item markers, historical estimates, clustering, local overrides,
-periods, visibility and manual refresh are available. Tickets 07–09 cover reviewed
-legacy migration, the original tour location reader, and storage contraction.
+periods, visibility, manual refresh and reviewed migration/cleanup are available. Both
+public pages read current Geolocation places; neither uses bundled location exports.
 
 ## Live places (ticket 02)
 
@@ -182,10 +184,9 @@ Notes are plain text and accompany public Items in the decision API.
 After deploying this slice, run `php scripts/initialize-map-storage.php` from the
 installed WalkingTour plugin directory. This idempotently adds
 `walking_tour_place_annotations` with one row per `(map_id, item_id)`; only local
-decisions are stored, and empty rows are removed. The old free annotation table
-is retained separately for reviewed migration in tickets 07/09. Deleting a map
-also removes its new Item decision rows. Final storage contraction is still
-pending; do not drop old tables manually.
+decisions are stored, and empty rows are removed. Only the map snapshot and Item decisions are runtime storage. Deleting a map removes its
+Item decision rows. Old free annotations are preserved in the private migration export
+before the explicit operator cleanup removes their retired table.
 
 GET `walking-tour/index/historical-map-decisions?map_id=…` reads public Item
 decisions and returns an editing token only to authorized editors. POST
@@ -250,7 +251,7 @@ Refresh never copies Item overrides into GCPs or writes the retired calibration 
 ### Local verification of tickets 02–06
 
 Verified against a disposable localhost Omeka 3.1.2 installation with Geolocation,
-PHP 8.3 and MySQL 8. Independent pixel points covered all supported transform types,
+PHP 8.3 and MySQL. Independent pixel points covered all supported transform types,
 polynomial orders and a folded model with ambiguous inverse roots; the BnF saved
 fixture covered the default projection. Live HTTP checks covered public/private
 Items, pagination, changed Geolocation coordinates without exports, zero pixels,

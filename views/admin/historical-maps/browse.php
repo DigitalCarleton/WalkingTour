@@ -8,9 +8,9 @@
         <thead><tr><th scope="col">Title</th><th scope="col">Source</th><th scope="col">Imported at (UTC)</th><th scope="col">Actions</th></tr></thead>
         <tbody><?php foreach ($maps as $map): ?><tr>
             <td><a href="<?php echo html_escape(url('historical-maps/show/' . $map['id'])); ?>"><?php echo html_escape($map['title']); ?></a></td>
-            <td><?php echo $map['source_kind'] === 'allmaps' ? 'Allmaps snapshot' : ($map['source_kind'] === 'upload' ? 'Legacy upload' : 'Legacy IIIF map'); ?></td>
+            <td><?php echo $map['source_kind'] === 'allmaps' ? 'Allmaps snapshot' : (($map['migration']['state'] ?? '') === 'archived' ? 'Archived record' : 'Pending Allmaps migration'); ?></td>
             <td><?php echo html_escape($map['allmaps']['imported_at'] ?? 'Not imported from Allmaps'); ?></td>
-            <td><a href="<?php echo html_escape(public_url('historical-maps') . '?map_id=' . $map['id']); ?>">View maps</a></td>
+            <td><?php if ($map['source_kind'] === 'allmaps'): ?><a href="<?php echo html_escape(public_url('historical-maps') . '?map_id=' . $map['id']); ?>">View maps</a><?php else: ?>Inspect this record before migration<?php endif; ?></td>
         </tr><?php endforeach; ?></tbody>
     </table></div>
     <?php endif; ?>

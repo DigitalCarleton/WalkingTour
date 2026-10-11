@@ -7,8 +7,7 @@
     <?php if ($map['source_kind'] === 'allmaps'): ?>
         <p>This permanently deletes this site's map record and imported Allmaps snapshot.</p>
     <?php else: ?>
-        <p>This permanently deletes the map record, <?php echo count($map['control_points']); ?> legacy control points,
-            <?php echo count($map['annotations']); ?> legacy annotations, its saved mask, and calibration history.</p>
+        <p>This permanently deletes the retained map record and its Item decisions. Export unresolved legacy data before deleting this record. Retired child-table data is removed only by the operator cleanup command.</p>
     <?php endif; ?>
     <?php if ($map['source_kind'] === 'upload'): ?>
         <p>The uploaded image file will also be removed from this site's configured storage.</p>

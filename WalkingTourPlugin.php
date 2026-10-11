@@ -100,10 +100,8 @@ class WalkingTourPlugin extends Omeka_Plugin_AbstractPlugin
     public function hookUpgrade($args)
     {
         $db = $this->_db;
-        if (version_compare($args['old_version'], '1.1.1', '<')) {
-            $historicalMaps = new WalkingTour_HistoricalMapRepository($db);
-            $historicalMaps->install();
-        }
+        $historicalMaps = new WalkingTour_HistoricalMapRepository($db);
+        $historicalMaps->install();
         if (version_compare($args['old_version'], '0.1-dev', "<")) {
             $sql = "ALTER TABLE `{$db->prefix}tour_items` MODIFY COLUMN `exhibit_id` INT NOT NULL;";
             $this->_db->query($sql);

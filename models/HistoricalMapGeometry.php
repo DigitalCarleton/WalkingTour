@@ -1,6 +1,6 @@
 <?php
 
-/** Validate the single, simple GeoJSON polygon supported by the map editor. */
+/** Validate coordinates and the simple resource polygon accepted by the Allmaps importer. */
 class WalkingTour_HistoricalMapGeometry
 {
     public static function coordinate($value, $xLimit, $yLimit)
@@ -22,10 +22,10 @@ class WalkingTour_HistoricalMapGeometry
     public static function ring($ring)
     {
         if (!is_array($ring) || count($ring) < 4 || count($ring) > 501 || array_keys($ring) !== range(0, count($ring)-1)) {
-            throw new InvalidArgumentException('Draw a closed polygon with 3 to 500 vertices.');
+            throw new InvalidArgumentException('The resource mask must be a closed polygon with 3 to 500 vertices.');
         }
         $ring = array_map(function ($p) { return self::coordinate($p, 180, 85); }, $ring);
-        if ($ring[0] !== $ring[count($ring)-1]) { throw new InvalidArgumentException('Close the mask by selecting its first point.'); }
+        if ($ring[0] !== $ring[count($ring)-1]) { throw new InvalidArgumentException('The resource mask must end at its first vertex.'); }
         $n = count($ring) - 1;
         $area = 0;
         $seen = array();

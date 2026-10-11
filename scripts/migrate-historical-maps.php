@@ -3,15 +3,16 @@
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('Run this script from the command line.'); }
 $pluginRoot = dirname(__DIR__);
 $omekaRoot = dirname($pluginRoot, 2);
-$options = getopt('', array('export:', 'preview:', 'apply:', 'plan:', 'review:', 'files-root:'));
+$options = getopt('', array('export:', 'preview:', 'apply:', 'plan:', 'review:', 'files-root:', 'cleanup-preview:', 'cleanup:', 'recovery:'));
 if (!$options) {
     echo "Usage:\n  php scripts/migrate-historical-maps.php --export=/private/new-backup [--files-root=/configured/files]\n  php scripts/migrate-historical-maps.php --preview=/private/backup --plan=/private/plan.json\n  php scripts/migrate-historical-maps.php --apply=/private/backup --review=PREVIEW_SHA256\n";
+    echo "  php scripts/migrate-historical-maps.php --cleanup-preview=/private/backup\n  php scripts/migrate-historical-maps.php --cleanup=/private/backup --review=CLEANUP_SHA256\n";
     exit(0);
 }
 try {
     if (!is_file($omekaRoot . '/bootstrap.php')) { throw new RuntimeException('Run from the installed Omeka plugin directory.'); }
-    $commands = array_intersect(array_keys($options), array('export','preview','apply'));
-    if (count($commands) !== 1) { throw new InvalidArgumentException('Choose one export, preview, or apply operation.'); }
+    $commands = array_intersect(array_keys($options), array('export','preview','apply','cleanup-preview','cleanup'));
+    if (count($commands) !== 1) { throw new InvalidArgumentException('Choose exactly one export, migration preview/apply, or cleanup preview/apply operation.'); }
     $command = reset($commands); $directory = $options[$command];
     if (!is_string($directory) || substr($directory,0,1) !== '/') { throw new InvalidArgumentException('Use an absolute private backup directory.'); }
     // Resolve symlinks in an existing parent; a web-served export could expose private points/history.
@@ -31,7 +32,16 @@ try {
         echo 'Recovery export created: ' . $directory . "\nBackup SHA-256: " . WalkingTour_HistoricalMapMigration::hash($backup) . "\nRead inventory.txt before preparing a migration plan.\n";
     } else {
         $backup = $migration->loadBackup($directory);
-        if ($command === 'preview') {
+        $recoveries = array();
+        foreach ((array) ($options['recovery'] ?? array()) as $recovery) { $recoveries[] = $migration->loadBackup($recovery); }
+        if ($command === 'cleanup-preview') {
+            $review = $migration->contractionPreview($backup,$recoveries);
+            WalkingTour_HistoricalMapMigration::write($directory . '/cleanup-preview.json',$review);
+            echo json_encode($review,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES) . "\nCleanup SHA-256: " . WalkingTour_HistoricalMapMigration::hash($review) . "\nReview the export, unresolved/unmatched points and archived uploads. No storage changed.\n";
+        } elseif ($command === 'cleanup') {
+            $review = json_decode(file_get_contents($directory . '/cleanup-preview.json'),true,512,JSON_THROW_ON_ERROR);
+            echo json_encode($migration->contract($backup,$review,$options['review'] ?? '',$recoveries)) . "\nRetired storage removed. Source Items, Geolocation, Tours and uploaded files preserved.\n";
+        } elseif ($command === 'preview') {
             if (!isset($options['plan'])) { throw new InvalidArgumentException('Supply --plan=/private/plan.json.'); }
             $review = $migration->preview($backup, json_decode(file_get_contents($options['plan']),true,512,JSON_THROW_ON_ERROR));
             WalkingTour_HistoricalMapMigration::write($directory . '/preview.json', $review);

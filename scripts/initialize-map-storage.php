@@ -22,7 +22,7 @@ try {
     require_once $pluginRoot . '/models/HistoricalMapRepository.php';
     $repository = new WalkingTour_HistoricalMapRepository(get_db());
     $repository->install();
-    echo "Map storage is ready for Allmaps import. Existing records and the plugin version were preserved; no example map was seeded.\n";
+    echo "Map storage is ready for Allmaps import. Existing records and the installed plugin version were preserved; no example map was seeded. If Omeka reports an available plugin upgrade, complete Plugins → Walking Tour → Upgrade so its routes load.\n";
 } catch (Exception $error) {
     fwrite(STDERR, "Map storage initialization failed: " . $error->getMessage() . "\n");
     exit(1);

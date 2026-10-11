@@ -4,7 +4,7 @@ A fork of the Omeka team's MallMap plugin to be used for the Carleton Guide to M
 
 ## Architecture and development plan
 
-See [WalkingTour architecture and next steps](docs/architecture/README.md) for the current Archify diagram, an explanation of how it was generated, and a proposed migration from the static locations GeoJSON overlay to live queries of Omeka's Geolocation table.
+See [WalkingTour architecture and next steps](docs/architecture/README.md) for the current Archify diagram, an explanation of how it was generated, and the historical design record. Both viewers now read current public Item locations from Geolocation.
 
 ## Historical Maps
 
@@ -14,12 +14,17 @@ then browse the original IIIF image beside the modern map. Imported calibration 
 in a provenance snapshot; this site no longer displays or edits control points.
 The original Walking Tour remains a separate page.
 
-The plugin version remains **0.2.3**. Existing initialized sites need the plugin code
-update. Fresh storage can be initialized with `php scripts/initialize-map-storage.php`
-from the installed plugin directory. Initialization preserves data and no longer seeds
-an example map. Legacy records/tables remain temporarily for migration. See the
-[Historical Maps guide](docs/map-editor.md) for workflow, supported sources, deployment,
-retired API behavior, and the remaining migration scope. All interface text is English.
+The plugin version is **0.3.0**. Fresh Historical Maps storage has two tables: maps with
+Allmaps provenance/snapshots, and Item-specific local decisions. Install/upgrade or
+`php scripts/initialize-map-storage.php` preserves existing data and never seeds an
+example or recreates retired storage. The original Walking Tour loads its additional
+place layer from live Geolocation, with its tours, filters and details preserved.
+
+A populated site must export and review legacy maps before explicit storage cleanup.
+See the [migration and deployment procedure](docs/historical-map-migration.md) and
+[Historical Maps guide](docs/map-editor.md). Pending/archive records remain in admin;
+only validated Allmaps imports enter the public library. Existing uploaded files are
+preserved. All interface text is English.
 
 ## Configuration
 
