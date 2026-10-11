@@ -5,6 +5,9 @@
         var L = window.L, generation = 0, request, decisionRequest, writeRequest, selected, pairs = {}, record;
         var decisions = {}, transform, canEdit = false, csrf, draft = null, draftMarker, busy = false;
         function el(id) { return document.getElementById(id); }
+        function apiError(xhr) {
+            try { var body = xhr.responseJSON || JSON.parse(xhr.responseText || '{}'); return typeof body.error === 'string' ? body.error : ''; } catch (e) { return ''; }
+        }
         function feedback(text) { el('historical-decision-status').textContent = text; }
         function decision(id) { return decisions[id] || {pixel: null, visibility: 'default', note: '', needs_review: false}; }
         function cancelDraft() {
@@ -28,7 +31,7 @@
         function details() {
             var pair = pairs[selected]; if (!pair) { return; }
             var d = decision(selected);
-            el('historical-place-status').textContent = d.needs_review ? 'The saved position needs review after an image change. Only the current automatic estimate is used.' :
+            el('historical-place-status').textContent = d.needs_review ? 'The saved position needs review after an image change. ' + (pair.historical ? 'The current automatic estimate is shown.' : 'No reliable historical estimate is available; the modern location is shown.') :
                 (d.pixel ? 'Reviewed historical position override. This does not change Allmaps calibration.' :
                 (pair.historical ? 'Estimated historical position. Compare with the original image.' : 'No reliable historical counterpart is available within this map. The modern location is shown.'));
             if (!visible(selected)) { el('historical-place-status').textContent = 'Hidden on this map. Restore Default or Show to display this Item again. ' + el('historical-place-status').textContent; }
@@ -41,7 +44,7 @@
             busy = value; picker.disabled = value;
             if (draftMarker && draftMarker.dragging) { if (value) { draftMarker.dragging.disable(); } else { draftMarker.dragging.enable(); } }
             root.querySelectorAll('#historical-place-editor button, #historical-place-editor input, #historical-place-editor textarea, #historical-place-editor select, #historical-show-hidden, #historical-map-list button').forEach(function (button) { button.disabled = value; });
-            if (!value) { details(); }
+            if (!value) { el('historical-position-reset').disabled = !decision(selected).pixel; }
         }
         function save(operation, value) {
             if (!canEdit || busy || !pairs[selected]) { return; }
@@ -60,7 +63,7 @@
                 details(); feedback('Decision saved.');
             }).fail(function (xhr) {
                 if (stamp !== generation) { return; }
-                feedback((xhr.responseJSON && xhr.responseJSON.error) || 'The save response was not received. Your draft is kept. Reload and review the saved decision before retrying.');
+                feedback(apiError(xhr) || 'The save response was not received. Your draft is kept. Reload and review the saved decision before retrying.');
                 el('historical-decision-reload').hidden = false;
             }).always(function () { if (stamp === generation) { setBusy(false); } });
         }
@@ -139,8 +142,8 @@
         function locate() {
             var pair = pairs[selected]; if (!pair || !visible(selected)) { return; }
             var stamp = generation, id = selected;
-            function reveal(layer, map, m, zoom) {
-                map.setView(m.getLatLng(), map.getMaxZoom(), {animate: false});
+            function reveal(layer, map, m, location) {
+                map.setView(location, map.getMaxZoom(), {animate: false});
                 var parent = layer.getVisibleParent(m);
                 if (parent && parent !== m && parent.spiderfy) { parent.spiderfy(); }
                 layer.zoomToShowLayer(m, function () {
@@ -149,8 +152,8 @@
                     m.openPopup();
                 });
             }
-            reveal(modernLayer, modern, pair.modern, 16);
-            if (pair.historical) { reveal(historicalLayer, historical, pair.historical, -1); }
+            reveal(modernLayer, modern, pair.modern, [pair.place.coordinates[1], pair.place.coordinates[0]]);
+            if (pair.historical) { var p = position(pair); if (p) { reveal(historicalLayer, historical, pair.historical, [-p[1],p[0]]); } }
         }
         function select(id) {
             var pair = pairs[id]; if (!pair) { return; }
@@ -175,7 +178,7 @@
             modernLayer = cluster(modern); historicalLayer = cluster(historical); panel.hidden = true;
             picker.textContent = ''; var empty = document.createElement('option'); empty.value = ''; empty.textContent = 'Choose a place'; picker.appendChild(empty);
             status.textContent = 'Loading public Omeka places…';
-            var error = '', count = 0, paired = 0; transform = null;
+            var error = ''; transform = null;
             try { transform = window.WalkingTourAllmaps.create(map); } catch (e) { error = e.message; }
             function page(after) {
                 request = $.ajax({url: base + 'historical-map-places', data: {after: after}, dataType: 'json', timeout: 20000});
@@ -191,7 +194,7 @@
                             var h = pixel ? marker([-pixel[1], pixel[0]], place, !d.pixel || d.needs_review) : null;
                             if (h && d.pixel && !d.needs_review) { h.options.icon.options.className += ' is-override'; }
                             if (visible(place.item_id)) { modernBatch.push(m); if (h) { historicalBatch.push(h); } }
-                            pairs[place.item_id] = {place: place, modern: m, historical: h}; count++; if (h) { paired++; }
+                            pairs[place.item_id] = {place: place, modern: m, historical: h};
                             addOption(pairs[place.item_id]);
                         }
                         modernLayer.addLayers(modernBatch); historicalLayer.addLayers(historicalBatch);
@@ -202,7 +205,7 @@
                     batch();
                 }).fail(function (xhr, text) {
                     if (current !== generation || text === 'abort') { return; }
-                    status.textContent = (xhr.responseJSON && xhr.responseJSON.error) || 'Places could not be loaded. Reload the page to retry.';
+                    status.textContent = apiError(xhr) || 'Places could not be loaded. Reload the page to retry.';
                 });
             }
             decisionRequest = $.ajax({url: base + 'historical-map-decisions', data: {map_id: map.id}, dataType: 'json', timeout: 20000});
@@ -213,9 +216,14 @@
                 canEdit = data.can_edit; csrf = data.csrf_token; el('historical-hidden-label').hidden = !canEdit; page(0);
             }).fail(function (xhr, text) {
                 if (current !== generation || text === 'abort') { return; }
-                status.textContent = (xhr.responseJSON && xhr.responseJSON.error) || 'Place decisions could not load. Reload the page to retry.';
+                status.textContent = apiError(xhr) || 'Place decisions could not load. Reload the page to retry.';
             });
         }
-        return {load: load};
+        function clear() {
+            generation++; if (request) { request.abort(); } if (decisionRequest) { decisionRequest.abort(); }
+            cancelDraft(); canEdit = false; pairs = {}; selected = null; panel.hidden = true;
+            modern.removeLayer(modernLayer); historical.removeLayer(historicalLayer);
+        }
+        return {load: load, clear: clear};
     };
 }(window, jQuery));

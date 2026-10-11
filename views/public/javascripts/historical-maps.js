@@ -103,7 +103,7 @@
             function showMap(record) {
                 var generation = ++loadGeneration;
                 activeMap = record;
-                places.load(record);
+                places.clear();
                 if (imageLayer) { historicalMap.removeLayer(imageLayer); }
                 imageBounds = L.latLngBounds(imageLatLng(0, record.image_height), imageLatLng(record.image_width, 0));
                 geographicBounds = L.latLngBounds();
@@ -113,6 +113,8 @@
                 historicalMap.setMinZoom(minimumZoom);
                 historicalMap.setMaxBounds(imageBounds.pad(.2));
                 historicalMap.fitBounds(imageBounds, {padding: [20, 20]});
+                // Cluster grids must be initialized after this image's minimum zoom.
+                places.load(record);
                 setStatus('Loading the original historical image…', false);
                 var failedTiles = new Set();
                 var attribution = document.createElement('a');

@@ -17,7 +17,7 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
         if (!is_admin_theme() || !current_user() || !is_allowed('WalkingTourBuilder_Tours', 'edit')) {
             throw new Omeka_Controller_Exception_403;
         }
-        if (!in_array($this->getRequest()->getActionName(), array('browse', 'show', 'import', 'add', 'upload', 'edit', 'delete'), true)) { throw new Omeka_Controller_Exception_404; }
+        if (!in_array($this->getRequest()->getActionName(), array('browse', 'show', 'import', 'add', 'upload', 'edit', 'delete', 'refresh'), true)) { throw new Omeka_Controller_Exception_404; }
         $this->getResponse()->setHeader('Cache-Control', 'private, no-store', true);
     }
 
@@ -143,6 +143,42 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
         } catch (Exception $error) {
             $this->formError($error, 'The Allmaps import could not finish. No selected maps were published. Please retry or contact the server administrator.');
         }
+    }
+
+    public function refreshAction()
+    {
+        require_once dirname(__FILE__) . '/../models/HistoricalMapRefresh.php';
+        $map = $this->findMap(); $this->view->map = $map; $this->view->preview = null;
+        $values = array('annotation_url'=>$this->getRequest()->isPost() ? $this->text('annotation_url') : $map['source_url'],
+            'revision'=>$this->getRequest()->isPost() ? $this->text('revision') : (string) $map['revision'], 'preview_token'=>$this->text('preview_token'));
+        if (!$this->form($values)) { return; }
+        $session = new Zend_Session_Namespace('WalkingTourAllmapsRefresh');
+        $previews = is_array($session->previews) ? $session->previews : array();
+        foreach ($previews as $token=>$preview) { if ($preview['expires'] < time()) { unset($previews[$token]); } }
+        $session->previews = $previews;
+        try {
+            $refresh = new WalkingTour_HistoricalMapRefresh;
+            if ($this->text('step', 'preview') === 'preview') {
+                if (!ctype_digit($values['revision']) || (int) $values['revision'] !== $map['revision']) { throw new RuntimeException('This map changed. Open its latest record and preview the refresh again.', 409); }
+                $image = $refresh->prepare($map, $values['annotation_url']);
+                if (count($previews) >= 3) { array_shift($previews); }
+                $token = bin2hex(random_bytes(16));
+                $preview = array('map_id'=>$map['id'], 'revision'=>$map['revision'], 'image'=>$image,
+                    'image_changed'=>WalkingTour_HistoricalMapRefresh::imageChanged($map, $image), 'expires'=>time()+900);
+                $previews[$token] = $preview; $session->previews = $previews;
+                $this->view->preview = $preview; $this->view->values['preview_token'] = $token;
+                return;
+            }
+            $token = $values['preview_token'];
+            if ($this->text('step') !== 'publish' || !isset($previews[$token]) || $previews[$token]['map_id'] !== $map['id']) { throw new InvalidArgumentException('This refresh preview is missing or expired. Preview the selected map again.'); }
+            $preview = $previews[$token]; $this->view->preview = $preview; $this->view->values['annotation_url'] = $preview['image']['source_url'];
+            // Only the server-side reviewed payload can be published; recheck image availability.
+            $image = $refresh->checkImage($preview['image']);
+            $result = $this->maps->refreshAllmaps($map['id'], $preview['revision'], $image, $this->text('review_image_change') === '1');
+            unset($previews[$token]); $session->previews = $previews;
+            $this->_helper->flashMessenger($result['changed'] ? ($result['image_changed'] ? 'Allmaps snapshot refreshed. Saved historical position overrides need review in the viewer.' : 'Allmaps snapshot refreshed. Local position and display decisions were preserved.') : 'The Allmaps snapshot is unchanged. No saved data was modified.', 'success');
+            $this->_redirect(url('historical-maps/show/' . $map['id']), array('prependBase'=>false));
+        } catch (Exception $error) { $this->formError($error, 'The Allmaps refresh could not finish. The active snapshot and local decisions were kept. Retry the preview or contact the server administrator.'); }
     }
 
     public function editAction()

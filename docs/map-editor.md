@@ -26,7 +26,7 @@ feedback; no map is published when validation or an image check fails.
 Both version-qualified and unqualified URLs are supported. Imported calibration is a
 snapshot: updating Allmaps does not silently update this site. Reimporting an unchanged
 source map returns its existing record. A changed annotation is rejected while keeping
-the saved version. Explicit snapshot refresh is planned in ticket 06.
+the saved version. Use Refresh from Allmaps on the existing admin record to review and publish its update.
 
 The importer supports the current Allmaps `SpecificResource` representation with an
 ImageService1/2/3 source object, dimensions, Point control features, one polygon SVG resource
@@ -44,8 +44,8 @@ transformation settings in `source_snapshot`. Control points and masks stay insi
 snapshot; importing does not create legacy control, mask, annotation, or history rows.
 External image pixels remain at the IIIF provider and load into the browser on demand.
 
-**Edit map information** changes an imported map's title using revision checks. Its source
-URL is fixed to its imported snapshot. **Delete map** retains the existing confirmation,
+**Edit map information** changes an imported map's title and optional represented period using revision checks. Its source
+URL changes only through an explicit reviewed refresh. **Delete map** retains the existing confirmation,
 CSRF, revision checks, and transactional cleanup. An external Allmaps/IIIF source is not
 deleted. Legacy uploaded images can still be inspected and deleted; their server files
 are removed through Omeka's configured storage adapter.
@@ -54,14 +54,15 @@ The IIIF-only and direct-upload actions are retired. Legacy map records remain r
 for reviewed migration, but their control markers are hidden and public calibration writes
 are disabled. Ticket 07 migrates reviewed legacy data; ticket 09 removes retired tables,
 editor assets, and example/static files once their remaining consumers are replaced.
-Five existing Historical Maps tables are temporarily retained for compatibility. This
-slice does not claim that the final two-table storage contraction is complete.
+Five legacy Historical Maps tables are temporarily retained alongside the new Item-bound
+annotations table. Tickets 07/09 handle reviewed migration and contraction to two business
+tables; this batch does not drop legacy data.
 
 ## Deployment and initialization
 
 The plugin version remains **0.2.3**. For a site already initialized with the previous
-map storage, deploy the updated plugin code; no new database columns are needed by this
-slice. Do not uninstall/reinstall: uninstall removes plugin-owned data.
+map storage, deploy the updated plugin code and run the initializer below to add the
+Item decisions table and map period columns. Do not uninstall/reinstall: uninstall removes plugin-owned data.
 
 For a fresh site or missing storage, run from the installed WalkingTour plugin directory
 using the server's PHP CLI with MySQL support:
@@ -103,8 +104,9 @@ Paths are relative to the Omeka site root:
 
 Place search remains on the modern map. It uses the configured Photon-compatible endpoint
 (default `https://photon.komoot.io/api/`) and does not save locations or change calibration.
-Live Geolocation Item markers and historical estimates are available. Clustering,
-local overrides, periods, refresh, and storage contraction remain later tickets.
+Live Geolocation Item markers, historical estimates, clustering, local overrides,
+periods, visibility and manual refresh are available. Tickets 07–09 cover reviewed
+legacy migration, the original tour location reader, and storage contraction.
 
 ## Live places (ticket 02)
 
@@ -140,6 +142,9 @@ Click a cluster to expand or spiderfy coincident places. The Find a place select
 and Locate on both maps button reveal a selected Item inside either cluster.
 Thirty-place batches yield between conversion passes; old groups are detached
 when the map changes, so obsolete asynchronous work cannot repaint the viewer.
+Cluster grids are created after each image's minimum zoom has been configured,
+including very large images. Locating uses the actual Item/pixel coordinates,
+not temporary spiderfy display offsets.
 Original Walking Tour assets and layers remain separate.
 
 ### Item position overrides and notes
@@ -190,3 +195,53 @@ source Item. Visibility is saved with operation `visibility` and value `default`
 
 Run the storage initializer after deployment to add the three map period fields.
 The same revision lock protects period edits, display decisions and positions.
+
+### Manual Allmaps refresh
+
+From the existing admin map record choose Refresh from Allmaps. Preview the saved
+source URL or deliberately enter another version of the same map. Unqualified URLs
+fetch the current source; qualified URLs retain their `@version`. The preview shows
+selected map identity, requested/resolved source, both hashes, image identity/dimensions,
+resource masks and transformation settings. A multi-map page is matched by the original
+Allmaps map ID, regardless of source ordering; a missing/different/ambiguous map is rejected.
+
+Only the server-side reviewed payload can be published within 15 minutes. Both preview
+and publish validate authorization and session CSRF. The image information and preview
+must be available and agree with the annotation; publishing rechecks them. Source errors,
+unsupported data and stale map revisions preserve the active snapshot and local decisions.
+Publishing is atomic under the same map revision lock used by all other edits.
+
+An identical annotation and source URL is a complete no-op, including revision/import time.
+An explicitly changed source URL is recorded even when its annotation hash is identical.
+A new calibration updates automatic browser estimates on reload, retaining the local map
+ID, title, period, notes and Item visibility. If image identity or pixel dimensions changed,
+publication requires explicit acknowledgment and flags saved position overrides as needing
+review. Their old pixels are retained for the editor, but visitors see the current automatic
+estimate (or only the modern marker) until Adjust historical position is reviewed and saved.
+Reset can instead discard the stale override while preserving visibility and notes.
+
+Image-space equality means the IIIF service identity and dimensions are unchanged. If a
+provider silently replaces or rotates pixels under the same identity/dimensions, that change
+cannot be detected by this comparison; editors must review or reset affected local positions.
+Refresh never copies Item overrides into GCPs or writes the retired calibration tables.
+
+### Local verification of tickets 02–06
+
+Verified against a disposable localhost Omeka 3.1.2 installation with Geolocation,
+PHP 8.3 and MySQL 8. Independent pixel points covered all supported transform types,
+polynomial orders and a folded model with ambiguous inverse roots; the BnF saved
+fixture covered the default projection. Live HTTP checks covered public/private
+Items, pagination, changed Geolocation coordinates without exports, zero pixels,
+invalid inputs, position/note/visibility preservation, map isolation, CSRF and
+revision conflicts. A 250-place coincident fixture covered independent clustering,
+spiderfying, counterpart selection and map switching; a large-image fixture covered
+minimum zoom changes. Desktop and 390-pixel layouts were checked, with stacked panes
+and no horizontal overflow on the narrow viewport.
+
+Manual refresh storage and HTTP checks covered unchanged and new snapshots,
+reordered multi-map sources, deliberately qualified source URLs, retained local
+decisions, image-space review, failure rollback and stale publication. Browser checks
+covered refresh preview/publish, no-op feedback, override re-review and a two-session
+conflict preserving the editor draft. Original Walking Tour routes, controls and
+assets and Allmaps import validation were checked for regressions. These are local
+checks; they do not confirm deployment or connectivity on the remote Omeka server.

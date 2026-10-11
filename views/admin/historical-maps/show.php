@@ -5,6 +5,7 @@
     <p><a class="button" href="<?php echo html_escape(url('historical-maps/edit/' . $map['id'])); ?>">Edit map information</a>
         <a class="button green" href="<?php echo html_escape(public_url('historical-maps') . '?map_id=' . $map['id']); ?>">View maps</a></p>
     <?php if ($map['source_kind'] === 'allmaps'): ?>
+        <p><a class="button" href="<?php echo html_escape(url('historical-maps/refresh/' . $map['id'])); ?>">Refresh from Allmaps</a></p>
         <p>Calibration is imported from Allmaps and is read-only on this website. The saved snapshot stays fixed until an explicit refresh.</p>
     <?php else: ?>
         <p>This legacy map remains readable. Its saved calibration and annotations are retained for migration. Website calibration editing and direct uploads are retired.</p>

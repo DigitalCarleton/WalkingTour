@@ -162,7 +162,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             $body = $this->getRequest()->getRawBody();
             if (strlen($body) > 16384) { throw new InvalidArgumentException('The place decision request is too large.'); }
             $data = json_decode($body, true);
-            if (!is_array($data)) { throw new InvalidArgumentException('Submit a JSON place decision.'); }
+            if (!is_array($data) || !array_key_exists('value', $data)) { throw new InvalidArgumentException('Submit a JSON place decision with an explicit value.'); }
             $csrf = new Omeka_Form_SessionCsrf;
             if (!$csrf->isValid($data)) { $this->getResponse()->setHttpResponseCode(403); $this->_helper->json(array('error'=>'Your editing session expired. Sign in again and reload the page. Your draft has not been saved.')); return; }
             require_once dirname(__FILE__) . '/../models/HistoricalMapDecisions.php';

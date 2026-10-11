@@ -30,7 +30,7 @@ class WalkingTour_HistoricalMapDecisions
     {
         return array('item_id' => (int) $row['item_id'],
             'pixel' => $row['image_x'] === null ? null : array((float) $row['image_x'], (float) $row['image_y']),
-            'visibility' => $row['visibility'], 'note' => $row['note'] ?: '', 'needs_review' => (bool) $row['needs_review']);
+            'visibility' => $row['visibility'], 'note' => $row['note'] ?? '', 'needs_review' => (bool) $row['needs_review']);
     }
 
     public function publicRows($mapId)

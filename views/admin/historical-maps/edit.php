@@ -9,7 +9,7 @@
             <div class="inputs five columns omega"><input id="map-title" name="title" type="text" maxlength="255" required value="<?php echo html_escape($values['title']); ?>"></div></div>
         <div class="field"><div class="two columns alpha"><label for="source-url">Provenance source URL</label></div>
             <div class="inputs five columns omega"><input id="source-url" name="source_url" type="url" <?php if ($map['source_kind'] === 'allmaps'): ?>readonly<?php endif; ?> value="<?php echo html_escape($values['source_url']); ?>">
-                <p class="explanation"><?php echo $map['source_kind'] === 'allmaps' ? 'The imported annotation URL is fixed; updates use an explicit refresh workflow.' : 'Optional HTTPS link to the source or catalog record.'; ?></p></div></div>
+                <p class="explanation"><?php echo $map['source_kind'] === 'allmaps' ? 'The imported annotation URL is fixed; use Refresh from Allmaps on the map record to update its version.' : 'Optional HTTPS link to the source or catalog record.'; ?></p></div></div>
         <fieldset><legend>Represented period (optional)</legend>
             <label for="period-label">Period label</label><input id="period-label" name="period_label" maxlength="255" value="<?php echo html_escape($values['period_label']); ?>">
             <label for="period-start">Start year</label><input id="period-start" name="period_start" type="number" min="-9999" max="9999" step="1" value="<?php echo html_escape($values['period_start']); ?>">

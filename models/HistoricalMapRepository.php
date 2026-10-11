@@ -184,7 +184,7 @@ class WalkingTour_HistoricalMapRepository
                 if ($existing) {
                     $before = json_decode($existing['source_snapshot'], true);
                     if (($before['content_hash'] ?? '') !== $snapshot['content_hash']) {
-                        throw new InvalidArgumentException('This map already exists with a different Allmaps snapshot. Its saved version was kept. Refresh from Allmaps will be available in a later update.');
+                        throw new InvalidArgumentException('This map already exists with a different Allmaps snapshot. Its saved version was kept. Open the existing record and use Refresh from Allmaps.');
                     }
                     $ids[] = (int) $existing['id']; continue;
                 }
@@ -294,6 +294,42 @@ class WalkingTour_HistoricalMapRepository
             $adapter->commit();
         } catch (Exception $error) { $adapter->rollBack(); throw $error; }
         return $this->find($id);
+    }
+
+    /** Publish a reviewed snapshot and invalidate only overrides in a changed pixel space. */
+    public function refreshAllmaps($id, $revision, array $image, $reviewImageChange = false)
+    {
+        require_once __DIR__ . '/HistoricalMapRefresh.php';
+        if (!is_int($id) || $id < 1 || !is_int($revision) || $revision < 1) { throw new InvalidArgumentException('A map ID and revision are required.'); }
+        $snapshot = json_decode($image['source_snapshot'] ?? '', true);
+        if (($snapshot['source_kind'] ?? '') !== 'allmaps' || !isset($snapshot['annotation']['id'], $snapshot['content_hash'], $snapshot['source_identity']) ||
+            hash('sha256', json_encode($snapshot['annotation'], JSON_UNESCAPED_SLASHES)) !== $snapshot['content_hash']) { throw new InvalidArgumentException('A valid reviewed Allmaps snapshot is required.'); }
+        $adapter = $this->db->getAdapter(); $adapter->beginTransaction();
+        try {
+            $row = $this->db->fetchRow("SELECT * FROM `{$this->maps}` WHERE id = ? FOR UPDATE", array($id));
+            if (!$row) { throw new InvalidArgumentException('Historical map not found.'); }
+            if ((int) $row['revision'] !== $revision) { throw new RuntimeException('This map changed after the refresh preview. Preview the latest map before publishing a refresh.', 409); }
+            $before = json_decode($row['source_snapshot'], true);
+            if (($before['source_kind'] ?? '') !== 'allmaps' || WalkingTour_HistoricalMapRefresh::identity($before['annotation']['id']) !== WalkingTour_HistoricalMapRefresh::identity($snapshot['annotation']['id'])) {
+                throw new InvalidArgumentException('The refresh does not refer to the selected Allmaps map.');
+            }
+            $imageChanged = WalkingTour_HistoricalMapRefresh::imageChanged($row, $image);
+            if ($imageChanged && $reviewImageChange !== true) { throw new InvalidArgumentException('Review the changed original image and dimensions before replacing the snapshot. Saved pixel overrides will need review.'); }
+            if (!$imageChanged && $before['content_hash'] === $snapshot['content_hash'] && $row['source_url'] === $image['source_url']) {
+                $adapter->commit(); return array('changed'=>false, 'image_changed'=>false, 'revision'=>$revision);
+            }
+            $slug = 'allmaps-' . hash('sha256', $snapshot['source_identity']);
+            if ($this->db->fetchOne("SELECT id FROM `{$this->maps}` WHERE slug = ? AND id <> ?", array($slug, $id))) { throw new InvalidArgumentException('This refreshed map identity already belongs to another catalog record. Review that record first.'); }
+            $this->db->query("UPDATE `{$this->maps}` SET slug = ?, image_service = ?, image_width = ?, image_height = ?, manifest_url = ?,
+                source_url = ?, source_snapshot = ?, transformation = ?, revision = revision + 1 WHERE id = ?",
+                array($slug, $image['image_service'], $image['image_width'], $image['image_height'], $image['manifest_url'], $image['source_url'], $image['source_snapshot'], $image['transformation'], $id));
+            if ($imageChanged) {
+                $table = $this->db->prefix . 'walking_tour_place_annotations';
+                $this->db->query("UPDATE `{$table}` SET needs_review = 1 WHERE map_id = ? AND image_x IS NOT NULL", array($id));
+            }
+            $adapter->commit();
+            return array('changed'=>true, 'image_changed'=>$imageChanged, 'revision'=>$revision + 1);
+        } catch (Exception $error) { $adapter->rollBack(); throw $error; }
     }
 
     /** Delete one map and its children; stage uploads so a failed transaction can restore them. */
