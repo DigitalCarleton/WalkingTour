@@ -112,9 +112,21 @@ legacy migration, the original tour location reader, and storage contraction.
 
 Historical Maps reads published Items directly from Geolocation in pages of 500. It never
 requires tour membership or the old location export. Reloading reads current locations.
-Select a place marker or **Find a place** to see its plain-text title, excerpt, Item link,
-and counterpart. Modern markers remain available when a reliable historical counterpart
-cannot be obtained. Ground control points are never drawn.
+Only Items with a reliable automatic historical position inside the imported mask are
+included in either pane or the place selector. Out-of-coverage, invalid and ambiguous
+positions are omitted from both panes. Ground control points are never drawn.
+Select a blue Leaflet pin or **Find a place** to see a Geolocation-style balloon with
+the linked Item title, first available Omeka thumbnail and a plain-text description
+excerpt. Missing thumbnails are omitted. Both panes show the same Item information.
+
+The imported resource mask is outlined in pink on the original image. The modern pane
+outlines its transformed footprint, including samples along each edge because nonlinear
+transformations bend straight image edges. Sampling refines chords to a 5-metre midpoint
+tolerance and 250-metre maximum segment length, with bounded subdivision. View map area
+fits this footprint rather than the control-point bounding box. The image remains unwarped
+and unclipped. No mask-editing tools or control markers are shown. Filtering uses the checked
+inverse inside the original mask, not the footprint's bounding box or the current viewport.
+An outline that cannot be transformed safely is omitted instead of displaying a fabricated extent.
 
 The local `allmaps-transform.js` bundle uses pinned `@allmaps/project` and
 `@allmaps/transform` packages with the declared transformation (including polynomial
@@ -157,6 +169,8 @@ estimated position clears only the override; notes and display decisions remain.
 Coordinates can be zero and can fall outside the Allmaps resource mask when
 explicitly reviewed, but must lie inside original-image dimensions. An override
 never changes Geolocation, Allmaps controls, the source snapshot, or other Items.
+Overrides only reposition Items whose modern location already qualifies for map coverage;
+an override cannot bring an outside Item into the viewer.
 Notes are plain text and accompany public Items in the decision API.
 
 After deploying this slice, run `php scripts/initialize-map-storage.php` from the
@@ -182,9 +196,10 @@ years, reversed intervals and values outside -9999…9999 are rejected. Unknown 
 stay blank. The library shows the label and available years. No timeline or Dublin
 Core date inference is performed.
 
-The default display rule shows all current public Geolocation Items on the modern
-map, and shows historical counterparts only when there is a reliable estimate or
-reviewed override. An explicit Show currently uses the same coverage rule; it records
+The default display rule shows current public Geolocation Items only when the imported
+calibration yields a reliable position inside the mask. Both panes share this coverage
+rule. Reviewed overrides replace historical positions after this filter. An explicit Show
+uses the same coverage rule; it records
 the editorial intention without bypassing publication or inventing positions. Hide
 removes that Item from both panes and the visitor picker. Editors can check Include
 hidden places to find a hidden Item and restore Default or Show. Saving Hide keeps
@@ -217,7 +232,8 @@ A new calibration updates automatic browser estimates on reload, retaining the l
 ID, title, period, notes and Item visibility. If image identity or pixel dimensions changed,
 publication requires explicit acknowledgment and flags saved position overrides as needing
 review. Their old pixels are retained for the editor, but visitors see the current automatic
-estimate (or only the modern marker) until Adjust historical position is reviewed and saved.
+estimate until Adjust historical position is reviewed and saved. If its modern location
+no longer qualifies for coverage, it is omitted from both panes while its decision remains stored.
 Reset can instead discard the stale override while preserving visibility and notes.
 
 Image-space equality means the IIIF service identity and dimensions are unchanged. If a

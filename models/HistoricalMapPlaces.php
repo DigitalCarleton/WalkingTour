@@ -13,7 +13,7 @@ class WalkingTour_HistoricalMapPlaces
         $db = $this->db;
         $rows = $db->fetchAll("SELECT i.id, l.longitude, l.latitude FROM `$db->Item` i
             JOIN `$db->Location` l ON l.item_id = i.id WHERE i.public = 1 AND i.id > ? ORDER BY i.id LIMIT 501", array($after));
-        $more = count($rows) > 500; $rows = array_slice($rows, 0, 500); $texts = array();
+        $more = count($rows) > 500; $rows = array_slice($rows, 0, 500); $texts = array(); $thumbnails = array();
         if ($rows) {
             $ids = array_map('intval', array_column($rows, 'id'));
             $data = $db->fetchAll("SELECT t.record_id, e.name, t.text FROM `$db->ElementText` t
@@ -25,6 +25,13 @@ class WalkingTour_HistoricalMapPlaces
                     $texts[$text['record_id']][$text['name']] = mb_substr(trim(html_entity_decode(strip_tags($text['text']), ENT_QUOTES, 'UTF-8')), 0, $text['name'] === 'Title' ? 255 : 1000);
                 }
             }
+            // Use Omeka's File/storage API in one batch, as Geolocation's balloon does.
+            $files = $db->getTable('File')->fetchObjects("SELECT f.* FROM `$db->File` f
+                WHERE f.item_id IN (" . implode(',', $ids) . ") AND f.has_derivative_image = 1
+                ORDER BY f.item_id, f.`order`, f.id");
+            foreach ($files as $file) {
+                if (!isset($thumbnails[$file->item_id])) { $thumbnails[$file->item_id] = $file->getWebPath('thumbnail'); }
+            }
         }
         $places = array();
         foreach ($rows as $row) {
@@ -33,7 +40,8 @@ class WalkingTour_HistoricalMapPlaces
             if (!is_finite($lon) || !is_finite($lat) || abs($lon) > 180 || abs($lat) > 90) { continue; }
             $id = (int) $row['id'];
             $places[] = array('item_id' => $id, 'coordinates' => array($lon, $lat),
-                'title' => $texts[$id]['Title'] ?? ('Item ' . $id), 'description' => $texts[$id]['Description'] ?? '', 'url' => public_url('items/show/' . $id));
+                'title' => $texts[$id]['Title'] ?? ('Item ' . $id), 'description' => $texts[$id]['Description'] ?? '',
+                'thumbnail_url' => $thumbnails[$id] ?? null, 'url' => public_url('items/show/' . $id));
         }
         return array('places' => $places, 'next' => $more ? (int) end($rows)['id'] : null);
     }

@@ -1,6 +1,6 @@
 import {build} from 'esbuild';
 import {fileURLToPath} from 'node:url';
-await build({entryPoints:[fileURLToPath(new URL('./allmaps.js',import.meta.url))],bundle:true,format:'iife',target:['es2020'],minify:true,legalComments:'eof',outfile:fileURLToPath(new URL('../../views/public/javascripts/allmaps-transform.js',import.meta.url))});
+await build({entryPoints:[fileURLToPath(new URL('./allmaps.js',import.meta.url))],bundle:true,format:'iife',target:['es2020'],supported:{'template-literal':false},minify:true,legalComments:'eof',outfile:fileURLToPath(new URL('../../views/public/javascripts/allmaps-transform.js',import.meta.url))});
 
 import {copyFile, readFile, writeFile, chmod} from 'node:fs/promises';
 const cluster = new URL('./node_modules/leaflet.markercluster/', import.meta.url);

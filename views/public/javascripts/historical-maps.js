@@ -38,6 +38,7 @@
             });
             historicalMap.setView([0, 0], -5);
             var imageLayer;
+            var historicalMask, modernMask;
             var activeMap;
             var imageBounds;
             var geographicBounds;
@@ -49,9 +50,20 @@
 
             function updateGeographicBounds(record) {
                 geographicBounds = L.latLngBounds();
-                (record.geographic_bounds || []).forEach(function (point) {
-                    geographicBounds.extend([point[1], point[0]]);
-                });
+                if (historicalMask) { historicalMap.removeLayer(historicalMask); historicalMask = null; }
+                if (modernMask) { modernMap.removeLayer(modernMask); modernMask = null; }
+                if (record.source_kind === 'allmaps') {
+                    var style = {color: '#f34ab8', weight: 3, fill: false, interactive: false, className: 'allmaps-mask-boundary'};
+                    var pixels = record.georeference.resourceMask;
+                    historicalMask = L.polygon(pixels.map(function (p) { return imageLatLng(p[0],p[1]); }), style).addTo(historicalMap);
+                    try {
+                        var footprint = window.WalkingTourAllmaps.create(record).footprint();
+                        if (footprint) {
+                            modernMask = L.polygon(footprint.map(function (p) { return [p[1],p[0]]; }), style).addTo(modernMap);
+                            geographicBounds = modernMask.getBounds();
+                        }
+                    } catch (e) { /* Legacy/invalid calibration has no geographic footprint. */ }
+                }
                 document.getElementById('map-area-fit').disabled = !geographicBounds.isValid();
             }
 
@@ -85,7 +97,7 @@
             });
             $('#map-area-fit').on('click', function () {
                 if (geographicBounds && geographicBounds.isValid()) {
-                    modernMap.fitBounds(geographicBounds, {padding: [40, 40], maxZoom: 16});
+                    modernMap.fitBounds(geographicBounds, {padding: [40, 40], maxZoom: modernMap.getMaxZoom()});
                 }
             });
 
@@ -138,7 +150,7 @@
                 imageLayer.on('tileload tileunload', function (event) { failedTiles.delete(event.tile); });
                 imageLayer.on('load', function () {
                     if (generation !== loadGeneration || failedTiles.size) { return; }
-                    setStatus(record.source_kind === 'allmaps' ? 'Original image · Calibrated in Allmaps' : 'Original historical image', false);
+                    setStatus(record.source_kind === 'allmaps' ? 'Original image · Calibrated in Allmaps · Pink outline: map coverage' : 'Original historical image', false);
                 });
                 imageLayer.addTo(historicalMap);
 
@@ -154,7 +166,7 @@
                     this.setAttribute('aria-pressed', String(this.dataset.mapId === String(record.id)));
                 });
                 if (geographicBounds.isValid()) {
-                    modernMap.fitBounds(geographicBounds, {padding: [40, 40], maxZoom: 16});
+                    modernMap.fitBounds(geographicBounds, {padding: [40, 40], maxZoom: modernMap.getMaxZoom()});
                 }
             }
 

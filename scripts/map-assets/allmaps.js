@@ -45,6 +45,34 @@ export function create(record) {
             return roots.length === 1 ? roots[0] : null;
         } catch (_) { return null; }
     };
-    return {estimate, valid, forward: p=>transformer.transformToGeo(p)};
+    // Densify the mask in image space: nonlinear transforms bend straight edges.
+    // Work in metres when measuring chord error, then return Leaflet's lon/lat.
+    let outline;
+    const footprint = () => {
+        if (outline !== undefined) return outline;
+        outline = null;
+        try {
+            const ring = map.resourceMask, pixels = [];
+            const append = (a, b, depth = 0) => {
+                const middle = [(a[0]+b[0])/2, (a[1]+b[1])/2];
+                const qa = forward(a), qb = forward(b), qm = forward(middle);
+                if (![qa,qb,qm].every(finite) || pixels.length > 8192) throw new Error('Invalid mask footprint');
+                const error = Math.hypot(qm[0]-(qa[0]+qb[0])/2, qm[1]-(qa[1]+qb[1])/2);
+                if (depth < 2 || error > 5 || Math.hypot(qb[0]-qa[0],qb[1]-qa[1]) > 250) {
+                    if (depth >= 12) throw new Error('Mask footprint did not converge');
+                    append(a,middle,depth+1); append(middle,b,depth+1);
+                } else pixels.push(a);
+            };
+            for (let i=0; i<ring.length; i++) {
+                const a=ring[i], b=ring[(i+1)%ring.length];
+                if (a[0] !== b[0] || a[1] !== b[1]) append(a,b);
+            }
+            const geo=pixels.map(p=>transformer.transformToGeo(p));
+            if (geo.length < 3 || !geo.every(p=>finite(p) && Math.abs(p[0])<=180 && Math.abs(p[1])<85.05112878)) return null;
+            outline=geo;
+        } catch (_) { /* A failed outline never becomes an invented bounding box. */ }
+        return outline;
+    };
+    return {estimate, valid, footprint, forward: p=>transformer.transformToGeo(p)};
 }
 window.WalkingTourAllmaps = {create, inside};
