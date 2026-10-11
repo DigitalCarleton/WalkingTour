@@ -11,6 +11,7 @@
             draft = null; if (draftMarker) { historical.removeLayer(draftMarker); draftMarker = null; }
             el('historical-position-draft').hidden = true;
         }
+        function visible(id) { return decision(id).visibility !== 'hide'; }
         function position(pair) {
             var d = decision(pair.place.item_id);
             return d.pixel && !d.needs_review ? d.pixel : (transform ? transform.estimate(pair.place.coordinates) : null);
@@ -21,7 +22,7 @@
             pair.historical = pixel ? marker([-pixel[1], pixel[0]], pair.place, !d.pixel || d.needs_review) : null;
             if (pair.historical) {
                 if (d.pixel && !d.needs_review) { pair.historical.options.icon.options.className += ' is-override'; }
-                historicalLayer.addLayer(pair.historical);
+                if (visible(pair.place.item_id)) { historicalLayer.addLayer(pair.historical); }
             }
         }
         function details() {
@@ -30,6 +31,8 @@
             el('historical-place-status').textContent = d.needs_review ? 'The saved position needs review after an image change. Only the current automatic estimate is used.' :
                 (d.pixel ? 'Reviewed historical position override. This does not change Allmaps calibration.' :
                 (pair.historical ? 'Estimated historical position. Compare with the original image.' : 'No reliable historical counterpart is available within this map. The modern location is shown.'));
+            if (!visible(selected)) { el('historical-place-status').textContent = 'Hidden on this map. Restore Default or Show to display this Item again. ' + el('historical-place-status').textContent; }
+            el('historical-place-visibility').value = d.visibility;
             el('historical-place-editor').hidden = !canEdit;
             el('historical-place-note').value = d.note;
             el('historical-position-reset').disabled = busy || !d.pixel;
@@ -37,7 +40,7 @@
         function setBusy(value) {
             busy = value; picker.disabled = value;
             if (draftMarker && draftMarker.dragging) { if (value) { draftMarker.dragging.disable(); } else { draftMarker.dragging.enable(); } }
-            root.querySelectorAll('#historical-place-editor button, #historical-place-editor input, #historical-place-editor textarea, #historical-map-list button').forEach(function (button) { button.disabled = value; });
+            root.querySelectorAll('#historical-place-editor button, #historical-place-editor input, #historical-place-editor textarea, #historical-place-editor select, #historical-show-hidden, #historical-map-list button').forEach(function (button) { button.disabled = value; });
             if (!value) { details(); }
         }
         function save(operation, value) {
@@ -49,7 +52,12 @@
             writeRequest.done(function (data) {
                 if (stamp !== generation) { return; }
                 record.revision = data.revision; decisions[itemId] = data.decision;
-                if (operation === 'position') { cancelDraft(); paintHistorical(pairs[itemId]); } details(); feedback('Decision saved.');
+                if (operation === 'position') { cancelDraft(); paintHistorical(pairs[itemId]); }
+                if (operation === 'visibility') {
+                    cancelDraft(); if (value === 'hide') { el('historical-show-hidden').checked = true; }
+                    paintVisibility(pairs[itemId]); refreshPicker(); refreshStats();
+                }
+                details(); feedback('Decision saved.');
             }).fail(function (xhr) {
                 if (stamp !== generation) { return; }
                 feedback((xhr.responseJSON && xhr.responseJSON.error) || 'The save response was not received. Your draft is kept. Reload and review the saved decision before retrying.');
@@ -86,8 +94,30 @@
         });
         el('historical-position-cancel').addEventListener('click', function () { cancelDraft(); feedback('Adjustment cancelled.'); });
         el('historical-position-reset').addEventListener('click', function () { save('position', null); });
+        el('historical-visibility-save').addEventListener('click', function () { save('visibility', el('historical-place-visibility').value); });
+        el('historical-show-hidden').addEventListener('change', refreshPicker);
         el('historical-note-save').addEventListener('click', function () { save('note', el('historical-place-note').value); });
         el('historical-decision-reload').addEventListener('click', function () { window.location.reload(); });
+        function paintVisibility(pair) {
+            modernLayer.removeLayer(pair.modern); if (pair.historical) { historicalLayer.removeLayer(pair.historical); }
+            if (visible(pair.place.item_id)) { modernLayer.addLayer(pair.modern); if (pair.historical) { historicalLayer.addLayer(pair.historical); } }
+        }
+        function addOption(pair) {
+            var id = pair.place.item_id;
+            if (!visible(id) && !(canEdit && el('historical-show-hidden').checked)) { return; }
+            var option = document.createElement('option'); option.value = id; option.textContent = pair.place.title + (visible(id) ? '' : ' (hidden)'); picker.appendChild(option);
+        }
+        function refreshPicker() {
+            picker.textContent = ''; var empty = document.createElement('option'); empty.value = ''; empty.textContent = 'Choose a place'; picker.appendChild(empty);
+            Object.keys(pairs).forEach(function (key) { addOption(pairs[key]); });
+            if (selected && (!visible(selected) && !(canEdit && el('historical-show-hidden').checked))) { cancelDraft(); selected = null; panel.hidden = true; }
+            picker.value = selected ? String(selected) : '';
+        }
+        function refreshStats() {
+            var shown = 0, paired = 0, hidden = 0;
+            Object.keys(pairs).forEach(function (key) { if (!visible(key)) { hidden++; } else { shown++; if (pairs[key].historical) { paired++; } } });
+            status.textContent = shown + ' places shown · ' + paired + ' historical positions · ' + hidden + ' hidden.';
+        }
         function cluster(map) {
             return L.markerClusterGroup({animate: false, showCoverageOnHover: false, chunkedLoading: true, chunkInterval: 40, chunkDelay: 10,
                 iconCreateFunction: function (group) { return L.divIcon({className: 'historical-place-cluster', html: '<span>' + group.getChildCount() + '</span>', iconSize: [38, 38]}); }
@@ -107,7 +137,7 @@
             return m;
         }
         function locate() {
-            var pair = pairs[selected]; if (!pair) { return; }
+            var pair = pairs[selected]; if (!pair || !visible(selected)) { return; }
             var stamp = generation, id = selected;
             function reveal(layer, map, m, zoom) {
                 map.setView(m.getLatLng(), map.getMaxZoom(), {animate: false});
@@ -140,7 +170,7 @@
             if (request) { request.abort(); }
             if (decisionRequest) { decisionRequest.abort(); }
             cancelDraft(); decisions = {}; canEdit = false; csrf = null; busy = false;
-            picker.disabled = false; el('historical-place-editor').hidden = true; el('historical-decision-reload').hidden = true;
+            picker.disabled = false; el('historical-show-hidden').checked = false; el('historical-hidden-label').hidden = true; el('historical-place-editor').hidden = true; el('historical-decision-reload').hidden = true;
             modern.removeLayer(modernLayer); historical.removeLayer(historicalLayer);
             modernLayer = cluster(modern); historicalLayer = cluster(historical); panel.hidden = true;
             picker.textContent = ''; var empty = document.createElement('option'); empty.value = ''; empty.textContent = 'Choose a place'; picker.appendChild(empty);
@@ -160,12 +190,12 @@
                             var m = marker([place.coordinates[1], place.coordinates[0]], place, false);
                             var h = pixel ? marker([-pixel[1], pixel[0]], place, !d.pixel || d.needs_review) : null;
                             if (h && d.pixel && !d.needs_review) { h.options.icon.options.className += ' is-override'; }
-                            modernBatch.push(m); if (h) { historicalBatch.push(h); }
+                            if (visible(place.item_id)) { modernBatch.push(m); if (h) { historicalBatch.push(h); } }
                             pairs[place.item_id] = {place: place, modern: m, historical: h}; count++; if (h) { paired++; }
-                            var option = document.createElement('option'); option.value = place.item_id; option.textContent = place.title; picker.appendChild(option);
+                            addOption(pairs[place.item_id]);
                         }
                         modernLayer.addLayers(modernBatch); historicalLayer.addLayers(historicalBatch);
-                        status.textContent = count + ' public places · ' + paired + ' estimated historical positions.' + (error ? ' ' + error : '');
+                        refreshStats(); if (error) { status.textContent += ' ' + error; }
                         if (offset < data.places.length) { window.setTimeout(batch, 0); }
                         else if (data.next !== null) { page(data.next); }
                     }
@@ -180,7 +210,7 @@
                 if (current !== generation) { return; }
                 if (data.revision !== record.revision) { status.textContent = 'This map changed while loading. Reload the page to use its latest version.'; return; }
                 data.decisions.forEach(function (d) { decisions[d.item_id] = d; });
-                canEdit = data.can_edit; csrf = data.csrf_token; page(0);
+                canEdit = data.can_edit; csrf = data.csrf_token; el('historical-hidden-label').hidden = !canEdit; page(0);
             }).fail(function (xhr, text) {
                 if (current !== generation || text === 'abort') { return; }
                 status.textContent = (xhr.responseJSON && xhr.responseJSON.error) || 'Place decisions could not load. Reload the page to retry.';

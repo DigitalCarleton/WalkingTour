@@ -151,10 +151,11 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
         $this->view->map = $map;
         $values = $this->getRequest()->isPost() ? array('title' => $this->text('title'), 'source_url' => $this->text('source_url'), 'revision' => $this->text('revision')) :
             array('title' => $map['title'], 'source_url' => $map['source_url'], 'revision' => (string) $map['revision']);
+        foreach (array('period_label','period_start','period_end') as $key) { $values[$key] = $this->getRequest()->isPost() ? $this->text($key) : (string) ($map[$key] ?? ''); }
         if (!$this->form($values)) { return; }
         try {
             if (!ctype_digit($values['revision'])) { throw new InvalidArgumentException('The saved map revision is required.'); }
-            $this->maps->updateMetadata($map['id'], (int) $values['revision'], $values['title'], $values['source_url']);
+            $this->maps->updateMetadata($map['id'], (int) $values['revision'], $values['title'], $values['source_url'], array('label'=>$values['period_label'],'start'=>$values['period_start'],'end'=>$values['period_end']));
             $this->_helper->flashMessenger('Map information saved.', 'success');
             $this->_redirect(url('historical-maps/show/' . $map['id']), array('prependBase' => false));
         } catch (Exception $error) { $this->formError($error); }

@@ -65,6 +65,9 @@ class WalkingTour_HistoricalMapDecisions
                 }
                 // Explicit overrides may be outside the resource mask, but not outside the image.
                 $row['image_x'] = $value === null ? null : $value[0]; $row['image_y'] = $value === null ? null : $value[1]; $row['needs_review'] = 0;
+            } elseif ($operation === 'visibility') {
+                if (!in_array($value, array('default', 'show', 'hide'), true)) { throw new InvalidArgumentException('Choose Default, Show, or Hide.'); }
+                $row['visibility'] = $value;
             } elseif ($operation === 'note') {
                 if (!is_string($value) || mb_strlen($value) > 2000) { throw new InvalidArgumentException('Enter a note of at most 2000 characters.'); }
                 $row['note'] = trim($value);

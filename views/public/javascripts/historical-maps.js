@@ -171,6 +171,13 @@
                             button.type = 'button';
                             button.dataset.mapId = record.id;
                             button.textContent = record.title;
+                            if (record.period_label || record.period_start !== null || record.period_end !== null) {
+                                var period = document.createElement('small');
+                                function year(value) { return value < 0 ? Math.abs(value) + ' BCE' : value + ' CE'; }
+                                var years = record.period_start !== null && record.period_end !== null ? year(record.period_start) + ' – ' + year(record.period_end) :
+                                    (record.period_start !== null ? 'From ' + year(record.period_start) : (record.period_end !== null ? 'Until ' + year(record.period_end) : ''));
+                                period.textContent = [record.period_label, years].filter(Boolean).join(' · '); button.appendChild(period);
+                            }
                             button.addEventListener('click', function () { showMap(record); });
                             list.appendChild(button);
                         });

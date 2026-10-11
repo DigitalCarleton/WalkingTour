@@ -76,3 +76,8 @@
 #historical-place-editor input, #historical-place-editor textarea {box-sizing: border-box; width: 100%;}
 #dual-map .historical-place-marker.is-override {color: #aa5511;}
 #dual-map .historical-place-marker.is-draft {color: #b34810; border: 2px dashed #b34810; border-radius: 50%;}
+
+#historical-map-list small {display: block; margin-top: .3em; font-size: .85em;}
+#historical-place-visibility {width: 100%;}
+#historical-hidden-label {display: block; margin: 1em 0;}
+#historical-hidden-label[hidden] {display: none;}

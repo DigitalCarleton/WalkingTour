@@ -10,6 +10,8 @@
         <p>This legacy map remains readable. Its saved calibration and annotations are retained for migration. Website calibration editing and direct uploads are retired.</p>
     <?php endif; ?>
     <dl>
+        <dt>Represented period</dt><dd><?php echo html_escape($map['period_label'] ?: 'Not specified'); ?></dd>
+        <dt>Period years</dt><dd><?php echo html_escape(($map['period_start'] === null ? 'Unknown' : (string) $map['period_start']) . ' to ' . ($map['period_end'] === null ? 'Unknown' : (string) $map['period_end'])); ?></dd>
         <dt>Original image size</dt><dd><?php echo $map['image_width']; ?> × <?php echo $map['image_height']; ?> pixels</dd>
         <dt>Image source</dt><dd><?php echo $map['source_kind'] === 'upload' ? 'Legacy uploaded image' : 'IIIF image'; ?></dd>
         <?php if ($map['source_kind'] === 'upload'): ?>

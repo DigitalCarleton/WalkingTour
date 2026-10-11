@@ -168,3 +168,25 @@ decisions and returns an editing token only to authorized editors. POST
 Item ID, operation (`position` or `note`) and value. Every write locks the map and
 rejects stale revisions. A failed or lost response can be checked with Reload
 latest decisions; that explicit page reload discards the draft for review.
+
+### Period metadata and map-specific visibility
+
+Edit map information in the Omeka admin to set an optional period label and start
+or end year. Negative years mean BCE, positive years mean CE; year zero, fractional
+years, reversed intervals and values outside -9999…9999 are rejected. Unknown years
+stay blank. The library shows the label and available years. No timeline or Dublin
+Core date inference is performed.
+
+The default display rule shows all current public Geolocation Items on the modern
+map, and shows historical counterparts only when there is a reliable estimate or
+reviewed override. An explicit Show currently uses the same coverage rule; it records
+the editorial intention without bypassing publication or inventing positions. Hide
+removes that Item from both panes and the visitor picker. Editors can check Include
+hidden places to find a hidden Item and restore Default or Show. Saving Hide keeps
+the selected Item available in that editor picker. Visibility is scoped to the map
+and shares its annotation row with position and note; reset/delete never touches the
+source Item. Visibility is saved with operation `visibility` and value `default`,
+`show`, or `hide` through the Item decision endpoint.
+
+Run the storage initializer after deployment to add the three map period fields.
+The same revision lock protects period edits, display decisions and positions.

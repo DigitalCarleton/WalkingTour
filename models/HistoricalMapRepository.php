@@ -91,13 +91,16 @@ class WalkingTour_HistoricalMapRepository
             KEY map_changes (map_id, id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         (new WalkingTour_HistoricalMapDecisions($this->db))->install();
+        foreach (array('period_label'=>"VARCHAR(255) NOT NULL DEFAULT ''", 'period_start'=>'INT NULL', 'period_end'=>'INT NULL') as $column => $definition) {
+            if (!$this->db->fetchOne("SHOW COLUMNS FROM `{$this->maps}` LIKE '{$column}'")) { $this->db->query("ALTER TABLE `{$this->maps}` ADD `{$column}` {$definition}"); }
+        }
         // Legacy tables remain until reviewed migration; initialization never seeds or recalibrates.
     }
 
     public function all()
     {
         $maps = $this->db->fetchAll("SELECT id, slug, title, image_service, image_width,
-            image_height, manifest_url, source_url, source_snapshot, transformation, revision, calibration_revision, next_control_ordinal
+            image_height, manifest_url, source_url, source_snapshot, transformation, revision, calibration_revision, next_control_ordinal, period_label, period_start, period_end
             FROM `{$this->maps}` ORDER BY id");
         foreach ($maps as &$map) {
             $snapshot = json_decode($map['source_snapshot'], true);
@@ -108,6 +111,7 @@ class WalkingTour_HistoricalMapRepository
             foreach (array('id', 'image_width', 'image_height', 'revision', 'calibration_revision', 'next_control_ordinal') as $key) {
                 $map[$key] = (int) $map[$key];
             }
+            foreach (array('period_start','period_end') as $key) { $map[$key] = $map[$key] === null ? null : (int) $map[$key]; }
             if ($map['source_kind'] === 'allmaps') {
                 $map['allmaps'] = array('annotation_url' => $snapshot['annotation_url'], 'resolved_id' => $snapshot['resolved_id'],
                     'annotation_id' => $snapshot['annotation']['id'], 'content_hash' => $snapshot['content_hash'], 'imported_at' => $snapshot['imported_at']);
@@ -257,11 +261,28 @@ class WalkingTour_HistoricalMapRepository
         return $this->find($id);
     }
 
-    public function updateMetadata($id, $revision, $title, $source)
+    private function period($period)
+    {
+        if (!is_array($period) || !is_string($period['label'] ?? null) || mb_strlen(trim($period['label'])) > 255) { throw new InvalidArgumentException('Enter a period label of at most 255 characters.'); }
+        $period['label'] = trim($period['label']);
+        foreach (array('start','end') as $key) {
+            $value = $period[$key] ?? null;
+            if ($value === '') { $value = null; }
+            if (is_string($value) && preg_match('/^-?[0-9]{1,4}$/D', $value)) { $value = (int) $value; }
+            if ($value !== null && (!is_int($value) || $value === 0 || abs($value) > 9999)) { throw new InvalidArgumentException('Period years must be whole years from -9999 to 9999, excluding zero. Use negative years for BCE.'); }
+            $period[$key] = $value;
+        }
+        if ($period['start'] !== null && $period['end'] !== null && $period['start'] > $period['end']) { throw new InvalidArgumentException('The period start must not be after its end.'); }
+        return $period;
+    }
+
+    public function updateMetadata($id, $revision, $title, $source, $period = null)
     {
         $saved = $this->find($id);
         if ($saved['source_kind'] === 'allmaps' && $source !== $saved['source_url']) { throw new InvalidArgumentException('The imported Allmaps source is fixed. Use the explicit refresh workflow to change its snapshot.'); }
         list($title, $source) = $this->metadata($title, $source);
+        if ($period === null) { $period = array('label'=>$saved['period_label'],'start'=>$saved['period_start'],'end'=>$saved['period_end']); }
+        $period = $this->period($period);
         if (!is_int($id) || $id < 1 || !is_int($revision) || $revision < 1) { throw new InvalidArgumentException('A map ID and revision are required.'); }
         $adapter = $this->db->getAdapter();
         $adapter->beginTransaction();
@@ -269,7 +290,7 @@ class WalkingTour_HistoricalMapRepository
             $current = $this->db->fetchOne("SELECT revision FROM `{$this->maps}` WHERE id = ? FOR UPDATE", array($id));
             if (!$current) { throw new InvalidArgumentException('Historical map not found.'); }
             if ((int) $current !== $revision) { throw new RuntimeException('This map changed after you opened the form. Your entered values have been kept. Open the latest record in another tab and review before saving.', 409); }
-            $this->db->query("UPDATE `{$this->maps}` SET title = ?, source_url = ?, revision = revision + 1 WHERE id = ?", array($title, $source, $id));
+            $this->db->query("UPDATE `{$this->maps}` SET title = ?, source_url = ?, period_label = ?, period_start = ?, period_end = ?, revision = revision + 1 WHERE id = ?", array($title, $source, $period['label'], $period['start'], $period['end'], $id));
             $adapter->commit();
         } catch (Exception $error) { $adapter->rollBack(); throw $error; }
         return $this->find($id);

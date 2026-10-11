@@ -51,12 +51,16 @@
                             <button type="button" id="historical-position-cancel">Cancel adjustment</button>
                         </div>
                         <button type="button" id="historical-position-reset">Reset to estimated position</button>
+                        <label for="historical-place-visibility">Display on this map</label>
+                        <select id="historical-place-visibility"><option value="default">Default</option><option value="show">Show</option><option value="hide">Hide</option></select>
+                        <button type="button" id="historical-visibility-save">Save display choice</button>
                         <label for="historical-place-note">Editorial note</label><textarea id="historical-place-note" maxlength="2000"></textarea>
                         <button type="button" id="historical-note-save">Save note</button>
                         <p id="historical-decision-status" role="status" aria-live="polite"></p>
                         <button type="button" id="historical-decision-reload" hidden>Reload latest decisions (discard draft)</button>
                     </div>
                 </section>
+                <label id="historical-hidden-label" hidden><input id="historical-show-hidden" type="checkbox"> Include hidden places (editor)</label>
                 <label for="historical-place-select">Find a place</label>
                 <select id="historical-place-select"><option value="">Choose a place</option></select>
                 <div id="historical-map-sources"></div>
