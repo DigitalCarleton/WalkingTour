@@ -10,6 +10,9 @@
     <?php else: ?>
         <p>This legacy map remains readable. Its saved calibration and annotations are retained for migration. Website calibration editing and direct uploads are retired.</p>
     <?php endif; ?>
+    <?php if ($map['migration']): ?>
+        <p>Migration status: <?php echo html_escape($map['migration']['state']); ?> · <?php echo html_escape($map['migration']['reason']); ?></p>
+    <?php endif; ?>
     <dl>
         <dt>Represented period</dt><dd><?php echo html_escape($map['period_label'] ?: 'Not specified'); ?></dd>
         <dt>Period years</dt><dd><?php echo html_escape(($map['period_start'] === null ? 'Unknown' : (string) $map['period_start']) . ' to ' . ($map['period_end'] === null ? 'Unknown' : (string) $map['period_end'])); ?></dd>

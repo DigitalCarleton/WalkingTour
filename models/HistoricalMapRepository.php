@@ -94,16 +94,21 @@ class WalkingTour_HistoricalMapRepository
         foreach (array('period_label'=>"VARCHAR(255) NOT NULL DEFAULT ''", 'period_start'=>'INT NULL', 'period_end'=>'INT NULL') as $column => $definition) {
             if (!$this->db->fetchOne("SHOW COLUMNS FROM `{$this->maps}` LIKE '{$column}'")) { $this->db->query("ALTER TABLE `{$this->maps}` ADD `{$column}` {$definition}"); }
         }
+        if (!$this->db->fetchOne("SHOW COLUMNS FROM `{$this->maps}` LIKE 'migration_receipt'")) {
+            $this->db->query("ALTER TABLE `{$this->maps}` ADD migration_receipt MEDIUMTEXT NULL");
+        }
         // Legacy tables remain until reviewed migration; initialization never seeds or recalibrates.
     }
 
     public function all()
     {
         $maps = $this->db->fetchAll("SELECT id, slug, title, image_service, image_width,
-            image_height, manifest_url, source_url, source_snapshot, transformation, revision, calibration_revision, next_control_ordinal, period_label, period_start, period_end
+            image_height, manifest_url, source_url, source_snapshot, transformation, revision, calibration_revision, next_control_ordinal, period_label, period_start, period_end, migration_receipt
             FROM `{$this->maps}` ORDER BY id");
         foreach ($maps as &$map) {
             $snapshot = json_decode($map['source_snapshot'], true);
+            $map['migration'] = json_decode($map['migration_receipt'] ?? 'null', true);
+            unset($map['migration_receipt']);
             $map['source_kind'] = in_array($snapshot['source_kind'] ?? '', array('upload', 'allmaps'), true) ? $snapshot['source_kind'] : 'iiif';
             $map['image_url'] = $map['source_kind'] === 'upload' ? Zend_Registry::get('storage')->getUri(WalkingTour_HistoricalMapUpload::storagePath($snapshot)) : null;
             $map['image_quality'] = ($snapshot['image_quality'] ?? '') === 'native' ? 'native' : 'default';
@@ -161,7 +166,7 @@ class WalkingTour_HistoricalMapRepository
     /** Viewer data has no legacy editable points or undo state. Allmaps GCPs are calculation inputs only. */
     public function catalog()
     {
-        $maps = $this->all();
+        $maps = array_values(array_filter($this->all(), function ($map) { return ($map['migration']['state'] ?? '') !== 'archived'; }));
         foreach ($maps as &$map) {
             // Preserve previously saved outlines for read-only browsing until
             // reviewed Allmaps migration. Do not expose old editing/revision state.
@@ -169,7 +174,7 @@ class WalkingTour_HistoricalMapRepository
                 $map['display_mask'] = array('image_ring' => $map['mask']['image_ring'],
                     'geographic_ring' => $map['mask']['geographic_ring']);
             }
-            unset($map['control_points'], $map['annotations'], $map['mask'], $map['undo_calibration'], $map['calibration_revision'], $map['next_control_ordinal']);
+            unset($map['migration'], $map['control_points'], $map['annotations'], $map['mask'], $map['undo_calibration'], $map['calibration_revision'], $map['next_control_ordinal']);
         }
         unset($map);
         return $maps;
@@ -563,6 +568,7 @@ class WalkingTour_HistoricalMapRepository
             if ((int) $current !== $revision) { throw new RuntimeException('This map was updated by another editor. Your draft has been kept. Reload the latest data and review before saving.', 409); }
             $map = $this->find($id);
             if ($map['source_kind'] === 'allmaps') { throw new InvalidArgumentException('Imported Allmaps calibration is read-only.'); }
+            if (($map['migration']['state'] ?? '') === 'archived') { throw new InvalidArgumentException('Archived calibration is read-only.'); }
             $calibrationBefore = null;
             if ($operation === 'mask') {
                 $ring = WalkingTour_HistoricalMapGeometry::ring($payload['ring'] ?? null);
