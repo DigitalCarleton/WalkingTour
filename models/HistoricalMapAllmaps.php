@@ -154,7 +154,10 @@ class WalkingTour_HistoricalMapAllmaps
                 ($body['type'] ?? '') !== 'FeatureCollection' || !is_array($body['features'] ?? null) || array_keys($body['features']) !== range(0, count($body['features']) - 1) || count($body['features']) < 2 || count($body['features']) > 200) {
                 throw new InvalidArgumentException('Each selected map must be a georeference annotation with a supported IIIF image service and 2 to 200 control points.');
             }
-            if (isset($body['resourceCrs'])) { throw new InvalidArgumentException('Custom resource coordinate systems are not supported. Export image pixel coordinates from Allmaps.'); }
+            $resourceCrs = $body['resourceCrs'] ?? null;
+            if ($resourceCrs !== null && (!is_array($resourceCrs) || !in_array($resourceCrs['definition'] ?? '', array('EPSG:4326', 'EPSG:3857'), true))) {
+                throw new InvalidArgumentException('Supported Allmaps resource projections are EPSG:4326 and EPSG:3857.');
+            }
             $annotationId = WalkingTour_HistoricalMapIiif::url($annotation['id'] ?? '');
             $service = rtrim(WalkingTour_HistoricalMapIiif::url($source['id'] ?? ''), '/');
             if (parse_url($service, PHP_URL_QUERY) !== null) { throw new InvalidArgumentException('The image service cannot contain a query string.'); }
@@ -183,7 +186,7 @@ class WalkingTour_HistoricalMapAllmaps
             $identity = $annotationId . "\n" . $service;
             if (isset($seen[$identity])) { throw new InvalidArgumentException('The annotation page contains a duplicate map identity.'); }
             $seen[$identity] = true;
-            $map = array('id'=>$annotationId, 'resource'=>$source, 'gcps'=>$gcps, 'resourceMask'=>$mask, 'transformation'=>$body['transformation'],
+            $map = array('id'=>$annotationId, 'resource'=>$source, 'gcps'=>$gcps, 'resourceMask'=>$mask, 'resourceCrs'=>$resourceCrs, 'transformation'=>$body['transformation'],
                 'geographic_bounds'=>array(array(min(array_column(array_column($gcps,'geo'),0)),min(array_column(array_column($gcps,'geo'),1))),
                     array(max(array_column(array_column($gcps,'geo'),0)),max(array_column(array_column($gcps,'geo'),1)))));
             $snapshot = array('source_kind'=>'allmaps','annotation_url'=>$url,'resolved_id'=>$resolvedId,'source_identity'=>$identity,

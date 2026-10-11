@@ -35,6 +35,14 @@
             <aside id="historical-map-catalog" aria-labelledby="map-catalog-heading">
                 <h2 id="map-catalog-heading">Map library</h2>
                 <div id="historical-map-list"></div>
+                <section id="historical-place-details" aria-label="Selected place" hidden>
+                    <h3 id="historical-place-title"></h3><p id="historical-place-description"></p>
+                    <p id="historical-place-status" role="status"></p>
+                    <a id="historical-place-link">View Item</a>
+                    <button type="button" id="historical-place-locate">Locate on both maps</button>
+                </section>
+                <label for="historical-place-select">Find a place</label>
+                <select id="historical-place-select"><option value="">Choose a place</option></select>
                 <div id="historical-map-sources"></div>
             </aside>
         </div>

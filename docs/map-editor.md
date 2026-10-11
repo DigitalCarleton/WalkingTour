@@ -32,8 +32,7 @@ The importer supports the current Allmaps `SpecificResource` representation with
 ImageService1/2/3 source object, dimensions, Point control features, one polygon SVG resource
 mask, and declared `thinPlateSpline`, `polynomial` (orders 1–3), `helmert`, or `projective`
 transformation. Unsupported options and degenerate calibration constraints are rejected.
-This slice validates calibration inputs; displaying estimated Omeka Item positions with
-the Allmaps transformation package belongs to ticket 02. It does not evaluate the retired
+The browser evaluates saved calibration using the pinned Allmaps transformation packages. It does not evaluate the retired
 PHP spline as a fallback. Older canvas-target annotations require re-export from Allmaps.
 
 ## Stored data and compatibility
@@ -104,5 +103,30 @@ Paths are relative to the Omeka site root:
 
 Place search remains on the modern map. It uses the configured Photon-compatible endpoint
 (default `https://photon.komoot.io/api/`) and does not save locations or change calibration.
-Ticket 02 introduces live Geolocation Item markers and historical estimates. Clustering,
+Live Geolocation Item markers and historical estimates are available. Clustering,
 local overrides, periods, refresh, and storage contraction remain later tickets.
+
+## Live places (ticket 02)
+
+Historical Maps reads published Items directly from Geolocation in pages of 500. It never
+requires tour membership or the old location export. Reloading reads current locations.
+Select a place marker or **Find a place** to see its plain-text title, excerpt, Item link,
+and counterpart. Modern markers remain available when a reliable historical counterpart
+cannot be obtained. Ground control points are never drawn.
+
+The local `allmaps-transform.js` bundle uses pinned `@allmaps/project` and
+`@allmaps/transform` packages with the declared transformation (including polynomial
+order). Default calibration projection is Web Mercator; explicitly declared EPSG:4326
+and EPSG:3857 resource projections are supported. Other projections are rejected on import.
+Image coordinates have a top-left origin; Leaflet Simple CRS uses `[-y, x]`.
+Automatic estimates must be finite, inside the original dimensions and resource mask,
+and pass a forward-model inverse check from multiple starting positions. Multiple detected
+roots are rejected. This numerical check cannot prove global uniqueness or historical
+accuracy; estimates remain estimates. Automatic positions are computed on demand and
+never create database rows. Legacy maps require reviewed Allmaps migration for estimates.
+
+Rebuild bundled assets only during development: run `npm ci` then `npm run build` in
+`scripts/map-assets`. Commit the generated bundle with its source and lockfile. Production
+PHP hosts need neither npm nor a Node service. Dependency notices are included in that folder.
+The dedicated `GET walking-tour/index/historical-map-places?after=<Item ID>` interface
+returns public Item positions and plain-text excerpts with no shared response cache.

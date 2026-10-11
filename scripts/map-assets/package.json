@@ -1,0 +1,8 @@
+{
+  "name": "walkingtour-map-assets",
+  "private": true,
+  "type": "module",
+  "scripts": {"build": "node build.mjs"},
+  "dependencies": {"@allmaps/project": "1.0.0-beta.10", "@allmaps/transform": "1.0.0-beta.53"},
+  "devDependencies": {"esbuild": "0.28.2"}
+}

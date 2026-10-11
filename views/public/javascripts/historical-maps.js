@@ -44,6 +44,7 @@
             var status = document.getElementById('historical-map-status');
             var retry = document.getElementById('historical-map-retry');
             var loadGeneration = 0;
+            var places = window.WalkingTourHistoricalPlaces(root, historicalMap, modernMap);
             window.WalkingTourPlaceSearch(modernMap, root.dataset.searchEndpoint);
 
             function updateGeographicBounds(record) {
@@ -102,6 +103,7 @@
             function showMap(record) {
                 var generation = ++loadGeneration;
                 activeMap = record;
+                places.load(record);
                 if (imageLayer) { historicalMap.removeLayer(imageLayer); }
                 imageBounds = L.latLngBounds(imageLatLng(0, record.image_height), imageLatLng(record.image_width, 0));
                 geographicBounds = L.latLngBounds();

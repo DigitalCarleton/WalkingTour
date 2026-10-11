@@ -71,7 +71,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
     public function mapViewerAction()
     {
         $this->viewerAssets(
-            array('map-place-search', 'historical-maps', 'historical-map-page'),
+            array('allmaps-transform', 'map-place-search', 'historical-map-places', 'historical-maps', 'historical-map-page'),
             array('walking-tour', 'historical-maps')
         );
     }
@@ -114,6 +114,21 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             _log($exception, Zend_Log::ERR);
             $this->getResponse()->setHttpResponseCode(503);
             $this->_helper->json(array('error' => 'Historical maps are unavailable. Please try again later.'));
+        }
+    }
+
+    public function historicalMapPlacesAction()
+    {
+        $this->getResponse()->setHeader('Cache-Control', 'private, no-store', true);
+        if (!$this->getRequest()->isGet()) { $this->getResponse()->setHttpResponseCode(405)->setHeader('Allow', 'GET', true); $this->_helper->json(array('error'=>'Use GET to browse places.')); return; }
+        try {
+            require_once dirname(__FILE__) . '/../models/HistoricalMapPlaces.php';
+            $cursor = $this->getRequest()->getQuery('after', '0');
+            if (!is_string($cursor) || !ctype_digit($cursor)) { throw new InvalidArgumentException('Use a valid Item cursor.'); }
+            $this->_helper->json((new WalkingTour_HistoricalMapPlaces(get_db()))->page((int) $cursor));
+        } catch (Exception $error) {
+            $this->getResponse()->setHttpResponseCode($error instanceof InvalidArgumentException ? 422 : 503);
+            $this->_helper->json(array('error'=>$error instanceof InvalidArgumentException ? $error->getMessage() : 'Places are unavailable. Ask the administrator to enable Geolocation and check its location storage.'));
         }
     }
 
