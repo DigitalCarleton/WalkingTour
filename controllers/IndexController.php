@@ -71,7 +71,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
     public function mapViewerAction()
     {
         $this->viewerAssets(
-            array('map-place-search', 'historical-map-editor', 'historical-maps', 'historical-map-page'),
+            array('map-place-search', 'historical-maps', 'historical-map-page'),
             array('walking-tour', 'historical-maps')
         );
     }
@@ -109,9 +109,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         try {
             require_once dirname(__FILE__) . '/../models/HistoricalMapRepository.php';
             $repository = new WalkingTour_HistoricalMapRepository(get_db());
-            $this->_helper->json(array('maps' => $repository->all(),
-                'can_edit' => $this->canEditHistoricalMaps(),
-                'csrf_token' => $this->canEditHistoricalMaps() ? (new Omeka_Form_SessionCsrf())->getElement('csrf_token')->getToken() : null));
+            $this->_helper->json(array('maps' => $repository->catalog(), 'can_edit' => false, 'workflow' => 'allmaps'));
         } catch (Exception $exception) {
             _log($exception, Zend_Log::ERR);
             $this->getResponse()->setHttpResponseCode(503);
@@ -119,70 +117,20 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         }
     }
 
-    private function canEditHistoricalMaps()
-    {
-        return current_user() && is_allowed('WalkingTourBuilder_Tours', 'edit');
-    }
-
     public function historicalMapEstimateAction()
     {
-        $this->getResponse()->setHeader('Cache-Control', 'private, no-store', true);
-        if (!$this->getRequest()->isGet()) {
-            $this->getResponse()->setHttpResponseCode(405)->setHeader('Allow', 'GET', true);
-            $this->_helper->json(array('error' => 'Use GET to estimate a position.'));
-            return;
-        }
-        try {
-            $x = $this->getRequest()->getQuery('x'); $y = $this->getRequest()->getQuery('y');
-            if (!is_numeric($x) || !is_numeric($y)) { throw new InvalidArgumentException('Two numeric coordinates are required.'); }
-            $repository = new WalkingTour_HistoricalMapRepository(get_db());
-            $map = $repository->find($this->getRequest()->getQuery('map_id'));
-            $point = $repository->estimate($map, $this->getRequest()->getQuery('side'), array((float) $x, (float) $y));
-            $this->_helper->json(array('point' => $point, 'revision' => $map['revision']));
-        } catch (InvalidArgumentException $error) {
-            $this->getResponse()->setHttpResponseCode(422);
-            $this->_helper->json(array('error' => $error->getMessage()));
-        } catch (Exception $error) {
-            _log($error, Zend_Log::ERR);
-            $this->getResponse()->setHttpResponseCode(503);
-            $this->_helper->json(array('error' => 'Position estimates are temporarily unavailable.'));
-        }
+        $this->retiredHistoricalMapAction();
     }
 
     public function historicalMapEditAction()
     {
-        $this->getResponse()->setHeader('Cache-Control', 'private, no-store', true);
-        if (!$this->getRequest()->isPost()) {
-            $this->getResponse()->setHttpResponseCode(405)->setHeader('Allow', 'POST', true);
-            $this->_helper->json(array('error' => 'Use POST to save a map edit.'));
-            return;
-        }
-        if (!$this->canEditHistoricalMaps()) {
-            $this->getResponse()->setHttpResponseCode(403);
-            $this->_helper->json(array('error' => 'Sign in with an editor account to save map edits. Your draft has been kept.'));
-            return;
-        }
-        $raw = $this->getRequest()->getRawBody();
-        $data = strlen($raw) <= 65536 ? json_decode($raw, true) : null;
-        $csrf = new Omeka_Form_SessionCsrf();
-        if (!is_array($data) || !$csrf->isValid(array('csrf_token' => $data['csrf_token'] ?? null))) {
-            $this->getResponse()->setHttpResponseCode(403);
-            $this->_helper->json(array('error' => 'Your editing session is invalid. Reload the page and sign in again.'));
-            return;
-        }
-        try {
-            $repository = new WalkingTour_HistoricalMapRepository(get_db());
-            $map = $repository->mutate($data['map_id'] ?? null, $data['revision'] ?? null, $data['operation'] ?? null, $data);
-            $this->_helper->json(array('map' => $map));
-        } catch (InvalidArgumentException $error) {
-            $this->getResponse()->setHttpResponseCode(422);
-            $this->_helper->json(array('error' => $error->getMessage()));
-        } catch (Exception $error) {
-            $code = $error->getCode() === 409 ? 409 : 503;
-            if ($code === 503) { _log($error, Zend_Log::ERR); }
-            $this->getResponse()->setHttpResponseCode($code);
-            $this->_helper->json(array('error' => $code === 409 ? $error->getMessage() : 'The edit could not be saved. Your draft has been kept.'));
-        }
+        $this->retiredHistoricalMapAction();
+    }
+
+    private function retiredHistoricalMapAction()
+    {
+        $this->getResponse()->setHeader('Cache-Control', 'private, no-store', true)->setHttpResponseCode(410);
+        $this->_helper->json(array('error' => 'The website calibration editor is retired. Georeference the map in Allmaps and import its annotation URL.'));
     }
 
     public function mapConfigAction()

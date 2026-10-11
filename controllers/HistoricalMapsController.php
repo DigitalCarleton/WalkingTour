@@ -1,6 +1,6 @@
 <?php
 
-/** Admin catalog; coordinate edits remain in the shared map editor. */
+/** Admin Allmaps import and catalog; legacy calibration writes are retired. */
 class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActionController
 {
     public $aclResource = 'WalkingTourBuilder_Tours';
@@ -17,7 +17,7 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
         if (!is_admin_theme() || !current_user() || !is_allowed('WalkingTourBuilder_Tours', 'edit')) {
             throw new Omeka_Controller_Exception_403;
         }
-        if (!in_array($this->getRequest()->getActionName(), array('browse', 'show', 'add', 'upload', 'edit', 'delete'), true)) { throw new Omeka_Controller_Exception_404; }
+        if (!in_array($this->getRequest()->getActionName(), array('browse', 'show', 'import', 'add', 'upload', 'edit', 'delete'), true)) { throw new Omeka_Controller_Exception_404; }
         $this->getResponse()->setHeader('Cache-Control', 'private, no-store', true);
     }
 
@@ -30,12 +30,6 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
     {
         $map = $this->findMap();
         $this->view->map = $map;
-        $before = $this->getRequest()->getQuery('before');
-        if ($before !== null && (!is_string($before) || !ctype_digit($before) || (int) $before < 1)) {
-            throw new Omeka_Controller_Exception_404;
-        }
-        $this->view->history = $this->maps->calibrationHistory($map['id'], $before === null ? null : (int) $before);
-        $this->view->olderPage = $before !== null;
     }
 
     private function findMap()
@@ -57,13 +51,13 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
         $this->view->csrf = new Omeka_Form_SessionCsrf;
         if (!$this->getRequest()->isGet() && !$this->getRequest()->isPost()) {
             $this->getResponse()->setHttpResponseCode(405)->setHeader('Allow', 'GET, POST', true);
-            $this->view->error = 'Use GET to view this form or POST to save it.';
+            $this->view->error = 'Use GET to view this form or POST to submit it.';
             return false;
         }
         if (!$this->getRequest()->isPost()) { return false; }
         if (empty($this->getRequest()->getPost()) && (int) $this->getRequest()->getServer('CONTENT_LENGTH') > 0) {
             $this->getResponse()->setHttpResponseCode(413);
-            $this->view->error = 'The request exceeds the server upload limit. Choose a smaller image and reload the form.';
+            $this->view->error = 'The request exceeds the server size limit. Reload the form and submit a smaller request.';
             return false;
         }
         if (!$this->view->csrf->isValid($this->getRequest()->getPost())) {
@@ -84,16 +78,71 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
 
     public function addAction()
     {
-        $values = array('iiif_url' => $this->text('iiif_url'), 'image_number' => $this->text('image_number', '1'), 'title' => $this->text('title'));
+        if ($this->getRequest()->isGet()) {
+            $this->_redirect(url('historical-maps/import'), array('prependBase' => false)); return;
+        }
+        $this->retiredImport('IIIF-only import is retired. Import an Allmaps annotation instead.');
+    }
+
+    public function importAction()
+    {
+        require_once dirname(__FILE__) . '/../models/HistoricalMapAllmaps.php';
+        $values = array('annotation_url' => $this->text('annotation_url'), 'preview_token' => $this->text('preview_token'));
+        $this->view->images = array();
         if (!$this->form($values)) { return; }
+        $session = new Zend_Session_Namespace('WalkingTourAllmapsImport');
+        $previews = is_array($session->previews) ? $session->previews : array();
+        foreach ($previews as $token => $preview) { if ($preview['expires'] < time()) { unset($previews[$token]); } }
+        $session->previews = $previews;
         try {
-            if (!preg_match('/^[1-9][0-9]{0,3}$/D', $values['image_number'])) { throw new InvalidArgumentException('Choose an image number between 1 and 1000.'); }
-            $image = (new WalkingTour_HistoricalMapIiif)->import($values['iiif_url'], (int) $values['image_number']);
-            if ($values['title'] !== '') { $image['title'] = $values['title']; }
-            $map = $this->maps->createMap($image);
-            $this->_helper->flashMessenger('Historical map added. Open the map editor to establish its control-point pairs.', 'success');
-            $this->_redirect(url('historical-maps/show/' . $map['id']), array('prependBase' => false));
-        } catch (Exception $error) { $this->formError($error); }
+            $reader = new WalkingTour_HistoricalMapAllmaps;
+            if ($this->text('step', 'preview') === 'preview') {
+                $images = $reader->review($values['annotation_url']);
+                // Keep the reviewed payload server-side so a modified form cannot replace it.
+                if (count($previews) >= 3) { array_shift($previews); }
+                $token = bin2hex(random_bytes(16));
+                $previews[$token] = array('images' => $images, 'expires' => time() + 900);
+                $session->previews = $previews;
+                $this->view->values['preview_token'] = $token;
+                $this->view->images = $images;
+                return;
+            }
+            if ($this->text('step') !== 'import' || !isset($previews[$values['preview_token']])) {
+                throw new InvalidArgumentException('This import preview is missing or expired. Preview the annotation URL again.');
+            }
+            $images = $previews[$values['preview_token']]['images'];
+            $this->view->images = $images;
+            $this->view->values['annotation_url'] = $images[0]['source_url'];
+            $indexes = $this->getRequest()->getPost('map_indexes');
+            if (!is_array($indexes) || !$indexes || count($indexes) > count($images)) { throw new InvalidArgumentException('Select the maps you want to import.'); }
+            $titles = $this->getRequest()->getPost('titles', array());
+            if (!is_array($titles)) { throw new InvalidArgumentException('Enter valid map titles.'); }
+            // Preserve edited titles and selections when image validation fails.
+            foreach ($titles as $index => $title) {
+                if (isset($images[$index]) && is_string($title)) { $this->view->images[$index]['title'] = $title; }
+            }
+            $this->view->selectedIndexes = $indexes;
+            $selected = array(); $seen = array();
+            foreach ($indexes as $index) {
+                if (!is_string($index) || !ctype_digit($index) || !isset($images[(int) $index]) || isset($seen[(int) $index])) {
+                    throw new InvalidArgumentException('Select each reviewed map at most once.');
+                }
+                $seen[(int) $index] = true;
+                $image = $images[(int) $index];
+                $title = $titles[(int) $index] ?? $image['title'];
+                if (!is_string($title) || trim($title) === '' || mb_strlen(trim($title)) > 255) { throw new InvalidArgumentException('Enter map titles of 1 to 255 characters.'); }
+                $image['title'] = trim($title);
+                $selected[] = $image;
+            }
+            // Check all selected images before the transaction publishes any map.
+            $selected = array_map(array($reader, 'checkImage'), $selected);
+            $saved = $this->maps->importAllmaps($selected);
+            unset($previews[$values['preview_token']]); $session->previews = $previews;
+            $this->_helper->flashMessenger(count($saved) . ' map(s) available from Allmaps. The imported calibration is read-only.', 'success');
+            $this->_redirect(url(count($saved) === 1 ? 'historical-maps/show/' . $saved[0]['id'] : 'historical-maps'), array('prependBase' => false));
+        } catch (Exception $error) {
+            $this->formError($error, 'The Allmaps import could not finish. No selected maps were published. Please retry or contact the server administrator.');
+        }
     }
 
     public function editAction()
@@ -113,13 +162,14 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
 
     public function uploadAction()
     {
-        $values = array('title' => $this->text('title'), 'source_url' => $this->text('source_url'));
-        if (!$this->form($values)) { return; }
-        try {
-            $map = (new WalkingTour_HistoricalMapUpload)->save($_FILES['image'] ?? null, $values['title'], $values['source_url'], $this->maps, Zend_Registry::get('storage'));
-            $this->_helper->flashMessenger('Image uploaded. Open the map editor to establish its control-point pairs.', 'success');
-            $this->_redirect(url('historical-maps/show/' . $map['id']), array('prependBase' => false));
-        } catch (Exception $error) { $this->formError($error); }
+        $this->retiredImport('Direct image uploads are retired. Find a IIIF source, georeference it in Allmaps, and import its annotation URL. Existing uploads remain available for inspection and deletion.');
+    }
+
+    private function retiredImport($message)
+    {
+        $this->getResponse()->setHttpResponseCode(410);
+        $this->view->message = $message;
+        $this->render('retired');
     }
 
     public function deleteAction()

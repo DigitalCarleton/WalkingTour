@@ -1,220 +1,108 @@
-# Historical map editing (Stages 2–4)
+# Historical Maps: Allmaps import and browsing
 
-The plugin version stays at **0.2.3**. After copying or pulling the updated plugin,
-run this command from the WalkingTour plugin directory using the server's PHP CLI
-with its MySQL extension enabled:
+Historical Maps now uses calibration completed in [Allmaps Editor](https://editor.allmaps.org/).
+The public `historical-maps` page displays the original unwarped image beside a modern
+map. Both panes support independent pan and zoom. Control points, calibration tools,
+mask drawing, counters, and calibration undo are retired on this site. The separate
+`walking-tour` page retains its existing tour map, filters, stops, and details.
+
+## Import a map
+
+1. Find a publicly accessible IIIF image source and georeference it in Allmaps.
+2. Copy its exported georeference Annotation or AnnotationPage URL, such as
+   `https://annotations.allmaps.org/images/f5301521e08412d3@660ce3ebc88b3010`.
+3. Sign in to Omeka with the existing WalkingTour editing permission. Open
+   **Historical Maps → Import from Allmaps**, paste the URL, and choose **Preview maps**.
+4. Review the map identities, dimensions, transformation, and titles. A page can contain
+   several maps; explicitly select the maps to import. A single map is preselected.
+5. Choose **Import selected maps**. The server checks each selected image's information
+   and a preview before publishing the selection in one database transaction.
+6. Open **View maps** from the map detail page, or choose it in the public map library.
+
+Preview data stays in the editor's server-side session for 15 minutes. Up to three previews
+are retained. An expired preview must be recreated. Invalid requests retain useful form
+feedback; no map is published when validation or an image check fails.
+
+Both version-qualified and unqualified URLs are supported. Imported calibration is a
+snapshot: updating Allmaps does not silently update this site. Reimporting an unchanged
+source map returns its existing record. A changed annotation is rejected while keeping
+the saved version. Explicit snapshot refresh is planned in ticket 06.
+
+The importer supports the current Allmaps `SpecificResource` representation with an
+ImageService1/2/3 source object, dimensions, Point control features, one polygon SVG resource
+mask, and declared `thinPlateSpline`, `polynomial` (orders 1–3), `helmert`, or `projective`
+transformation. Unsupported options and degenerate calibration constraints are rejected.
+This slice validates calibration inputs; displaying estimated Omeka Item positions with
+the Allmaps transformation package belongs to ticket 02. It does not evaluate the retired
+PHP spline as a fallback. Older canvas-target annotations require re-export from Allmaps.
+
+## Stored data and compatibility
+
+Each imported record in `<prefix>walking_tour_maps` stores the original annotation URL,
+resolved document/map identity, selected annotation and original document JSON, normalized
+calibration inputs, SHA-256 content hash, UTC import time, image service/dimensions, and
+transformation settings in `source_snapshot`. Control points and masks stay inside that
+snapshot; importing does not create legacy control, mask, annotation, or history rows.
+External image pixels remain at the IIIF provider and load into the browser on demand.
+
+**Edit map information** changes an imported map's title using revision checks. Its source
+URL is fixed to its imported snapshot. **Delete map** retains the existing confirmation,
+CSRF, revision checks, and transactional cleanup. An external Allmaps/IIIF source is not
+deleted. Legacy uploaded images can still be inspected and deleted; their server files
+are removed through Omeka's configured storage adapter.
+
+The IIIF-only and direct-upload actions are retired. Legacy map records remain readable
+for reviewed migration, but their control markers are hidden and public calibration writes
+are disabled. Ticket 07 migrates reviewed legacy data; ticket 09 removes retired tables,
+editor assets, and example/static files once their remaining consumers are replaced.
+Five existing Historical Maps tables are temporarily retained for compatibility. This
+slice does not claim that the final two-table storage contraction is complete.
+
+## Deployment and initialization
+
+The plugin version remains **0.2.3**. For a site already initialized with the previous
+map storage, deploy the updated plugin code; no new database columns are needed by this
+slice. Do not uninstall/reinstall: uninstall removes plugin-owned data.
+
+For a fresh site or missing storage, run from the installed WalkingTour plugin directory
+using the server's PHP CLI with MySQL support:
 
 ```sh
 php scripts/initialize-map-storage.php
 ```
 
-This command reads the existing Omeka database configuration, adds missing map, mask, and
-annotation storage, and preserves existing tours, control points, and saved masks. It can
-be run again safely and does not change the installed plugin version. No version-based
-upgrade prompt is required. Do not uninstall/reinstall: uninstalling removes plugin-owned data.
+The installation/upgrade hooks and this command preserve existing records. Rerunning does
+not seed the former BnF example, import masks, or recalibrate legacy records. Back up the
+Omeka database and existing uploaded image files before later migration tickets.
 
-Run the initialization command again when deploying Stages 3–4. It adds persistent control-point
-numbering and calibration change history without replacing existing points, annotations, or masks.
+Import requires PHP cURL, DOM, JSON, and mbstring, plus outbound HTTPS. Fetches accept only
+public HTTPS destinations on port 443, pin resolved public IPs, revalidate redirects, disable
+proxy forwarding, cap responses at 3 MiB, and limit request time and redirect count.
+Image information must match the reviewed dimensions/identity and support level 1/2 regions;
+a preview must decode as JPEG/PNG. Private and authenticated sources are unsupported.
+A successful import cannot guarantee future provider availability or browser CORS access;
+image failures display retry feedback while the modern map remains available.
 
-The two maps remain independently navigable on Historical Maps. Walking Tour separately
-displays its original tour map, filters, numbered stops, and details.
+The supplied BnF annotation was checked from local development on 2026-10-11: both annotation
+URLs returned HTTP 200, but the BnF `info.json` request returned HTTP 403. The importer reports
+that failure without publishing. Saved-fixture validation does not establish live image
+availability. Repeat the connectivity check on the deployment server before relying on
+that source; this change has not itself been deployed or checked from that server.
 
-## Map footprint and custom mask
+## Public interfaces
 
-The supplied Allmaps snapshot contains an SVG polygon in **image pixels**, not geographic
-coordinates. On storage initialization its boundary is sampled along each edge and transformed
-using the ten imported control-point pairs. The resulting estimated geographic footprint is
-saved and displayed as a pink outline. Transforming only the four corners would omit its curved edges.
+Paths are relative to the Omeka site root:
 
-Sign in using an existing Omeka editor account. Select **Draw a map mask** in the modern map's
-upper-right controls. Click at least three vertices, then select the first vertex to close the
-polygon. Choose **Save** to replace the displayed geographic mask or **Cancel** to retain the
-saved mask. **Undo last vertex** reopens a closed draft and removes the most recent vertex.
-Open, crossing, degenerate, or out-of-range polygons cannot be saved. One simple polygon with
-up to 500 vertices is supported; polygons crossing the international date line are not supported.
+- `GET walking-tour/index/historical-maps` returns the read-only catalog, image metadata,
+  provenance, geographic viewport bounds, and normalized Allmaps calculation inputs.
+  It returns `can_edit: false`, `workflow: allmaps`, and no editor CSRF token. Legacy editable
+  control/annotation/mask arrays, calibration counters, and undo state are omitted.
+- `historical-map-edit` and `historical-map-estimate` at the same API base return **410 Gone**
+  without executing the former calibration or mutation engine, including old direct requests.
+- `admin/historical-maps/import` implements authorized, CSRF-protected preview and import.
+  Admin routes are unavailable through the public page.
 
-Custom mask coordinates become authoritative for the modern-map outline. Repeated initialization does
-not overwrite them. Mask vertices are separate from calibration control points: drawing a mask
-does not improve or change the coordinate transform. The original image boundary remains visible
-on the historical image; a custom geographic mask does not crop or distort that image.
-
-## Estimated point annotations
-
-Select the pencil on either map, then click a position. The source click is preserved and its
-counterpart is estimated using the imported thin-plate-spline calibration. Save or cancel the draft.
-Blue labels such as **A1** distinguish saved annotations from purple calibration points. Selecting
-an annotation highlights its available counterparts and emits a `walkingtour:annotation-selected`
-event from the map container, with `mapId` and an `annotation` object for future information panels.
-
-A position outside the control-point hull is marked as extrapolated. If no stable, unique image
-counterpart is found, only the original position is saved. Inverse estimates numerically solve the
-forward spline from multiple initial positions; they do not establish historical accuracy or
-mathematically guarantee global invertibility. Automatic estimates never become calibration
-points unless an editor explicitly confirms both positions.
-
-## Adjust and confirm a pair
-
-Select a saved annotation or control point on either map, then choose **Adjust pair**. Drag either
-endpoint while keeping the other fixed, or edit **Image X**, **Image Y**, **Longitude**, and
-**Latitude**, then choose **Apply coordinates** for numerical adjustment. If a counterpart is
-missing, click the other map to supply it or enter its coordinates. Image pixels use a top-left
-origin. Coordinates are validated on
-the server as well as in the editor.
-
-Choose **Confirm pair** to promote an annotation into a shared control point, or **Save calibration
-pair** to save adjustments to an existing control. A new draft may also be confirmed directly;
-**Save** preserves an untouched draft as an ordinary estimated annotation. After manual adjustment,
-explicit confirmation is required to save the corrected pair. **Cancel** discards the draft.
-
-With the ten original controls, confirming **A1** removes its blue annotation markers and displays
-the same purple circular marker style as the imported controls, numbered **11** on both maps.
-Numbers are persistent and allocated monotonically; deleting or undoing a control does not renumber
-other points or reuse its number. The displayed shared-control count reflects the currently saved controls.
-
-A calibration save keeps all confirmed endpoint pairs fixed and recomputes only the predicted
-side of ordinary annotations. Their source side and original source click remain unchanged. The
-imported geographic footprint is recomputed; a hand-drawn custom mask stays authoritative.
-Duplicate or unsolvable control arrangements are rejected without changing saved data or numbering.
-With too few controls, estimates are marked unavailable and source clicks remain available for manual pairing.
-
-## Delete points and undo calibration
-
-Select the **Delete a point pair** trash icon on either map, then select a saved point. This saves
-the deletion and removes both markers. Delete mode stays active for further deletions; select the
-trash tool again or **Cancel** to exit. A failed deletion preserves the point and offers retry;
-a conflict keeps the intended deletion for review against the latest data.
-
-Deleting an ordinary annotation does not alter calibration. Deleting a control pair recomputes
-predictions and makes **Undo calibration change** available in the top toolbar. That action restores
-the latest calibration addition, adjustment, or deletion and persists the result. Undoing promotion
-of a saved annotation restores its original annotation ID. Later ordinary annotations and custom
-masks are preserved. This is one-change calibration undo, not a general annotation trash or undo stack.
-
-Calibration writes, deletions, and undo use map revisions, transaction locking, and request identifiers.
-A retry after a lost response cannot create another control point or delete another pair. All writes
-continue to require existing Omeka editing privileges and a valid session CSRF token.
-
-Writes require existing Omeka editing privileges and a session CSRF token. Each edit carries the
-map's revision; outdated edits return a conflict and retain the draft. Choose **Reload latest data**,
-review the refreshed estimate or mask, then explicitly save again. Retried point saves use a request
-identifier to avoid duplicates if the previous response was lost.
-
-## Place search
-
-Place search starts collapsed as a magnifying-glass button. Select it to open the search field;
-use the close button or Escape to collapse it again without losing the query or selected location.
-The search field offers suggestions after three characters, or on Search/Enter.
-Select a result to move the map; this does not create a saved annotation or change the mask.
-Clear removes the search marker. Arrow keys can navigate results, and Escape collapses the search panel.
-
-Search uses [Photon](https://github.com/komoot/photon) with English result preferences, a typing
-delay, and a small per-page query cache. Queries are sent to the configured provider. Photon may
-return an original place name when no English translation exists. The default public demo service
-permits reasonable traffic but does not guarantee availability. For larger deployments use a
-self-hosted or managed Photon-compatible service via **Place search endpoint** in the plugin settings.
-Its URL must allow browser requests from the site's origin (CORS); use HTTPS on HTTPS sites.
-Original image tiles still depend on the BnF IIIF service.
-
-## Omeka administration
-
-Signed-in users with the existing WalkingTour editing permission can open **Historical Maps**
-in the Omeka admin navigation. The list shows each map's control-point and annotation counts
-and calibration revision. Select a map title to inspect its source metadata, or choose
-**Open map editor** to open that specific map in the public dual-map editor.
-
-The catalog routes are registered only in the admin theme (`admin/historical-maps`).
-The public dual-map viewer is at `historical-maps`, replacing that address's former
-Simple Pages placeholder without deleting its stored page. The `walking-tour` page
-again displays the original Digital Commonwealth tour image, tour filters, numbered
-stops, detail panels, and the retained Omeka locations snapshot. Each page loads its
-own viewer scripts. Older editor bookmarks with `walking-tour?map_id=...` redirect
-to Historical Maps and retain valid point links. Existing map API paths remain
-compatible. No map, annotation, calibration, upload, or tour data is migrated.
-Deploying this change requires only the plugin code update, not database initialization
-or a plugin reinstall.
-
-Map detail pages also list confirmed control coordinates, ordinary annotation coordinates and
-prediction status, and paginated calibration history (50 changes per page). **Locate on maps**
-opens the selected map and highlights that specific saved point pair. Missing counterparts stay
-explicitly unavailable. Coordinate edits and calibration undo are performed in the shared map
-editor so they continue to use its transactional calibration and conflict handling. History lists
-recorded changes and undone state; the existing records do not contain timestamps or editor identities.
-
-Choose **Upload image** to add a JPEG or PNG from your computer, with a title and optional
-HTTPS provenance link. No IIIF service is required. Uploaded maps start with no control points,
-use the same dual-map editor, and appear in the public map library. The image is decoded and
-re-encoded, with JPEG EXIF orientation applied when PHP EXIF is available; metadata is stripped.
-The stored pixel dimensions define the fixed coordinate space for all later annotations.
-Identical uploaded files are rejected. Uploading a replacement for an existing map is not supported.
-
-Uploads require PHP GD with JPEG/PNG support and working Omeka file storage. Images are stored
-through Omeka's configured storage adapter (under `files/original/` for the default filesystem
-adapter), independently of Omeka Items. Back up these files along with the Omeka database.
-The application limit is 20 MiB, 25 million pixels, and 20,000 pixels per side. PHP
-`upload_max_filesize`, `post_max_size`, memory limits, and web-server request limits may be lower.
-The first version loads the entire uploaded image as a zoomable original-image layer; it does not
-generate image tiles. Use IIIF import for very large scans that exceed the upload limits.
-
-Choose **Import from IIIF** to import an HTTPS IIIF Presentation API 2/3 manifest or
-Image API 1/2/3 `info.json`. Image services must support level 1 or 2 region requests. Select the
-image's position in the manifest (starting at 1; Presentation 2 uses the first sequence), and
-optionally provide a title. The original IIIF metadata is retained as provenance. Duplicate
-images are rejected. New maps start with no control points and no predicted geographic footprint;
-use the map editor to place both endpoints and confirm initial pairs. Three non-collinear image
-points are needed for a solvable transform, but that minimum does not establish historical accuracy.
-
-**Edit map information** changes the title and optional provenance URL. The original image service
-or uploaded file and dimensions stay fixed to preserve saved coordinates. Metadata updates use
-the same map revision lock as point edits; a conflict retains the entered values and requires
-review before another save.
-
-The editing page also has a separate **Delete map** button. It opens a confirmation page
-with the current control-point and annotation counts. **Cancel and return to editing** leaves
-the map unchanged. Permanent deletion requires the acknowledgement checkbox and a POST
-with a valid editing session, CSRF token, and current map revision. If someone changes the
-map after the confirmation page opens, reload and review the latest data before deleting.
-
-Deletion removes that map's record, control points, annotations, mask, and calibration history.
-Uploaded image files are removed through Omeka's configured storage adapter; external IIIF
-images remain at their source. Other maps and Walking Tour records are preserved. There is
-no editor undo for deleting an entire map. The default example also stays deleted when the
-initialization command is rerun. This feature requires no new database migration.
-
-Uploads are staged before the database transaction commits, so a database failure can restore
-the original image path. If final file cleanup fails after the records have been deleted, the
-admin page reports it and the application log identifies the staged file for server cleanup.
-
-The server requires PHP cURL and outbound HTTPS access for import. Metadata requests have size,
-timeout, redirect, and public-address limits; images themselves remain at the source provider and
-are loaded by the browser. Private sources and authentication-only image services
-are outside the IIIF importer. IIIF compatibility follows the official
-[Image API](https://iiif.io/api/image/3.0/) and
-[Presentation API](https://iiif.io/api/presentation/3.0/) structures, including older versions.
-
-The admin catalog is not exposed to public visitors. These records use WalkingTour's dedicated
-tables in the existing Omeka database; they do not appear as Omeka Items. This admin interface
-does not require an additional storage migration after Stages 3–4 have been initialized.
-
-## Data interfaces
-
-All paths are relative to the Omeka site root:
-
-- `GET walking-tour/index/historical-maps`: catalog, control points, masks, annotations, editing
-  availability, and a CSRF token for signed-in editors. Responses are private and not cached.
-- `GET walking-tour/index/historical-map-estimate`: `map_id`, `side` (`image` or `modern`), `x`, `y`.
-  Image coordinates use a top-left origin; modern coordinates use longitude, latitude.
-- `POST walking-tour/index/historical-map-edit`: JSON with `map_id`, `revision`, `csrf_token`, and
-  `operation`. A `mask` operation includes a closed `ring` in longitude/latitude order. An
-  `annotation` operation includes `side`, `coordinates`, and a unique `request_id`.
-- `confirm`: `point_type` (`new`, `annotation`, or `control`), `point_id` for a saved point,
-  `image` in pixel order and `geographic` in longitude/latitude order, plus a unique `request_id`.
-- `delete`: `point_type` (`annotation` or `control`), `point_id`, and a unique `request_id`.
-- `undo_calibration`: the catalog's latest `undo_calibration.change_id` and a unique `request_id`.
-
-All edit operations share `map_id`, `revision`, and `csrf_token`. Catalog records now include
-`next_control_ordinal` and `undo_calibration` (null when the latest calibration change cannot be undone).
-`walkingtour:control-point-selected` and `walkingtour:calibration-updated` events provide extension hooks.
-
-Coordinates and geometry are validated on the server. Annotation estimates are calculated by the
-server again when saving an ordinary annotation. Only an explicit, authorized `confirm` operation
-can introduce manually reviewed calibration endpoints.
+Place search remains on the modern map. It uses the configured Photon-compatible endpoint
+(default `https://photon.komoot.io/api/`) and does not save locations or change calibration.
+Ticket 02 introduces live Geolocation Item markers and historical estimates. Clustering,
+local overrides, periods, refresh, and storage contraction remain later tickets.

@@ -5,7 +5,7 @@ require_once __DIR__ . "/HistoricalMapGeometry.php";
 require_once __DIR__ . "/HistoricalMapIiif.php";
 require_once __DIR__ . "/HistoricalMapUpload.php";
 
-/** Persistent catalog and independently editable copies of imported control points. */
+/** Allmaps-backed catalog with read compatibility for legacy calibration records. */
 class WalkingTour_HistoricalMapRepository
 {
     private $db;
@@ -27,7 +27,6 @@ class WalkingTour_HistoricalMapRepository
 
     public function install()
     {
-        //create two maps if there are not any
         $this->db->query("CREATE TABLE IF NOT EXISTS `{$this->maps}` (
             id INT UNSIGNED NOT NULL AUTO_INCREMENT,
             slug VARCHAR(191) NOT NULL,
@@ -90,61 +89,7 @@ class WalkingTour_HistoricalMapRepository
             UNIQUE KEY request_per_map (map_id, request_id),
             KEY map_changes (map_id, id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
-        $this->seed();
-        $this->importMasks();
-    }
-
-    private function seed()
-    {
-        $slug = 'bnf-rome-btv1b53119597n';
-        // Never reseed an existing map: its points may already have been edited or deleted.
-        if ($this->db->fetchOne("SELECT id FROM `{$this->maps}` WHERE slug = ?", array($slug))) {
-            return;
-        }
-        // Retain an internal receipt so initialization does not resurrect a deleted seed.
-        if ($this->db->fetchOne("SELECT id FROM `{$this->changes}` WHERE map_id = 0 AND request_id = 'deleted-default-map' AND operation = 'delete_map_seed'")) {
-            return;
-        }
-
-        $snapshot = file_get_contents(dirname(__FILE__) . '/../data/rome-allmaps-annotation.json');
-        $page = json_decode($snapshot, true);
-        if (!$page || count($page['items']) !== 1) {
-            throw new RuntimeException('The historical map seed is invalid.');
-        }
-        $annotation = $page['items'][0];
-        $source = $annotation['target']['source'];
-        $body = $annotation['body'];
-
-        // MySQL cannot prepare START TRANSACTION; use the driver's transaction API.
-        $adapter = $this->db->getAdapter();
-        $adapter->beginTransaction();
-        try {
-            $this->db->query("INSERT INTO `{$this->maps}`
-                (slug, title, image_service, image_width, image_height, manifest_url,
-                 source_url, source_snapshot, transformation)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", array(
-                $slug, 'Historic Rome — BnF GE C-11245', $source['id'],
-                $source['width'], $source['height'],
-                $source['partOf'][0]['partOf'][0]['id'], $page['id'], $snapshot,
-                $body['transformation']['type']
-            ));
-            $mapId = $this->db->fetchOne('SELECT LAST_INSERT_ID()');
-            foreach ($body['features'] as $index => $feature) {
-                $image = $feature['properties']['resourceCoords'];
-                $geo = $feature['geometry']['coordinates'];
-                $this->db->query("INSERT INTO `{$this->points}`
-                    (map_id, ordinal, image_x, image_y, longitude, latitude)
-                    VALUES (?, ?, ?, ?, ?, ?)", array(
-                    $mapId, $index + 1, $image[0], $image[1], $geo[0], $geo[1]
-                ));
-            }
-            $this->db->query("UPDATE `{$this->maps}` SET next_control_ordinal = ? WHERE id = ?",
-                array(count($body['features']) + 1, $mapId));
-            $adapter->commit();
-        } catch (Exception $exception) {
-            $adapter->rollBack();
-            throw $exception;
-        }
+        // Legacy tables remain until reviewed migration; initialization never seeds or recalibrates.
     }
 
     public function all()
@@ -154,12 +99,20 @@ class WalkingTour_HistoricalMapRepository
             FROM `{$this->maps}` ORDER BY id");
         foreach ($maps as &$map) {
             $snapshot = json_decode($map['source_snapshot'], true);
-            $map['source_kind'] = ($snapshot['source_kind'] ?? '') === 'upload' ? 'upload' : 'iiif';
+            $map['source_kind'] = in_array($snapshot['source_kind'] ?? '', array('upload', 'allmaps'), true) ? $snapshot['source_kind'] : 'iiif';
             $map['image_url'] = $map['source_kind'] === 'upload' ? Zend_Registry::get('storage')->getUri(WalkingTour_HistoricalMapUpload::storagePath($snapshot)) : null;
             $map['image_quality'] = ($snapshot['image_quality'] ?? '') === 'native' ? 'native' : 'default';
             unset($map['source_snapshot']);
             foreach (array('id', 'image_width', 'image_height', 'revision', 'calibration_revision', 'next_control_ordinal') as $key) {
                 $map[$key] = (int) $map[$key];
+            }
+            if ($map['source_kind'] === 'allmaps') {
+                $map['allmaps'] = array('annotation_url' => $snapshot['annotation_url'], 'resolved_id' => $snapshot['resolved_id'],
+                    'annotation_id' => $snapshot['annotation']['id'], 'content_hash' => $snapshot['content_hash'], 'imported_at' => $snapshot['imported_at']);
+                $map['georeference'] = $snapshot['map'];
+                $map['geographic_bounds'] = $snapshot['map']['geographic_bounds'];
+                $map['control_points'] = array(); $map['annotations'] = array(); $map['mask'] = null; $map['undo_calibration'] = null;
+                continue;
             }
             $map['control_points'] = $this->db->fetchAll("SELECT id, ordinal, image_x, image_y,
                 longitude, latitude FROM `{$this->points}` WHERE map_id = ? ORDER BY ordinal",
@@ -189,31 +142,56 @@ class WalkingTour_HistoricalMapRepository
             unset($annotation);
             $change = $this->latestCalibrationChange($map['id']);
             $map['undo_calibration'] = $change && !$change['undone'] ? array('change_id' => (int) $change['id']) : null;
+            $geo = $map['mask']['geographic_ring'] ?? array();
+            if (!$geo) { foreach ($map['control_points'] as $point) { $geo[] = array($point['longitude'], $point['latitude']); } }
+            $map['geographic_bounds'] = $geo ? array(array(min(array_column($geo, 0)), min(array_column($geo, 1))),
+                array(max(array_column($geo, 0)), max(array_column($geo, 1)))) : null;
+
         }
         unset($map);
         return $maps;
     }
 
-    private function importMasks()
+    /** Viewer data has no legacy editable points or undo state. Allmaps GCPs are calculation inputs only. */
+    public function catalog()
     {
-        foreach ($this->all() as $map) {
-            if ($map['mask']) { continue; }
-            $snapshot = json_decode($this->db->fetchOne("SELECT source_snapshot FROM `{$this->maps}` WHERE id = ?", array($map['id'])), true);
-            $selector = $snapshot['items'][0]['target']['selector']['value'] ?? '';
-            if (!preg_match('/<polygon\b[^>]*\bpoints="([^"]+)"/i', $selector, $match)) { continue; }
-            $ring = array();
-            foreach (preg_split('/\s+/', trim($match[1])) as $pair) {
-                $parts = explode(',', $pair);
-                if (count($parts) !== 2 || !is_numeric($parts[0]) || !is_numeric($parts[1])) { $ring = array(); break; }
-                $ring[] = array((float) $parts[0], (float) $parts[1]);
-            }
-            if (count($ring) < 3) { continue; }
-            if ($ring[0] !== $ring[count($ring)-1]) { $ring[] = $ring[0]; }
-            try { $geo = (new WalkingTour_HistoricalMapTransform($map))->footprint($ring); }
-            catch (RuntimeException $error) { $geo = null; }
-            $this->db->query("INSERT IGNORE INTO `{$this->masks}` (map_id, image_ring, geographic_ring, source, calibration_revision) VALUES (?, ?, ?, 'imported', ?)",
-                array($map['id'], json_encode($ring), $geo ? json_encode($geo) : null, $map['calibration_revision']));
+        $maps = $this->all();
+        foreach ($maps as &$map) {
+            unset($map['control_points'], $map['annotations'], $map['mask'], $map['undo_calibration'], $map['calibration_revision'], $map['next_control_ordinal']);
         }
+        unset($map);
+        return $maps;
+    }
+
+    /** Import selected maps atomically, without copying GCPs into legacy tables. */
+    public function importAllmaps(array $images)
+    {
+        if (!$images || count($images) > 50) { throw new InvalidArgumentException('Select between 1 and 50 maps.'); }
+        $adapter = $this->db->getAdapter(); $ids = array();
+        $adapter->beginTransaction();
+        try {
+            foreach ($images as $image) {
+                $snapshot = json_decode($image['source_snapshot'] ?? '', true);
+                if (($snapshot['source_kind'] ?? '') !== 'allmaps') { throw new InvalidArgumentException('A reviewed Allmaps snapshot is required.'); }
+                $slug = 'allmaps-' . hash('sha256', $snapshot['source_identity']);
+                $existing = $this->db->fetchRow("SELECT id, source_snapshot FROM `{$this->maps}` WHERE slug = ? FOR UPDATE", array($slug));
+                if ($existing) {
+                    $before = json_decode($existing['source_snapshot'], true);
+                    if (($before['content_hash'] ?? '') !== $snapshot['content_hash']) {
+                        throw new InvalidArgumentException('This map already exists with a different Allmaps snapshot. Its saved version was kept. Refresh from Allmaps will be available in a later update.');
+                    }
+                    $ids[] = (int) $existing['id']; continue;
+                }
+                list($title, $source) = $this->metadata($image['title'], $image['source_url']);
+                $this->db->query("INSERT INTO `{$this->maps}` (slug, title, image_service, image_width, image_height, manifest_url,
+                    source_url, source_snapshot, transformation, next_control_ordinal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)",
+                    array($slug, $title, $image['image_service'], $image['image_width'], $image['image_height'],
+                        $image['manifest_url'], $source, $image['source_snapshot'], $image['transformation']));
+                $ids[] = (int) $this->db->fetchOne('SELECT LAST_INSERT_ID()');
+            }
+            $adapter->commit();
+        } catch (Exception $error) { $adapter->rollBack(); throw $error; }
+        return array_map(array($this, 'find'), array_values(array_unique($ids)));
     }
 
     public function find($id)
@@ -279,6 +257,8 @@ class WalkingTour_HistoricalMapRepository
 
     public function updateMetadata($id, $revision, $title, $source)
     {
+        $saved = $this->find($id);
+        if ($saved['source_kind'] === 'allmaps' && $source !== $saved['source_url']) { throw new InvalidArgumentException('The imported Allmaps source is fixed. Use the explicit refresh workflow to change its snapshot.'); }
         list($title, $source) = $this->metadata($title, $source);
         if (!is_int($id) || $id < 1 || !is_int($revision) || $revision < 1) { throw new InvalidArgumentException('A map ID and revision are required.'); }
         $adapter = $this->db->getAdapter();
@@ -320,10 +300,6 @@ class WalkingTour_HistoricalMapRepository
                 $this->db->query("DELETE FROM `{$table}` WHERE map_id = ?", array($id));
             }
             $this->db->query("DELETE FROM `{$this->maps}` WHERE id = ?", array($id));
-            if ($map['slug'] === 'bnf-rome-btv1b53119597n') {
-                $this->db->query("INSERT INTO `{$this->changes}` (map_id, request_id, operation) VALUES (0, 'deleted-default-map', 'delete_map_seed')
-                    ON DUPLICATE KEY UPDATE operation = VALUES(operation)");
-            }
             $adapter->commit();
         } catch (Exception $error) {
             $adapter->rollBack();
@@ -371,6 +347,7 @@ class WalkingTour_HistoricalMapRepository
 
     public function estimate(array $map, $side, $coordinates, $transform = null)
     {
+        if (($map['source_kind'] ?? '') === 'allmaps') { throw new InvalidArgumentException('Allmaps snapshots cannot use the legacy calibration engine.'); }
         if (!in_array($side, array('image', 'modern'), true)) { throw new InvalidArgumentException('Choose an image or modern map position.'); }
         $coordinates = WalkingTour_HistoricalMapGeometry::coordinate($coordinates,
             $side === 'image' ? $map['image_width'] : 180, $side === 'image' ? $map['image_height'] : 85);
@@ -520,6 +497,7 @@ class WalkingTour_HistoricalMapRepository
             }
             if ((int) $current !== $revision) { throw new RuntimeException('This map was updated by another editor. Your draft has been kept. Reload the latest data and review before saving.', 409); }
             $map = $this->find($id);
+            if ($map['source_kind'] === 'allmaps') { throw new InvalidArgumentException('Imported Allmaps calibration is read-only.'); }
             $calibrationBefore = null;
             if ($operation === 'mask') {
                 $ring = WalkingTour_HistoricalMapGeometry::ring($payload['ring'] ?? null);

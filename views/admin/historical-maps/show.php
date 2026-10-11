@@ -1,78 +1,35 @@
-<?php
-$editorUrl = public_url('historical-maps') . '?map_id=' . $map['id'];
-$coordinate = function ($value, $precision) { return $value === null ? '—' : number_format($value, $precision, '.', ''); };
-echo head(array('title' => html_escape($map['title']), 'bodyclass' => 'historical-maps show'));
-?>
+<?php echo head(array('title' => html_escape($map['title']), 'bodyclass' => 'historical-maps show')); ?>
 <?php echo flash(); ?>
 <div id="primary">
     <p><a href="<?php echo html_escape(url('historical-maps')); ?>">Back to Historical Maps</a></p>
     <p><a class="button" href="<?php echo html_escape(url('historical-maps/edit/' . $map['id'])); ?>">Edit map information</a>
-        <a class="button green" href="<?php echo html_escape(public_url('historical-maps') . '?map_id=' . $map['id']); ?>">Open map editor</a></p>
-    <?php if (!$map['control_points']): ?><p>This map has no calibration yet. Open the map editor and place matching points on both maps to confirm control pairs.</p><?php endif; ?>
+        <a class="button green" href="<?php echo html_escape(public_url('historical-maps') . '?map_id=' . $map['id']); ?>">View maps</a></p>
+    <?php if ($map['source_kind'] === 'allmaps'): ?>
+        <p>Calibration is imported from Allmaps and is read-only on this website. The saved snapshot stays fixed until an explicit refresh.</p>
+    <?php else: ?>
+        <p>This legacy map remains readable. Its saved calibration and annotations are retained for migration. Website calibration editing and direct uploads are retired.</p>
+    <?php endif; ?>
     <dl>
         <dt>Original image size</dt><dd><?php echo $map['image_width']; ?> × <?php echo $map['image_height']; ?> pixels</dd>
-        <dt>Control points</dt><dd><?php echo count($map['control_points']); ?></dd>
-        <dt>Annotations</dt><dd><?php echo count($map['annotations']); ?></dd>
-        <dt>Calibration revision</dt><dd><?php echo $map['calibration_revision']; ?></dd>
-        <dt>Image source</dt><dd><?php echo $map['source_kind'] === 'upload' ? 'Uploaded image' : 'IIIF'; ?></dd>
+        <dt>Image source</dt><dd><?php echo $map['source_kind'] === 'upload' ? 'Legacy uploaded image' : 'IIIF image'; ?></dd>
         <?php if ($map['source_kind'] === 'upload'): ?>
         <dt>Saved image</dt><dd><a href="<?php echo html_escape($map['image_url']); ?>" target="_blank" rel="noopener noreferrer">View uploaded image</a></dd>
         <?php else: ?>
         <dt>IIIF image service</dt><dd><?php echo html_escape($map['image_service']); ?></dd>
-        <dt>IIIF source</dt><dd><?php echo html_escape($map['manifest_url']); ?></dd>
+        <dt>IIIF manifest</dt><dd><?php echo html_escape($map['manifest_url'] ?: 'Not provided'); ?></dd>
         <?php endif; ?>
-        <dt>Provenance source</dt><dd><?php echo $map['source_url'] === '' ? 'Not provided' : html_escape($map['source_url']); ?></dd>
+        <dt>Provenance source</dt><dd><?php echo html_escape($map['source_url'] ?: 'Not provided'); ?></dd>
+        <?php if ($map['source_kind'] === 'allmaps'): ?>
+        <dt>Resolved annotation source</dt><dd><?php echo html_escape($map['allmaps']['resolved_id']); ?></dd>
+        <dt>Allmaps map identity</dt><dd><?php echo html_escape($map['allmaps']['annotation_id']); ?></dd>
+        <dt>Content hash (SHA-256)</dt><dd><?php echo html_escape($map['allmaps']['content_hash']); ?></dd>
+        <dt>Imported at (UTC)</dt><dd><?php echo html_escape($map['allmaps']['imported_at']); ?></dd>
+        <dt>Transformation</dt><dd><?php echo html_escape($map['transformation']); ?></dd>
+        <?php else: ?>
+        <dt>Retained legacy control points</dt><dd><?php echo count($map['control_points']); ?></dd>
+        <dt>Retained legacy annotations</dt><dd><?php echo count($map['annotations']); ?></dd>
+        <dt>Legacy calibration revision</dt><dd><?php echo $map['calibration_revision']; ?></dd>
+        <?php endif; ?>
     </dl>
-    <p><a href="#map-controls">Control points</a> · <a href="#map-annotations">Annotations</a> · <a href="#map-history">Calibration history</a></p>
-
-    <h2 id="map-controls">Control points</h2>
-    <p>Confirmed pairs participate in calibration. Use the map editor to adjust or delete them.</p>
-    <?php if (!$map['control_points']): ?><p>No control points have been confirmed.</p><?php else: ?>
-    <div class="map-data-table" role="region" aria-label="Control point coordinates" tabindex="0">
-        <table class="simple"><thead><tr><th scope="col">Point</th><th scope="col">Image X</th><th scope="col">Image Y</th><th scope="col">Longitude</th><th scope="col">Latitude</th><th scope="col">Actions</th></tr></thead><tbody>
-        <?php foreach ($map['control_points'] as $point): ?>
-            <tr><th scope="row"><?php echo $point['ordinal']; ?></th>
-                <td><?php echo $coordinate($point['image_x'], 2); ?></td><td><?php echo $coordinate($point['image_y'], 2); ?></td>
-                <td><?php echo $coordinate($point['longitude'], 6); ?></td><td><?php echo $coordinate($point['latitude'], 6); ?></td>
-                <td><a href="<?php echo html_escape($editorUrl . '&point_type=control&point_id=' . $point['id']); ?>">Locate on maps</a></td></tr>
-        <?php endforeach; ?>
-        </tbody></table>
-    </div>
-    <?php endif; ?>
-
-    <h2 id="map-annotations">Annotations</h2>
-    <p>Ordinary annotations do not participate in calibration. An unavailable counterpart is shown as —.</p>
-    <?php if (!$map['annotations']): ?><p>No ordinary annotations have been saved.</p><?php else: ?>
-    <div class="map-data-table" role="region" aria-label="Annotation coordinates" tabindex="0">
-        <table class="simple"><thead><tr><th scope="col">Point</th><th scope="col">Source side</th><th scope="col">Status</th><th scope="col">Image X</th><th scope="col">Image Y</th><th scope="col">Longitude</th><th scope="col">Latitude</th><th scope="col">Calibration revision</th><th scope="col">Actions</th></tr></thead><tbody>
-        <?php foreach ($map['annotations'] as $point): ?>
-            <tr><th scope="row">A<?php echo $point['id']; ?></th><td><?php echo $point['source_side'] === 'image' ? 'Historical image' : 'Modern map'; ?></td>
-                <td><?php echo html_escape(ucfirst($point['status'])); ?></td>
-                <td><?php echo $coordinate($point['image_x'], 2); ?></td><td><?php echo $coordinate($point['image_y'], 2); ?></td>
-                <td><?php echo $coordinate($point['longitude'], 6); ?></td><td><?php echo $coordinate($point['latitude'], 6); ?></td>
-                <td><?php echo $point['calibration_revision']; ?></td>
-                <td><a href="<?php echo html_escape($editorUrl . '&point_type=annotation&point_id=' . $point['id']); ?>">Locate on maps</a></td></tr>
-        <?php endforeach; ?>
-        </tbody></table>
-    </div>
-    <?php endif; ?>
-
-    <h2 id="map-history">Calibration history</h2>
-    <p>Up to 50 changes are listed from newest to oldest. To undo the latest available calibration change, use the map editor.</p>
-    <?php if (!$history['changes']): ?><p>No calibration changes have been recorded on this page.</p><?php else: ?>
-    <div class="map-data-table" role="region" aria-label="Calibration change records" tabindex="0">
-        <table class="simple"><thead><tr><th scope="col">Change</th><th scope="col">Operation</th><th scope="col">Controls before change</th><th scope="col">State</th></tr></thead><tbody>
-        <?php $operations = array('confirm' => 'Confirm or adjust pair', 'delete' => 'Delete control pair', 'undo_calibration' => 'Undo calibration change'); ?>
-        <?php foreach ($history['changes'] as $change): ?>
-            <tr><th scope="row"><?php echo $change['id']; ?></th><td><?php echo html_escape($operations[$change['operation']] ?? $change['operation']); ?></td>
-                <td><?php echo $change['controls_before'] === null ? '—' : $change['controls_before']; ?></td>
-                <td><?php echo $change['undone'] ? 'Undone' :
-                    (($map['undo_calibration']['change_id'] ?? null) === $change['id'] ? 'Available to undo' : 'Recorded'); ?></td></tr>
-        <?php endforeach; ?>
-        </tbody></table>
-    </div>
-    <?php endif; ?>
-    <?php if ($olderPage): ?><a href="<?php echo html_escape(url('historical-maps/show/' . $map['id']) . '#map-history'); ?>">Newest changes</a><?php endif; ?>
-    <?php if ($history['older_than']): ?><a href="<?php echo html_escape(url('historical-maps/show/' . $map['id']) . '?before=' . $history['older_than'] . '#map-history'); ?>">Older changes</a><?php endif; ?>
 </div>
 <?php echo foot(); ?>

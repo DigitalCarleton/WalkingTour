@@ -44,22 +44,14 @@
             var status = document.getElementById('historical-map-status');
             var retry = document.getElementById('historical-map-retry');
             var loadGeneration = 0;
-            var editor = window.WalkingTourMapEditor({root: root, historical: historicalMap, modern: modernMap,
-                onSaved: function (record) {
-                    activeMap = record; updateGeographicBounds(record);
-                    if (!status.classList.contains('is-error')) {
-                        setStatus('Original image · ' + record.control_points.length + ' shared control points', false);
-                    }
-                }});
             window.WalkingTourPlaceSearch(modernMap, root.dataset.searchEndpoint);
 
             function updateGeographicBounds(record) {
                 geographicBounds = L.latLngBounds();
-                if (record.mask && record.mask.geographic_ring) {
-                    record.mask.geographic_ring.forEach(function (p) { geographicBounds.extend([p[1], p[0]]); });
-                }
-                record.control_points.forEach(function (p) { geographicBounds.extend([p.latitude, p.longitude]); });
-                document.getElementById('control-points-fit').disabled = !geographicBounds.isValid();
+                (record.geographic_bounds || []).forEach(function (point) {
+                    geographicBounds.extend([point[1], point[0]]);
+                });
+                document.getElementById('map-area-fit').disabled = !geographicBounds.isValid();
             }
 
             function setStatus(message, error) {
@@ -90,7 +82,7 @@
             $('#historical-map-fit').on('click', function () {
                 if (imageBounds) { historicalMap.fitBounds(imageBounds, {padding: [20, 20]}); }
             });
-            $('#control-points-fit').on('click', function () {
+            $('#map-area-fit').on('click', function () {
                 if (geographicBounds && geographicBounds.isValid()) {
                     modernMap.fitBounds(geographicBounds, {padding: [40, 40], maxZoom: 16});
                 }
@@ -108,7 +100,6 @@
             }
 
             function showMap(record) {
-                if (!editor.canSwitch()) { return; }
                 var generation = ++loadGeneration;
                 activeMap = record;
                 if (imageLayer) { historicalMap.removeLayer(imageLayer); }
@@ -143,26 +134,22 @@
                 imageLayer.on('tileload tileunload', function (event) { failedTiles.delete(event.tile); });
                 imageLayer.on('load', function () {
                     if (generation !== loadGeneration || failedTiles.size) { return; }
-                    setStatus('Original image · ' + record.control_points.length + ' shared control points', false);
+                    setStatus(record.source_kind === 'allmaps' ? 'Original image · Calibrated in Allmaps' : 'Original historical image', false);
                 });
                 imageLayer.addTo(historicalMap);
 
                 updateGeographicBounds(record);
-                editor.load(record);
                 document.getElementById('historical-map-fit').disabled = false;
-                document.getElementById('control-points-fit').disabled = !geographicBounds.isValid();
+                document.getElementById('map-area-fit').disabled = !geographicBounds.isValid();
                 document.getElementById('historical-map-heading').title = record.title;
-                document.getElementById('control-point-selection').textContent = 'Select a numbered point to locate its pair.';
                 var sources = document.getElementById('historical-map-sources');
                 sources.textContent = '';
-                sourceLink(sources, uploaded ? 'Uploaded image' : 'Image source (IIIF)', uploaded ? record.image_url : record.manifest_url);
-                sourceLink(sources, 'Provenance source', record.source_url);
+                sourceLink(sources, uploaded ? 'Uploaded image' : 'Image source (IIIF)', uploaded ? record.image_url : (record.manifest_url || record.image_service + '/info.json'));
+                sourceLink(sources, record.source_kind === 'allmaps' ? 'Allmaps annotation' : 'Provenance source', record.source_url);
                 $('#historical-map-list button').each(function () {
                     this.setAttribute('aria-pressed', String(this.dataset.mapId === String(record.id)));
                 });
-                // Start at the seeded map's area; tour auto-fit may subsequently show the selected route.
                 if (geographicBounds.isValid()) {
-                    // One initial control has zero-area bounds; keep surrounding streets visible.
                     modernMap.fitBounds(geographicBounds, {padding: [40, 40], maxZoom: 16});
                 }
             }
@@ -171,7 +158,6 @@
                 setStatus('Loading historical maps…', false);
                 $.ajax({url: root.dataset.catalogUrl, dataType: 'json', timeout: 15000})
                     .done(function (response) {
-                        editor.access(response.can_edit, response.csrf_token);
                         var list = document.getElementById('historical-map-list');
                         list.textContent = '';
                         if (!response.maps || !response.maps.length) {
@@ -189,13 +175,6 @@
                         var requestedMap = new URLSearchParams(window.location.search).get('map_id');
                         var selectedMap = response.maps.filter(function (record) { return String(record.id) === requestedMap; })[0];
                         showMap(selectedMap || response.maps[0]);
-                        var parameters = new URLSearchParams(window.location.search);
-                        var pointType = parameters.get('point_type'), pointId = Number(parameters.get('point_id'));
-                        if (selectedMap && (pointType === 'control' || pointType === 'annotation') && Number.isInteger(pointId) && pointId > 0) {
-                            if (!editor.focus(pointType, pointId)) {
-                                document.getElementById('control-point-selection').textContent = 'The linked point is no longer available on this map.';
-                            }
-                        }
                     }).fail(function () {
                         setStatus('Historical maps could not be loaded. Please retry or contact the site administrator.', true);
                     });

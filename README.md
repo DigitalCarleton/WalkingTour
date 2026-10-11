@@ -6,15 +6,20 @@ A fork of the Omeka team's MallMap plugin to be used for the Carleton Guide to M
 
 See [WalkingTour architecture and next steps](docs/architecture/README.md) for the current Archify diagram, an explanation of how it was generated, and a proposed migration from the static locations GeoJSON overlay to live queries of Omeka's Geolocation table.
 
-## Dual-map viewer
+## Historical Maps
 
-This increment is based on `add-historic-maps1`. It adds a persistent BnF map catalog,
-ten paired control points, and side-by-side historical and modern maps. The existing
-Omeka locations snapshot is retained but hidden by default. The plugin version remains
-**0.2.3**; do not uninstall to update it.
-Stage 2 now adds saved estimated annotations, imported geographic footprints, custom polygon masks, and place search. Calibration editing remains a later batch.
+Import a georeference Annotation or AnnotationPage URL exported from Allmaps through
+**Omeka admin → Historical Maps → Import from Allmaps**. Review and select the maps,
+then browse the original IIIF image beside the modern map. Imported calibration stays
+in a provenance snapshot; this site no longer displays or edits control points.
+The original Walking Tour remains a separate page.
 
-After pulling the code, run `php scripts/initialize-map-storage.php` from the WalkingTour plugin directory to initialize the new tables without changing the plugin version. See the [map editor guide](docs/map-editor.md) for usage, permissions, search configuration, and API details. All new interface text is English.
+The plugin version remains **0.2.3**. Existing initialized sites need the plugin code
+update. Fresh storage can be initialized with `php scripts/initialize-map-storage.php`
+from the installed plugin directory. Initialization preserves data and no longer seeds
+an example map. Legacy records/tables remain temporarily for migration. See the
+[Historical Maps guide](docs/map-editor.md) for workflow, supported sources, deployment,
+retired API behavior, and the remaining migration scope. All interface text is English.
 
 ## Configuration
 
