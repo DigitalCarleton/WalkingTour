@@ -71,3 +71,8 @@
 #historical-place-select { width: 100%; margin: 8px 0; min-height: 44px; }
 
 #dual-map .historical-place-cluster {background: #29677c; border: 3px solid #fff; border-radius: 50%; color: #fff; text-align: center; line-height: 32px; font-weight: bold; box-shadow: 0 1px 4px #333;}
+
+#historical-place-editor {border-top: 1px solid #ccc; margin-top: 1em; padding-top: 1em;}
+#historical-place-editor input, #historical-place-editor textarea {box-sizing: border-box; width: 100%;}
+#dual-map .historical-place-marker.is-override {color: #aa5511;}
+#dual-map .historical-place-marker.is-draft {color: #b34810; border: 2px dashed #b34810; border-radius: 50%;}

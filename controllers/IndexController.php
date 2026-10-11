@@ -132,6 +132,53 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         }
     }
 
+    private function placeEditorAllowed()
+    {
+        return current_user() && is_allowed('WalkingTourBuilder_Tours', 'edit');
+    }
+
+    public function historicalMapDecisionsAction()
+    {
+        $this->getResponse()->setHeader('Cache-Control', 'private, no-store', true);
+        if (!$this->getRequest()->isGet()) { $this->getResponse()->setHttpResponseCode(405)->setHeader('Allow', 'GET', true); $this->_helper->json(array('error'=>'Use GET to read decisions.')); return; }
+        try {
+            require_once dirname(__FILE__) . '/../models/HistoricalMapRepository.php';
+            $id = $this->getRequest()->getQuery('map_id');
+            if (!is_string($id) || !ctype_digit($id) || (int) $id < 1) { throw new InvalidArgumentException('Choose a historical map.'); }
+            $map = (new WalkingTour_HistoricalMapRepository(get_db()))->find((int) $id);
+            $canEdit = $this->placeEditorAllowed() && $map['source_kind'] === 'allmaps';
+            $result = array('revision'=>$map['revision'], 'decisions'=>(new WalkingTour_HistoricalMapDecisions(get_db()))->publicRows($map['id']), 'can_edit'=>(bool) $canEdit);
+            if ($canEdit) { $csrf = new Omeka_Form_SessionCsrf; $result['csrf_token'] = $csrf->getElement('csrf_token')->getToken(); }
+            $this->_helper->json($result);
+        } catch (Exception $error) { $this->placeDecisionError($error); }
+    }
+
+    public function historicalMapDecisionAction()
+    {
+        $this->getResponse()->setHeader('Cache-Control', 'private, no-store', true);
+        if (!$this->getRequest()->isPost()) { $this->getResponse()->setHttpResponseCode(405)->setHeader('Allow', 'POST', true); $this->_helper->json(array('error'=>'Use POST to save a place decision.')); return; }
+        if (!$this->placeEditorAllowed()) { $this->getResponse()->setHttpResponseCode(403); $this->_helper->json(array('error'=>'Sign in with map editing permission to save decisions.')); return; }
+        try {
+            $body = $this->getRequest()->getRawBody();
+            if (strlen($body) > 16384) { throw new InvalidArgumentException('The place decision request is too large.'); }
+            $data = json_decode($body, true);
+            if (!is_array($data)) { throw new InvalidArgumentException('Submit a JSON place decision.'); }
+            $csrf = new Omeka_Form_SessionCsrf;
+            if (!$csrf->isValid($data)) { $this->getResponse()->setHttpResponseCode(403); $this->_helper->json(array('error'=>'Your editing session expired. Sign in again and reload the page. Your draft has not been saved.')); return; }
+            require_once dirname(__FILE__) . '/../models/HistoricalMapDecisions.php';
+            $this->_helper->json((new WalkingTour_HistoricalMapDecisions(get_db()))->save($data['map_id'] ?? null, $data['revision'] ?? null,
+                $data['item_id'] ?? null, $data['operation'] ?? null, $data['value'] ?? null));
+        } catch (Exception $error) { $this->placeDecisionError($error); }
+    }
+
+    private function placeDecisionError($error)
+    {
+        $status = $error instanceof InvalidArgumentException ? 422 : ($error->getCode() === 409 ? 409 : 503);
+        $this->getResponse()->setHttpResponseCode($status);
+        if ($status === 503) { _log($error, Zend_Log::ERR); }
+        $this->_helper->json(array('error'=>$status === 503 ? 'Place decisions are unavailable. Ask the administrator to run initialize-map-storage.php and check Geolocation storage.' : $error->getMessage()));
+    }
+
     public function historicalMapEstimateAction()
     {
         $this->retiredHistoricalMapAction();

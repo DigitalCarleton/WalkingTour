@@ -40,6 +40,22 @@
                     <p id="historical-place-status" role="status"></p>
                     <a id="historical-place-link">View Item</a>
                     <button type="button" id="historical-place-locate">Locate on both maps</button>
+                    <div id="historical-place-editor" hidden>
+                        <p>Adjust this Item on this historical image. Allmaps calibration and modern coordinates stay fixed.</p>
+                        <button type="button" id="historical-place-adjust">Adjust historical position</button>
+                        <div id="historical-position-draft" hidden>
+                            <p>Click the historical image, drag the draft marker, or enter original-image pixels. Placement outside the mask is an explicit editorial override.</p>
+                            <label for="historical-pixel-x">Image X</label><input id="historical-pixel-x" type="number" step="any" min="0">
+                            <label for="historical-pixel-y">Image Y</label><input id="historical-pixel-y" type="number" step="any" min="0">
+                            <button type="button" id="historical-position-save">Save position</button>
+                            <button type="button" id="historical-position-cancel">Cancel adjustment</button>
+                        </div>
+                        <button type="button" id="historical-position-reset">Reset to estimated position</button>
+                        <label for="historical-place-note">Editorial note</label><textarea id="historical-place-note" maxlength="2000"></textarea>
+                        <button type="button" id="historical-note-save">Save note</button>
+                        <p id="historical-decision-status" role="status" aria-live="polite"></p>
+                        <button type="button" id="historical-decision-reload" hidden>Reload latest decisions (discard draft)</button>
+                    </div>
                 </section>
                 <label for="historical-place-select">Find a place</label>
                 <select id="historical-place-select"><option value="">Choose a place</option></select>

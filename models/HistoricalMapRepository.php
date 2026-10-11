@@ -4,6 +4,7 @@ require_once __DIR__ . "/HistoricalMapTransform.php";
 require_once __DIR__ . "/HistoricalMapGeometry.php";
 require_once __DIR__ . "/HistoricalMapIiif.php";
 require_once __DIR__ . "/HistoricalMapUpload.php";
+require_once __DIR__ . "/HistoricalMapDecisions.php";
 
 /** Allmaps-backed catalog with read compatibility for legacy calibration records. */
 class WalkingTour_HistoricalMapRepository
@@ -89,6 +90,7 @@ class WalkingTour_HistoricalMapRepository
             UNIQUE KEY request_per_map (map_id, request_id),
             KEY map_changes (map_id, id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
+        (new WalkingTour_HistoricalMapDecisions($this->db))->install();
         // Legacy tables remain until reviewed migration; initialization never seeds or recalibrates.
     }
 
@@ -296,7 +298,7 @@ class WalkingTour_HistoricalMapRepository
                 $storage->move($original, $destination);
                 $staged = $destination;
             }
-            foreach (array($this->points, $this->annotations, $this->masks, $this->changes) as $table) {
+            foreach (array($this->points, $this->annotations, $this->masks, $this->changes, $this->db->prefix . 'walking_tour_place_annotations') as $table) {
                 $this->db->query("DELETE FROM `{$table}` WHERE map_id = ?", array($id));
             }
             $this->db->query("DELETE FROM `{$this->maps}` WHERE id = ?", array($id));
@@ -542,6 +544,7 @@ class WalkingTour_HistoricalMapRepository
 
     public function uninstall()
     {
+        $this->db->query("DROP TABLE IF EXISTS `{$this->db->prefix}walking_tour_place_annotations`");
         $this->db->query("DROP TABLE IF EXISTS `{$this->changes}`");
         $this->db->query("DROP TABLE IF EXISTS `{$this->annotations}`");
         $this->db->query("DROP TABLE IF EXISTS `{$this->masks}`");

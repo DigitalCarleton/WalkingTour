@@ -141,3 +141,30 @@ and Locate on both maps button reveal a selected Item inside either cluster.
 Thirty-place batches yield between conversion passes; old groups are detached
 when the map changes, so obsolete asynchronous work cannot repaint the viewer.
 Original Walking Tour assets and layers remain separate.
+
+### Item position overrides and notes
+
+Authorized map editors select a public Item in Historical Maps, then use Adjust
+historical position. Click/drag in the historical pane or enter original-image
+pixels; Save position persists the correction. Cancel, switching Items, and
+switching maps discard the position draft. Failed writes keep it. Reset to
+estimated position clears only the override; notes and display decisions remain.
+Coordinates can be zero and can fall outside the Allmaps resource mask when
+explicitly reviewed, but must lie inside original-image dimensions. An override
+never changes Geolocation, Allmaps controls, the source snapshot, or other Items.
+Notes are plain text and accompany public Items in the decision API.
+
+After deploying this slice, run `php scripts/initialize-map-storage.php` from the
+installed WalkingTour plugin directory. This idempotently adds
+`walking_tour_place_annotations` with one row per `(map_id, item_id)`; only local
+decisions are stored, and empty rows are removed. The old free annotation table
+is retained separately for reviewed migration in tickets 07/09. Deleting a map
+also removes its new Item decision rows. Final storage contraction is still
+pending; do not drop old tables manually.
+
+GET `walking-tour/index/historical-map-decisions?map_id=…` reads public Item
+decisions and returns an editing token only to authorized editors. POST
+`historical-map-decision` accepts bounded JSON, a session CSRF token, map revision,
+Item ID, operation (`position` or `note`) and value. Every write locks the map and
+rejects stale revisions. A failed or lost response can be checked with Reload
+latest decisions; that explicit page reload discards the draft for review.
