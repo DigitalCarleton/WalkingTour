@@ -3,7 +3,6 @@
 <div id="dialog"></div>
 <div id="walking-tour" role="main"
     data-api-base="<?php echo html_escape(url('walking-tour/index/')); ?>"
-    data-locations-url="<?php echo html_escape(src('omeka-locations', 'data', 'geojson')); ?>"
     data-annotation-url="https://annotations.allmaps.org/manifests/47574ee029cca631">
     <div class="map-title">
         <h1 id="marker-count"></h1>

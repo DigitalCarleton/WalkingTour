@@ -259,7 +259,7 @@ function walkingTourJs() {
         imageZoom = record.resource.height / $('#map').height();
         mapSetUp(record, results[3]);
         doQuery();
-        loadOmekaLocationsGeojson();
+        loadLiveOmekaLocations();
     }).catch(function (error) {
         $('#walking-tour-status').text('The walking tour map could not load. Please reload the page.');
         console.error('Walking Tour:', error);
@@ -317,40 +317,36 @@ function walkingTourJs() {
         });
     }
 
-    function loadOmekaLocationsGeojson() {
+    function loadLiveOmekaLocations() {
         $('#omeka-locations-status').prop('hidden', false);
-        var source = root.dataset.locationsUrl;
-        $.ajax({url: source, dataType: 'json', timeout: 15000}).done(function (geojson) {
-            var features = (geojson.features || []).filter(function (feature) {
-                var coordinates = feature.geometry && feature.geometry.coordinates;
-                return feature.geometry && feature.geometry.type === 'Point' &&
-                    Array.isArray(coordinates) && coordinates.length >= 2 &&
-                    coordinates.every(Number.isFinite) && Math.abs(coordinates[0]) <= 180 &&
-                    Math.abs(coordinates[1]) <= 90;
-            });
-            L.geoJson(features, {
-                coordsToLatLng: geographicToImageLatLng,
-                pointToLayer: function (feature, latlng) {
-                    var properties = feature.properties || {};
-                    var content = document.createElement('div');
-                    var title = document.createElement('strong');
-                    title.textContent = 'Item ' + properties.item_id;
-                    content.appendChild(title);
-                    if (properties.address) {
-                        var address = document.createElement('p');
-                        address.textContent = properties.address;
-                        content.appendChild(address);
-                    }
-                    return L.circleMarker(latlng, {
-                        radius: 5, color: '#1f2937', weight: 1,
-                        fillColor: '#f59e0b', fillOpacity: 0.85,
-                        className: 'omeka-location-marker'
-                    }).bindPopup(content);
+        WalkingTourLivePlaces.load(apiBase + 'historical-map-places').done(function (places) {
+            var shown = 0, omitted = 0;
+            var layer = L.layerGroup();
+            places.forEach(function (place) {
+                var latlng;
+                try { latlng = geographicToImageLatLng(place.coordinates); }
+                catch (error) { omitted++; return; }
+                if (!Number.isFinite(latlng.lat) || !Number.isFinite(latlng.lng)) { omitted++; return; }
+                var content = document.createElement('div');
+                var title = document.createElement('strong');
+                title.textContent = 'Item ' + place.item_id;
+                content.appendChild(title);
+                if (place.address) {
+                    var address = document.createElement('p');
+                    address.textContent = place.address;
+                    content.appendChild(address);
                 }
-            }).addTo(map);
-            $('#omeka-locations-status').text(features.length + ' Omeka locations · existing snapshot');
+                L.circleMarker(latlng, {
+                    radius: 5, color: '#1f2937', weight: 1,
+                    fillColor: '#f59e0b', fillOpacity: 0.85,
+                    className: 'omeka-location-marker'
+                }).bindPopup(content).addTo(layer);
+                shown++;
+            });
+            layer.addTo(map);
+            $('#omeka-locations-status').text(shown + ' live Omeka locations' + (omitted ? ' · ' + omitted + ' positions unavailable on this tour image' : ''));
         }).fail(function () {
-            $('#omeka-locations-status').text('The Omeka locations snapshot could not be loaded.');
+            $('#omeka-locations-status').text('Live Omeka locations could not be loaded. Reload to retry or contact the site administrator. You can still browse walking tours.');
         });
     }
 

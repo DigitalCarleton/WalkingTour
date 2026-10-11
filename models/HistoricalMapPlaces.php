@@ -11,7 +11,7 @@ class WalkingTour_HistoricalMapPlaces
         if (!plugin_is_active('Geolocation')) { throw new RuntimeException('Enable Geolocation and add Item locations in the Map tab.'); }
         if (!is_int($after) || $after < 0) { throw new InvalidArgumentException('Use a valid Item cursor.'); }
         $db = $this->db;
-        $rows = $db->fetchAll("SELECT i.id, l.longitude, l.latitude FROM `$db->Item` i
+        $rows = $db->fetchAll("SELECT i.id, l.longitude, l.latitude, l.address FROM `$db->Item` i
             JOIN `$db->Location` l ON l.item_id = i.id WHERE i.public = 1 AND i.id > ? ORDER BY i.id LIMIT 501", array($after));
         $more = count($rows) > 500; $rows = array_slice($rows, 0, 500); $texts = array(); $thumbnails = array();
         if ($rows) {
@@ -41,6 +41,7 @@ class WalkingTour_HistoricalMapPlaces
             $id = (int) $row['id'];
             $places[] = array('item_id' => $id, 'coordinates' => array($lon, $lat),
                 'title' => $texts[$id]['Title'] ?? ('Item ' . $id), 'description' => $texts[$id]['Description'] ?? '',
+                'address' => mb_substr(trim(html_entity_decode(strip_tags($row['address'] ?? ''), ENT_QUOTES, 'UTF-8')), 0, 1000),
                 'thumbnail_url' => $thumbnails[$id] ?? null, 'url' => public_url('items/show/' . $id));
         }
         return array('places' => $places, 'next' => $more ? (int) end($rows)['id'] : null);

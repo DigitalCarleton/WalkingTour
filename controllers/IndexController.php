@@ -64,7 +64,7 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         $_tourTypes = $this->publicTours();
         $this->view->tour_types = $_tourTypes;
 
-        $this->viewerAssets(array('walking-tour'), array('walking-tour'));
+        $this->viewerAssets(array('live-map-places', 'walking-tour'), array('walking-tour'));
     }
 
     /** Public Historical Maps viewer; the similarly named action below is the JSON catalog. */

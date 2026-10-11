@@ -267,3 +267,14 @@ covered refresh preview/publish, no-op feedback, override re-review and a two-se
 conflict preserving the editor draft. Original Walking Tour routes, controls and
 assets and Allmaps import validation were checked for regressions. These are local
 checks; they do not confirm deployment or connectivity on the remote Omeka server.
+
+### Original Walking Tour live location layer (ticket 08)
+
+The separate Walking Tour page now loads all public Item locations through the same
+`historical-map-places` read service. Pagination must finish successfully before the
+additional orange location layer is published. Popups retain the Item ID and current
+Geolocation address; text is inserted safely. Reloading reads updated coordinates and
+publication state. A failed page gives explicit feedback and leaves tour stops usable;
+there is no stale or partial location fallback. The original tour image conversion,
+filters, routes, numbered stops and Item details remain separate from Historical Maps.
+Bundled location JSON/GeoJSON and their offline converters have been removed.

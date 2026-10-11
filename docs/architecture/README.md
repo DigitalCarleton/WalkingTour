@@ -1,4 +1,13 @@
-From https://github.com/tt-a1i/archify
+# Architecture record and current readers
+
+The generated diagram and source links below describe the repository at revision
+`01bf849` and remain a historical design record. The static export/converter nodes in
+that diagram are retired. Current Historical Maps and the separate original Walking Tour
+both read public Item coordinates from the live Geolocation service; no location export
+is served as a runtime fallback. The tour keeps its own image conversion, numbered stops,
+filters, routes and Item details. See [the active Historical Maps guide](../map-editor.md)
+and [migration procedures](../historical-map-migration.md) for current operations.
+
 
 > Snapshot notice: the diagram below describes the implementation before the dual-map batch. The current viewer uses a persistent historical-map catalog. The existing location snapshot is retained but hidden by default. The original diagram and receipts are retained unchanged.
 # WalkingTour architecture and next steps
