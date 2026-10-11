@@ -52,7 +52,12 @@ are removed through Omeka's configured storage adapter.
 
 The IIIF-only and direct-upload actions are retired. Legacy map records remain readable
 for reviewed migration, but their control markers are hidden and public calibration writes
-are disabled. Ticket 07 migrates reviewed legacy data; ticket 09 removes retired tables,
+are disabled. Previously saved image/geographic mask rings remain visible as read-only
+outlines using the original pink styling (3px image outline; 4px geographic outline with
+4% fill). The catalog supplies only these rings as `display_mask`, without mask editing
+or calibration state. They are not recalculated by the retired engine or used as a
+fallback estimator. Allmaps imports always draw their own imported resource mask and
+transformed footprint. Ticket 07 migrates reviewed legacy data; ticket 09 removes retired tables,
 editor assets, and example/static files once their remaining consumers are replaced.
 Five legacy Historical Maps tables are temporarily retained alongside the new Item-bound
 annotations table. Tickets 07/09 handle reviewed migration and contraction to two business
@@ -96,7 +101,8 @@ Paths are relative to the Omeka site root:
 - `GET walking-tour/index/historical-maps` returns the read-only catalog, image metadata,
   provenance, geographic viewport bounds, and normalized Allmaps calculation inputs.
   It returns `can_edit: false`, `workflow: allmaps`, and no editor CSRF token. Legacy editable
-  control/annotation/mask arrays, calibration counters, and undo state are omitted.
+  editable control/annotation/mask state, calibration counters, and undo state are omitted.
+  Existing legacy outlines are exposed separately as read-only `display_mask` rings.
 - `historical-map-edit` and `historical-map-estimate` at the same API base return **410 Gone**
   without executing the former calibration or mutation engine, including old direct requests.
 - `admin/historical-maps/import` implements authorized, CSRF-protected preview and import.

@@ -52,17 +52,32 @@
                 geographicBounds = L.latLngBounds();
                 if (historicalMask) { historicalMap.removeLayer(historicalMask); historicalMask = null; }
                 if (modernMask) { modernMap.removeLayer(modernMask); modernMask = null; }
+                var imageRing, geographicRing;
                 if (record.source_kind === 'allmaps') {
-                    var style = {color: '#f34ab8', weight: 3, fill: false, interactive: false, className: 'allmaps-mask-boundary'};
-                    var pixels = record.georeference.resourceMask;
-                    historicalMask = L.polygon(pixels.map(function (p) { return imageLatLng(p[0],p[1]); }), style).addTo(historicalMap);
+                    imageRing = record.georeference.resourceMask;
                     try {
-                        var footprint = window.WalkingTourAllmaps.create(record).footprint();
-                        if (footprint) {
-                            modernMask = L.polygon(footprint.map(function (p) { return [p[1],p[0]]; }), style).addTo(modernMap);
-                            geographicBounds = modernMask.getBounds();
-                        }
+                        geographicRing = window.WalkingTourAllmaps.create(record).footprint();
                     } catch (e) { /* Legacy/invalid calibration has no geographic footprint. */ }
+                } else if (record.display_mask) {
+                    // Existing stored pairs are display geometry, never a fallback
+                    // estimator or a request to recalculate the retired calibration.
+                    imageRing = record.display_mask.image_ring;
+                    geographicRing = record.display_mask.geographic_ring;
+                }
+                function validRing(ring) {
+                    return Array.isArray(ring) && ring.length >= 3 && ring.length <= 8193 && ring.every(function (p) {
+                        return Array.isArray(p) && p.length === 2 && p.every(Number.isFinite);
+                    });
+                }
+                var boundaryClass = 'map-mask-boundary' + (record.source_kind === 'allmaps' ? ' allmaps-mask-boundary' : '');
+                if (validRing(imageRing)) {
+                    historicalMask = L.polygon(imageRing.map(function (p) { return imageLatLng(p[0],p[1]); }),
+                        {color: '#f549b2', weight: 3, fill: false, interactive: false, className: boundaryClass}).addTo(historicalMap);
+                }
+                if (validRing(geographicRing)) {
+                    modernMask = L.polygon(geographicRing.map(function (p) { return [p[1],p[0]]; }),
+                        {color: '#f549b2', weight: 4, fillOpacity: .04, interactive: false, className: boundaryClass}).addTo(modernMap);
+                    geographicBounds = modernMask.getBounds();
                 }
                 document.getElementById('map-area-fit').disabled = !geographicBounds.isValid();
             }
@@ -150,7 +165,8 @@
                 imageLayer.on('tileload tileunload', function (event) { failedTiles.delete(event.tile); });
                 imageLayer.on('load', function () {
                     if (generation !== loadGeneration || failedTiles.size) { return; }
-                    setStatus(record.source_kind === 'allmaps' ? 'Original image · Calibrated in Allmaps · Pink outline: map coverage' : 'Original historical image', false);
+                    setStatus(record.source_kind === 'allmaps' ? 'Original image · Calibrated in Allmaps · Pink outline: map coverage' :
+                        (historicalMask ? 'Original image · Saved mask outline · Allmaps migration pending' : 'Original historical image'), false);
                 });
                 imageLayer.addTo(historicalMap);
 

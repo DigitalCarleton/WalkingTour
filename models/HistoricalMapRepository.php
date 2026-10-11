@@ -163,6 +163,12 @@ class WalkingTour_HistoricalMapRepository
     {
         $maps = $this->all();
         foreach ($maps as &$map) {
+            // Preserve previously saved outlines for read-only browsing until
+            // reviewed Allmaps migration. Do not expose old editing/revision state.
+            if ($map['source_kind'] !== 'allmaps' && $map['mask']) {
+                $map['display_mask'] = array('image_ring' => $map['mask']['image_ring'],
+                    'geographic_ring' => $map['mask']['geographic_ring']);
+            }
             unset($map['control_points'], $map['annotations'], $map['mask'], $map['undo_calibration'], $map['calibration_revision'], $map['next_control_ordinal']);
         }
         unset($map);
