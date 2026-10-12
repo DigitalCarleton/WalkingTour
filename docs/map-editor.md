@@ -163,15 +163,17 @@ returns public Item positions and plain-text excerpts with no shared response ca
 ### Clustered place browsing
 
 Historical Maps uses the existing Leaflet 1.6 instance and locally bundled
-Leaflet.markercluster 1.5.3 (rebuilt by the same asset command). Each pane clusters
-its own positions, including negative image Y values and negative image zooms.
-Click a cluster to expand or spiderfy coincident places. The Find a place selector
-and Locate on both maps button reveal a selected Item inside either cluster.
+Leaflet.markercluster 1.5.3 (rebuilt by the same asset command). The modern pane
+shows and clusters the eligible places. The historical pane initially shows only
+the image and its mask, with no place pins or clusters. Click a modern place marker,
+use Find a place, or choose Locate on both maps to reveal the selected counterpart.
+Only that Item's pin and detail balloon appear on the historical image; modern pins
+do not display detail balloons. Selecting another Item replaces the historical pin.
+Choosing the empty selector entry or switching maps clears the selection.
 Thirty-place batches yield between conversion passes; old groups are detached
 when the map changes, so obsolete asynchronous work cannot repaint the viewer.
-Cluster grids are created after each image's minimum zoom has been configured,
-including very large images. Locating uses the actual Item/pixel coordinates,
-not temporary spiderfy display offsets.
+Click a modern cluster to expand or spiderfy coincident places. Locating uses the
+actual Item/pixel coordinates, not temporary spiderfy display offsets.
 Original Walking Tour assets and layers remain separate.
 
 ### Item position overrides and notes

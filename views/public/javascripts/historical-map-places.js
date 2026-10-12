@@ -22,18 +22,15 @@
         function paintHistorical(pair) {
             if (pair.historical) { historicalLayer.removeLayer(pair.historical); }
             var pixel = position(pair), d = decision(pair.place.item_id);
-            pair.historical = pixel ? marker([-pixel[1], pixel[0]], pair.place, !d.pixel || d.needs_review) : null;
-            if (pair.historical) {
-                if (d.pixel && !d.needs_review) { pair.historical.options.icon.options.className += ' is-override'; }
-                if (visible(pair.place.item_id)) { historicalLayer.addLayer(pair.historical); }
-            }
+            pair.historical = pixel && pair.place.item_id === selected && visible(selected) ? marker([-pixel[1], pixel[0]], pair.place, !d.pixel || d.needs_review, true) : null;
+            if (pair.historical && d.pixel && !d.needs_review) { pair.historical.options.icon.options.className += ' is-override'; }
         }
         function details() {
             var pair = pairs[selected]; if (!pair) { return; }
-            var d = decision(selected);
-            el('historical-place-status').textContent = d.needs_review ? 'The saved position needs review after an image change. ' + (pair.historical ? 'The current automatic estimate is shown.' : 'No reliable historical estimate is available; the modern location is shown.') :
+            var d = decision(selected), hasPosition = !!position(pair);
+            el('historical-place-status').textContent = d.needs_review ? 'The saved position needs review after an image change. ' + (hasPosition ? 'The current automatic estimate is shown.' : 'No reliable historical estimate is available; the modern location is shown.') :
                 (d.pixel ? 'Reviewed historical position override. This does not change Allmaps calibration.' :
-                (pair.historical ? 'Estimated historical position. Compare with the original image.' : 'No reliable historical counterpart is available within this map. The modern location is shown.'));
+                (hasPosition ? 'Estimated historical position. Compare with the original image.' : 'No reliable historical counterpart is available within this map. The modern location is shown.'));
             if (!visible(selected)) { el('historical-place-status').textContent = 'Hidden on this map. Restore Default or Show to display this Item again. ' + el('historical-place-status').textContent; }
             el('historical-place-visibility').value = d.visibility;
             el('historical-place-editor').hidden = !canEdit;
@@ -55,7 +52,7 @@
             writeRequest.done(function (data) {
                 if (stamp !== generation) { return; }
                 record.revision = data.revision; decisions[itemId] = data.decision;
-                if (operation === 'position') { cancelDraft(); paintHistorical(pairs[itemId]); refreshStats(); }
+                if (operation === 'position') { cancelDraft(); paintHistorical(pairs[itemId]); locate(); refreshStats(); }
                 if (operation === 'visibility') {
                     cancelDraft(); if (value === 'hide') { el('historical-show-hidden').checked = true; }
                     paintVisibility(pairs[itemId]); refreshPicker(); refreshStats();
@@ -103,7 +100,10 @@
         el('historical-decision-reload').addEventListener('click', function () { window.location.reload(); });
         function paintVisibility(pair) {
             modernLayer.removeLayer(pair.modern); if (pair.historical) { historicalLayer.removeLayer(pair.historical); }
-            if (visible(pair.place.item_id)) { modernLayer.addLayer(pair.modern); if (pair.historical) { historicalLayer.addLayer(pair.historical); } }
+            if (visible(pair.place.item_id)) {
+                modernLayer.addLayer(pair.modern);
+                if (pair.place.item_id === selected) { locate(); }
+            }
         }
         function addOption(pair) {
             var id = pair.place.item_id;
@@ -113,12 +113,12 @@
         function refreshPicker() {
             picker.textContent = ''; var empty = document.createElement('option'); empty.value = ''; empty.textContent = 'Choose a place'; picker.appendChild(empty);
             Object.keys(pairs).forEach(function (key) { addOption(pairs[key]); });
-            if (selected && (!visible(selected) && !(canEdit && el('historical-show-hidden').checked))) { cancelDraft(); selected = null; panel.hidden = true; }
+            if (selected && (!visible(selected) && !(canEdit && el('historical-show-hidden').checked))) { clearSelection(); }
             picker.value = selected ? String(selected) : '';
         }
         function refreshStats() {
             var shown = 0, paired = 0, hidden = 0;
-            Object.keys(pairs).forEach(function (key) { if (!visible(key)) { hidden++; } else { shown++; if (pairs[key].historical) { paired++; } } });
+            Object.keys(pairs).forEach(function (key) { if (!visible(key)) { hidden++; } else { shown++; if (position(pairs[key])) { paired++; } } });
             status.textContent = shown + ' places within map coverage · ' + paired + ' historical positions · ' + hidden + ' hidden · ' + excluded + ' outside coverage or without a reliable estimate.';
         }
         function cluster(map) {
@@ -126,16 +126,19 @@
                 iconCreateFunction: function (group) { return L.divIcon({className: 'historical-place-cluster', html: '<span>' + group.getChildCount() + '</span>', iconSize: [38, 38]}); }
             }).addTo(map);
         }
-        var modernLayer = cluster(modern), historicalLayer = cluster(historical);
+        var modernLayer = cluster(modern), historicalLayer = L.layerGroup().addTo(historical);
         var status = document.getElementById('modern-map-status');
         var picker = document.getElementById('historical-place-select');
         var panel = document.getElementById('historical-place-details');
         var base = root.dataset.apiBase.replace(/\/?$/, '/');
-        function marker(position, place, estimated) {
+        function marker(position, place, estimated, showPopup) {
             // Geolocation uses Leaflet's standard blue pin. Each marker gets its
             // own icon options so an override never changes other Items' pins.
             var icon = new L.Icon.Default({className: 'historical-place-marker' + (estimated ? ' is-estimated' : '')});
             var m = L.marker(position, {icon: icon, title: place.title, keyboard: true});
+            m.on('add', function () { if (m.getElement()) { m.getElement().classList.toggle('is-selected', place.item_id === selected); } });
+            m.on('click', function () { select(place.item_id); });
+            if (!showPopup) { return m; }
             var content = document.createElement('div'); content.className = 'geolocation_balloon';
             var heading = document.createElement('div'); heading.className = 'geolocation_balloon_title';
             var title = document.createElement('a'); title.textContent = place.title; title.href = place.url;
@@ -154,25 +157,28 @@
                 content.appendChild(description);
             }
             m.bindPopup(content, {className: 'historical-place-popup', maxWidth: 300, minWidth: 180, autoPanPadding: [20,20]});
-            m.on('add', function () { if (m.getElement()) { m.getElement().classList.toggle('is-selected', place.item_id === selected); } });
-            m.on('click', function () { select(place.item_id); });
             return m;
         }
         function locate() {
             var pair = pairs[selected]; if (!pair || !visible(selected)) { return; }
             var stamp = generation, id = selected;
-            function reveal(layer, map, m, location) {
-                map.setView(location, map.getMaxZoom(), {animate: false});
-                var parent = layer.getVisibleParent(m);
-                if (parent && parent !== m && parent.spiderfy) { parent.spiderfy(); }
-                layer.zoomToShowLayer(m, function () {
-                    if (stamp !== generation || id !== selected) { return; }
-                    if (m.getElement()) { m.getElement().classList.add('is-selected'); }
-                    m.openPopup();
-                });
+            modern.closePopup();
+            modernLayer.zoomToShowLayer(pair.modern, function () {
+                if (stamp !== generation || id !== selected) { return; }
+                if (pair.modern.getElement()) { pair.modern.getElement().classList.add('is-selected'); }
+            });
+            // The historical pane contains only the selected counterpart, never
+            // the complete place layer or clusters. Details open on this pane only.
+            historicalLayer.clearLayers();
+            if (!pair.historical) { paintHistorical(pair); }
+            if (pair.historical) {
+                var p = position(pair);
+                if (p) {
+                    historicalLayer.addLayer(pair.historical);
+                    historical.setView([-p[1],p[0]], historical.getMaxZoom(), {animate: false});
+                    pair.historical.openPopup();
+                }
             }
-            reveal(modernLayer, modern, pair.modern, [pair.place.coordinates[1], pair.place.coordinates[0]]);
-            if (pair.historical) { var p = position(pair); if (p) { reveal(historicalLayer, historical, pair.historical, [-p[1],p[0]]); } }
         }
         function select(id) {
             var pair = pairs[id]; if (!pair) { return; }
@@ -185,7 +191,12 @@
             Object.keys(pairs).forEach(function (key) { [pairs[key].modern, pairs[key].historical].forEach(function (m) { if (m && m.getElement()) { m.getElement().classList.toggle('is-selected', key === String(id)); } }); });
             locate();
         }
-        picker.addEventListener('change', function () { if (this.value) { select(Number(this.value)); } });
+        function clearSelection() {
+            cancelDraft(); selected = null; panel.hidden = true; picker.value = '';
+            historicalLayer.clearLayers(); modern.closePopup(); feedback('');
+            Object.keys(pairs).forEach(function (key) { var m = pairs[key].modern; if (m.getElement()) { m.getElement().classList.remove('is-selected'); } });
+        }
+        picker.addEventListener('change', function () { if (this.value) { select(Number(this.value)); } else if (!busy) { clearSelection(); } });
         document.getElementById('historical-place-locate').addEventListener('click', locate);
         function load(map) {
             var current = ++generation; record = map; selected = null; pairs = {}; excluded = 0;
@@ -194,7 +205,7 @@
             cancelDraft(); decisions = {}; canEdit = false; csrf = null; busy = false;
             picker.disabled = false; el('historical-show-hidden').checked = false; el('historical-hidden-label').hidden = true; el('historical-place-editor').hidden = true; el('historical-decision-reload').hidden = true;
             modern.removeLayer(modernLayer); historical.removeLayer(historicalLayer);
-            modernLayer = cluster(modern); historicalLayer = cluster(historical); panel.hidden = true;
+            modernLayer = cluster(modern); historicalLayer = L.layerGroup().addTo(historical); panel.hidden = true;
             picker.textContent = ''; var empty = document.createElement('option'); empty.value = ''; empty.textContent = 'Choose a place'; picker.appendChild(empty);
             status.textContent = 'Loading public Omeka places…';
             var error = ''; transform = null;
@@ -206,22 +217,19 @@
                     var offset = 0;
                     function batch() {
                         if (current !== generation) { return; }
-                        var end = Math.min(offset + 30, data.places.length), modernBatch = [], historicalBatch = [];
+                        var end = Math.min(offset + 30, data.places.length), modernBatch = [];
                         for (; offset < end; offset++) {
-                            var place = data.places[offset], d = decision(place.item_id);
+                            var place = data.places[offset];
                             // Scope is set by the live geographic location and imported
                             // calibration, before applying any editorial display/position.
                             var estimate = transform ? transform.estimate(place.coordinates) : null;
                             if (!estimate) { excluded++; continue; }
-                            var pixel = position({place: place, estimate: estimate});
                             var m = marker([place.coordinates[1], place.coordinates[0]], place, false);
-                            var h = pixel ? marker([-pixel[1], pixel[0]], place, !d.pixel || d.needs_review) : null;
-                            if (h && d.pixel && !d.needs_review) { h.options.icon.options.className += ' is-override'; }
-                            if (visible(place.item_id)) { modernBatch.push(m); if (h) { historicalBatch.push(h); } }
-                            pairs[place.item_id] = {place: place, modern: m, historical: h, estimate: estimate};
+                            if (visible(place.item_id)) { modernBatch.push(m); }
+                            pairs[place.item_id] = {place: place, modern: m, historical: null, estimate: estimate};
                             addOption(pairs[place.item_id]);
                         }
-                        modernLayer.addLayers(modernBatch); historicalLayer.addLayers(historicalBatch);
+                        modernLayer.addLayers(modernBatch);
                         refreshStats(); if (error) { status.textContent += ' ' + error; }
                         if (offset < data.places.length) { window.setTimeout(batch, 0); }
                         else if (data.next !== null) { page(data.next); }

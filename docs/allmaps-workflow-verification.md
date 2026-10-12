@@ -16,6 +16,14 @@ selection opened matching Item balloons on both panes, with no console errors. T
 test map was removed after verification. The updated 35 migration/cleanup checks and
 22 transformation/tile tests passed; no remote map records or tables were changed.
 
+The subsequent selected-place display change was also checked in the local browser:
+the historical pane starts with zero pins or clusters, while the modern pane retains
+its place cluster. Clicking a modern pin shows exactly one historical counterpart
+and its detail balloon, with no modern balloon. Switching Items replaces that pin;
+clearing the selector or switching maps removes it. Draft cancellation, position
+save/reset and visibility hide/restore preserved this behavior. No console errors
+were captured, and both local test maps and their decisions were removed afterward.
+
 ## Passed checks
 
 - 35 populated/fresh storage checks: exactly two fresh Historical Maps tables; verbatim
