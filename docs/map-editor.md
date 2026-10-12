@@ -15,13 +15,14 @@ mask drawing, counters, and calibration undo are retired on this site. The separ
    **Historical Maps → Import from Allmaps**, paste the URL, and choose **Preview maps**.
 4. Review the map identities, dimensions, transformation, and titles. A page can contain
    several maps; explicitly select the maps to import. A single map is preselected.
-5. Choose **Import selected maps**. The server checks each selected image's information
-   and a preview before publishing the selection in one database transaction.
+5. Choose **Import selected maps**. The server saves the reviewed annotation, including
+   its image service and dimensions, in one database transaction. It does not request
+   the image provider's `info.json` or preview pixels.
 6. Open **View maps** from the map detail page, or choose it in the public map library.
 
 Preview data stays in the editor's server-side session for 15 minutes. Up to three previews
 are retained. An expired preview must be recreated. Invalid requests retain useful form
-feedback; no map is published when validation or an image check fails.
+feedback; no map is published when annotation validation or publication fails.
 
 Both version-qualified and unqualified URLs are supported. Imported calibration is a
 snapshot: updating Allmaps does not silently update this site. Reimporting an unchanged
@@ -91,24 +92,16 @@ files stay at their configured storage locations until their own map is explicit
 Import requires PHP cURL, DOM, JSON, and mbstring, plus outbound HTTPS. Fetches accept only
 public HTTPS destinations on port 443, pin resolved public IPs, revalidate redirects, disable
 proxy forwarding, cap responses at 3 MiB, and limit request time and redirect count.
-Image information must match the reviewed dimensions/identity and support level 1/2 regions;
-a preview must decode as JPEG/PNG. Private and authenticated sources are unsupported.
-A successful import cannot guarantee future provider availability or browser CORS access;
-image failures display retry feedback while the modern map remains available.
+These fetch restrictions apply to annotation documents. Import, refresh and legacy
+migration do not request IIIF image information or preview pixels from the server.
+Image service identity, dimensions and IIIF version come from the annotation. ImageService1
+uses `native` quality; ImageService2/3 use `default`. The browser requests original IIIF
+regions directly when a map is opened. An optional **Open IIIF image information** link
+is available for manual inspection; visiting it is not required to import.
 
-The supplied BnF annotation was checked from local development on 2026-10-11: both annotation
-URLs returned HTTP 200, but the BnF `info.json` request returned HTTP 403. The importer reports
-that failure without publishing. Saved-fixture validation does not establish live image
-availability. Repeat the connectivity check on the deployment server before relying on
-that source; this change has not itself been deployed or checked from that server.
-
-An import failure now identifies the exact IIIF information or image-preview URL and
-retains the provider's HTTP status. The annotation may preview successfully while its
-separate image provider refuses server access. HTTP 403 does not mean the Allmaps URL
-is invalid. The review page offers **Open IIIF image information** for diagnosis;
-browser access alone does not prove the Omeka server can reach it. Resolve access with
-the image provider or use another accessible IIIF source, then retry. Failed checks
-keep the reviewed selection and publish no maps.
+A provider's server-side `info.json` refusal no longer prevents publication. This does
+not guarantee browser image availability: if tile requests fail, the historical pane
+shows Retry feedback while the modern map and imported mask remain available.
 
 ## Public interfaces
 

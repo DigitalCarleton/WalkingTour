@@ -85,14 +85,4 @@ class WalkingTour_HistoricalMapRemoteJson
         return $document;
     }
 
-    public function image($url)
-    {
-        $bytes = $this->request($url, 'image/jpeg, image/png');
-        $info = @getimagesizefromstring($bytes);
-        if (!$info || !in_array($info[2], array(IMAGETYPE_JPEG, IMAGETYPE_PNG), true)) {
-            throw new InvalidArgumentException('The IIIF image service did not return a readable JPEG or PNG preview.');
-        }
-        return $info;
-    }
-
 }

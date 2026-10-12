@@ -56,9 +56,9 @@ Create a private `plan.json`:
 ```
 
 Use the exact annotation ID from the exported Allmaps document. The preview checks the
-same IIIF service and original dimensions, supported calibration, resource mask and live
-image information/preview. An inaccessible provider prevents migration; resolve its access
-problem and retry. A reviewed acceptance of differing controls requires both the explicit
+same IIIF service and original dimensions supplied by the annotation, supported calibration
+and resource mask. The server does not request image information or preview pixels;
+verify browser image loading in the viewer after migration. A reviewed acceptance of differing controls requires both the explicit
 flag and a reason. Uploaded records cannot masquerade as matching IIIF images.
 
 `associations` are optional, human-reviewed links from legacy free-point IDs to public
@@ -75,7 +75,7 @@ php scripts/migrate-historical-maps.php --apply=/private/wt-backup --review=PREV
 ```
 
 Review `preview.json` and its printed SHA-256 before applying. The exact preview and backup
-are linked to each completion receipt. Applying rechecks image access and database state,
+are linked to each completion receipt. Applying rechecks database state,
 locks maps, and commits all selected records and Item associations together. IDs, titles,
 periods and existing links survive. Repeating the same apply is a no-op, even after a later
 refresh; it cannot replace newer snapshots. A changed map or legacy data requires a new

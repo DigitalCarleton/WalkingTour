@@ -3,17 +3,15 @@
 require_once __DIR__ . '/HistoricalMapIiif.php';
 require_once __DIR__ . '/HistoricalMapGeometry.php';
 
-/** Review georeference annotations; image checks are deferred until explicit selection. */
+/** Review georeference annotations; original IIIF images load directly in the browser. */
 class WalkingTour_HistoricalMapAllmaps
 {
     private $load;
-    private $image;
 
-    public function __construct($load = null, $image = null)
+    public function __construct($load = null)
     {
         $remote = new WalkingTour_HistoricalMapRemoteJson;
         $this->load = $load ?: array($remote, 'fetch');
-        $this->image = $image ?: array($remote, 'image');
     }
 
     private function label($value)
@@ -189,7 +187,8 @@ class WalkingTour_HistoricalMapAllmaps
                 'geographic_bounds'=>array(array(min(array_column(array_column($gcps,'geo'),0)),min(array_column(array_column($gcps,'geo'),1))),
                     array(max(array_column(array_column($gcps,'geo'),0)),max(array_column(array_column($gcps,'geo'),1)))));
             $snapshot = array('source_kind'=>'allmaps','annotation_url'=>$url,'resolved_id'=>$resolvedId,'source_identity'=>$identity,
-                'document'=>$document,'annotation'=>$annotation,'map'=>$map,'content_hash'=>hash('sha256',json_encode($annotation,JSON_UNESCAPED_SLASHES)), 'imported_at'=>gmdate('Y-m-d H:i:s'));
+                'document'=>$document,'annotation'=>$annotation,'map'=>$map,'content_hash'=>hash('sha256',json_encode($annotation,JSON_UNESCAPED_SLASHES)), 'imported_at'=>gmdate('Y-m-d H:i:s'),
+                'image_quality'=>$source['type'] === 'ImageService1' ? 'native' : 'default');
             $encoded = json_encode($snapshot, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             $previewBytes += strlen($encoded);
             if (strlen($encoded) > 6500000 || $previewBytes > 8388608) { throw new InvalidArgumentException('This annotation page is too large for one import preview. Use individual map annotation URLs.'); }
@@ -199,36 +198,4 @@ class WalkingTour_HistoricalMapAllmaps
         return $images;
     }
 
-    public function checkImage(array $image)
-    {
-        $infoUrl = $image['image_service'] . '/info.json';
-        try {
-            $checked = (new WalkingTour_HistoricalMapIiif($this->load))->import($infoUrl);
-        } catch (Exception $error) {
-            throw $this->imageError('information', $infoUrl, $error);
-        }
-        if ($checked['image_service'] !== $image['image_service'] || $checked['image_width'] !== $image['image_width'] || $checked['image_height'] !== $image['image_height']) {
-            throw new InvalidArgumentException('The IIIF image identity or dimensions differ from the reviewed annotation. Complete the calibration for this image in Allmaps before importing.');
-        }
-        $quality = json_decode($checked['source_snapshot'], true)['image_quality'];
-        $previewUrl = $image['image_service'] . '/full/' . min(128, $image['image_width']) . ',/0/' . $quality . '.jpg';
-        try {
-            call_user_func($this->image, $previewUrl);
-        } catch (Exception $error) {
-            throw $this->imageError('preview', $previewUrl, $error);
-        }
-        $snapshot = json_decode($image['source_snapshot'],true); $snapshot['image_quality'] = $quality;
-        $image['source_snapshot'] = json_encode($snapshot,JSON_UNESCAPED_SLASHES);
-        return $image;
-    }
-
-    private function imageError($stage, $url, Exception $error)
-    {
-        $message = 'The Allmaps annotation was read, but the IIIF image ' . $stage .
-            ' check failed at ' . $url . '. ' . $error->getMessage() . ' No map was published.';
-        if (strpos($error->getMessage(), 'HTTP 403') !== false) {
-            $message .= ' The image provider refused the server request. Ask the provider to allow public IIIF access, or use an accessible IIIF source.';
-        }
-        return new InvalidArgumentException($message, 0, $error);
-    }
 }

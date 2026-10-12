@@ -117,7 +117,7 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
             if (!is_array($indexes) || !$indexes || count($indexes) > count($images)) { throw new InvalidArgumentException('Select the maps you want to import.'); }
             $titles = $this->getRequest()->getPost('titles', array());
             if (!is_array($titles)) { throw new InvalidArgumentException('Enter valid map titles.'); }
-            // Preserve edited titles and selections when image validation fails.
+            // Preserve edited titles and selections when publication fails.
             foreach ($titles as $index => $title) {
                 if (isset($images[$index]) && is_string($title)) { $this->view->images[$index]['title'] = $title; }
             }
@@ -134,8 +134,8 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
                 $image['title'] = trim($title);
                 $selected[] = $image;
             }
-            // Check all selected images before the transaction publishes any map.
-            $selected = array_map(array($reader, 'checkImage'), $selected);
+            // The reviewed annotation supplies image identity and dimensions.
+            // Image pixels load directly in the browser, not through server preflight.
             $saved = $this->maps->importAllmaps($selected);
             unset($previews[$values['preview_token']]); $session->previews = $previews;
             $this->_helper->flashMessenger(count($saved) . ' map(s) available from Allmaps. The imported calibration is read-only.', 'success');
@@ -172,8 +172,8 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
             $token = $values['preview_token'];
             if ($this->text('step') !== 'publish' || !isset($previews[$token]) || $previews[$token]['map_id'] !== $map['id']) { throw new InvalidArgumentException('This refresh preview is missing or expired. Preview the selected map again.'); }
             $preview = $previews[$token]; $this->view->preview = $preview; $this->view->values['annotation_url'] = $preview['image']['source_url'];
-            // Only the server-side reviewed payload can be published; recheck image availability.
-            $image = $refresh->checkImage($preview['image']);
+            // Publish only the annotation payload held in the reviewed server-side session.
+            $image = $preview['image'];
             $result = $this->maps->refreshAllmaps($map['id'], $preview['revision'], $image, $this->text('review_image_change') === '1');
             unset($previews[$token]); $session->previews = $previews;
             $this->_helper->flashMessenger($result['changed'] ? ($result['image_changed'] ? 'Allmaps snapshot refreshed. Saved historical position overrides need review in the viewer.' : 'Allmaps snapshot refreshed. Local position and display decisions were preserved.') : 'The Allmaps snapshot is unchanged. No saved data was modified.', 'success');

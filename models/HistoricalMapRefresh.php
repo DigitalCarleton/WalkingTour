@@ -27,8 +27,7 @@ class WalkingTour_HistoricalMapRefresh
             if (self::identity($snapshot['annotation']['id']) === self::identity($map['allmaps']['annotation_id'])) { $selected[] = $image; }
         }
         if (count($selected) !== 1) { throw new InvalidArgumentException('This source must contain exactly one version of the selected Allmaps map. Its saved snapshot was kept. Choose that map\'s annotation URL.'); }
-        return $this->reader->checkImage($selected[0]);
+        return $selected[0];
     }
 
-    public function checkImage(array $image) { return $this->reader->checkImage($image); }
 }

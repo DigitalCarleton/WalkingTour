@@ -4,6 +4,18 @@ Verified locally on 2026-10-11 using a disposable Omeka 3.1.2 site, PHP 8.3.30 a
 MySQL 9.4.0. Tickets 07–09 were implemented as separate commits. No remote database
 migration, table cleanup, deployment or Git push was performed by this batch.
 
+This receipt records the original ticket checks. A subsequent user-requested change
+removed server-side IIIF image information and preview checks from import, refresh and
+migration. Image pixels now load directly in the browser; the earlier image-check
+results below describe the previous behavior, not a current publication requirement.
+
+The updated path was verified with the current BnF Rome annotation: import and refresh
+completed without server image checks. In the local Omeka browser, the original BnF
+image tiles loaded successfully, both pink masks rendered, two places clustered and
+selection opened matching Item balloons on both panes, with no console errors. The
+test map was removed after verification. The updated 35 migration/cleanup checks and
+22 transformation/tile tests passed; no remote map records or tables were changed.
+
 ## Passed checks
 
 - 35 populated/fresh storage checks: exactly two fresh Historical Maps tables; verbatim
@@ -45,9 +57,9 @@ migration, table cleanup, deployment or Git push was performed by this batch.
 
 The supplied BnF Allmaps annotation URL preview returned its calibration successfully.
 Publishing was rejected because BnF image information returned HTTP 403 from this local
-host. No record was published by that failed import. Saved-fixture calibration tests do
-not establish provider availability on the Carleton server. Check its access from that
-server before migrating the Rome record; the importer must validate the actual image.
+host under the previous implementation. This no longer blocks import or migration:
+the current workflow uses the annotation's image metadata and loads pixels directly
+in the browser. Browser tile availability must still be verified after publication.
 
 ## Deployment order
 

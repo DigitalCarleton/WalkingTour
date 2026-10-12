@@ -14,8 +14,8 @@
     <?php else: ?>
     <h2>Choose maps to import</h2>
     <p>Source: <?php echo html_escape($values['annotation_url']); ?></p>
-    <p><?php echo count($images); ?> map(s) found. Select the maps you want; each map becomes a separate catalog record. Images are checked before any selected map is published.</p>
-    <p>The annotation contains calibration and an image reference, not the image itself. The image provider must allow this site to read its IIIF information and a small image preview.</p>
+    <p><?php echo count($images); ?> map(s) found. Select the maps you want; each map becomes a separate catalog record.</p>
+    <p>Images load directly from the IIIF provider when you open the map. Import uses the image address and dimensions supplied by the Allmaps annotation.</p>
     <form method="post" action="<?php echo html_escape(url('historical-maps/import')); ?>">
         <?php echo $csrf; ?><input name="step" type="hidden" value="import">
         <input name="preview_token" type="hidden" value="<?php echo html_escape($values['preview_token']); ?>">

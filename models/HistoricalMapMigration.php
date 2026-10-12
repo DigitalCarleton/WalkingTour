@@ -133,7 +133,7 @@ class WalkingTour_HistoricalMapMigration
                 $images = $this->reader->review($action['annotation_url'] ?? '');
                 $selected = array_values(array_filter($images, function ($image) use ($action) { return json_decode($image['source_snapshot'], true)['annotation']['id'] === ($action['annotation_id'] ?? ''); }));
                 if (count($selected) !== 1) { throw new InvalidArgumentException('Select the exact reviewed Allmaps annotation ID.'); }
-                $image = $this->reader->checkImage($selected[0]);
+                $image = $selected[0];
                 if ($old['image_service'] !== $image['image_service'] || (int) $old['image_width'] !== $image['image_width'] || (int) $old['image_height'] !== $image['image_height']) { throw new InvalidArgumentException('Migration requires the same IIIF image identity and dimensions. Uploads must be archived; import their published IIIF image separately.'); }
                 $snapshot = json_decode($image['source_snapshot'], true);
                 $controls = $this->children($backup, 'walking_tour_control_points', $id);
@@ -182,13 +182,7 @@ class WalkingTour_HistoricalMapMigration
     private function applyReviewed($backup, $review, $hash)
     {
         if (!is_string($hash) || !hash_equals(self::hash($review), $hash) || ($review['format'] ?? null) !== 1 || ($review['backup_hash'] ?? '') !== self::hash($backup)) { throw new InvalidArgumentException('Review the exact preview hash and its recovery export before applying.'); }
-        // Recheck provider availability before any database mutation. Same saved annotation is used.
-        foreach ($review['maps'] as $entry) {
-            $current = $this->db->fetchRow('SELECT migration_receipt FROM `' . $this->db->prefix . 'walking_tour_maps` WHERE id = ?', array($entry['map_id']));
-            $receipt = json_decode($current['migration_receipt'] ?? 'null', true);
-            if (($receipt['review_hash'] ?? '') === $hash) { continue; }
-            if ($entry['action'] === 'migrate') { $this->reader->checkImage($entry['image']); }
-        }
+        // Apply the exact reviewed annotation without requesting image-provider pixels.
         $adapter = $this->db->getAdapter(); $adapter->beginTransaction(); $result = array('migrated'=>0,'archived'=>0,'unchanged'=>0,'converted'=>0);
         try {
             $this->legacyUnchanged($backup);
