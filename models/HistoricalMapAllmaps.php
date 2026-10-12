@@ -64,13 +64,12 @@ class WalkingTour_HistoricalMapAllmaps
             foreach (preg_split('/\s+/', trim($polygons->item(0)->getAttribute('points'))) as $pair) {
                 $parts = explode(',', $pair);
                 if (count($parts) !== 2 || !is_numeric($parts[0]) || !is_numeric($parts[1])) { throw new InvalidArgumentException('The resource mask must use numeric pixel coordinates.'); }
-                $point = WalkingTour_HistoricalMapGeometry::coordinate(array((float) $parts[0], (float) $parts[1]), $width, $height);
-                if (min($point) < 0) { throw new InvalidArgumentException('The resource mask must be inside the original image.'); }
-                $ring[] = array($point[0] / $width, $point[1] / $height);
+                // Allmaps SVG masks may extend past the image edges. Preserve their
+                // pixel vertices; image bounds are enforced separately for place pins.
+                $ring[] = WalkingTour_HistoricalMapGeometry::coordinate(array((float) $parts[0], (float) $parts[1]), 1000000, 1000000);
             }
             if ($ring && $ring[0] !== end($ring)) { $ring[] = $ring[0]; }
-            $ring = WalkingTour_HistoricalMapGeometry::ring($ring);
-            return array_map(function ($point) use ($width, $height) { return array($point[0] * $width, $point[1] * $height); }, $ring);
+            return WalkingTour_HistoricalMapGeometry::ring($ring);
         } finally { libxml_clear_errors(); libxml_use_internal_errors($previous); }
     }
 

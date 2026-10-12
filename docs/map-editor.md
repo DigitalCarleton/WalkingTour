@@ -35,6 +35,12 @@ transformation. Unsupported options and degenerate calibration constraints are r
 The browser evaluates saved calibration using the pinned Allmaps transformation packages. It does not evaluate the retired
 PHP spline as a fallback. Older canvas-target annotations require re-export from Allmaps.
 
+Allmaps SVG mask vertices can extend beyond the image edges. The importer preserves
+those original pixel coordinates, including negative values, rather than clipping or
+rejecting them. Masks still require a finite, simple polygon with coordinates within
+±1,000,000 pixels. Place estimates and local position overrides must remain inside both
+the original image dimensions and its mask.
+
 ## Stored data and compatibility
 
 Each imported record in `<prefix>walking_tour_maps` stores the original annotation URL,
