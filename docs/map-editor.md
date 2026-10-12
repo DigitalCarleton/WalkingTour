@@ -65,17 +65,17 @@ Geolocation, Tour and TourItem storage is independent and remains in place.
 
 ## Deployment and initialization
 
-The plugin version is **0.3.0**. After deploying the complete plugin code, open Omeka
-**Plugins → Walking Tour → Upgrade**. Omeka does not load a plugin with a pending version
-upgrade, so this step is required. The hook adds new storage fields without migrating or
-dropping old data. The storage initializer can then be rerun from the installed plugin directory:
+The plugin version remains **0.2.3**. Deploy the complete plugin code and run the storage
+initializer from the installed plugin directory. Because the version is unchanged, an
+existing 0.2.3 installation does not trigger Omeka's Upgrade action automatically:
 
 ```sh
 php scripts/initialize-map-storage.php
 ```
 
 Both schema paths add missing new storage/metadata without modifying maps or Item decisions.
-The standalone initializer does not update Omeka's installed plugin version or replace the Upgrade action.
+The standalone initializer preserves Omeka's installed plugin version. If Omeka reports
+a version mismatch, check the installed version before proceeding.
 Rerunning never creates retired tables/columns or seeds an example. Do not uninstall/reinstall:
 uninstall removes plugin-owned data. For a populated upgrade, follow export → preview →
 reviewed migration/archive → viewer verification → cleanup preview → reviewed cleanup in

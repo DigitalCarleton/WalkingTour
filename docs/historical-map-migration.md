@@ -8,8 +8,9 @@ production migration automatically during install or upgrade.
 
 ## Export and review
 
-After deploying 0.3.0, complete **Plugins → Walking Tour → Upgrade** in Omeka before
-opening the public pages. Then initialize/check schema and make a new, private recovery export:
+The plugin version remains 0.2.3. After deploying the complete code, initialize/check
+schema and make a new, private recovery export before opening the public pages.
+An existing 0.2.3 installation does not trigger an automatic Omeka upgrade:
 
 ```sh
 php scripts/initialize-map-storage.php
@@ -100,7 +101,7 @@ restore endpoint or silently overwrite a database from an export.
 
 ## Contract retired storage after verification
 
-Deploy all 0.3.0 files, finish migration/archive for every old record, and verify the new
+Deploy all current plugin files, finish migration/archive for every old record, and verify the new
 viewer. Keep the original recovery export used for each completed migration. Run:
 
 ```sh

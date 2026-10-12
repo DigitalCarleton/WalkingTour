@@ -15,8 +15,10 @@ migration, table cleanup, deployment or Git push was performed by this batch.
   imported and archived-upload deletion; no default/example reseeding; source Item and
   Geolocation preservation. These checks used isolated table prefixes and removed their
   synthetic storage afterward.
-- Actual Omeka plugin installer upgraded the populated localhost site to 0.3.0 without
-  uninstalling. Historical Maps and the original Walking Tour routes loaded afterward.
+- Before restoring the declared version to 0.2.3, the actual Omeka plugin installer
+  upgraded the populated localhost site to 0.3.0 without uninstalling. Historical Maps
+  and the original Walking Tour routes loaded afterward. This is a historical test
+  result, not the current deployment procedure.
 - 18 Allmaps numerical tests covered all supported models, independent interior points,
   checked inverses, ambiguous folded mappings, concave/reduced masks and curved footprints.
   Three IIIF tile tests and five live-loader tests passed.
@@ -50,10 +52,9 @@ server before migrating the Rome record; the importer must validate the actual i
 ## Deployment order
 
 1. Back up the complete site database and configured uploaded-image storage.
-2. Deploy all plugin files and complete **Omeka Plugins → Walking Tour → Upgrade** to
-   0.3.0. Omeka keeps pending-upgrade plugins unloaded; the standalone schema initializer
-   does not update its installed version. Do not uninstall/reinstall.
-3. Run the initializer if needed, then create a private recovery export. Review a migration
+2. Deploy all plugin files. The declared version remains 0.2.3; an existing 0.2.3
+   installation does not trigger an automatic Upgrade action. Do not uninstall/reinstall.
+3. Run the storage initializer, then create a private recovery export. Review a migration
    plan for each legacy record, accept the intended external calibration explicitly, and
    apply the preview hash. Archive unsupported/unmatched uploads with a documented next step.
 4. Verify both imported masks, live Item markers/details, clusters, overrides, visibility,

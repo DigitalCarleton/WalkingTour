@@ -14,7 +14,7 @@ then browse the original IIIF image beside the modern map. Imported calibration 
 in a provenance snapshot; this site no longer displays or edits control points.
 The original Walking Tour remains a separate page.
 
-The plugin version is **0.3.0**. Fresh Historical Maps storage has two tables: maps with
+The plugin version remains **0.2.3**. Fresh Historical Maps storage has two tables: maps with
 Allmaps provenance/snapshots, and Item-specific local decisions. Install/upgrade or
 `php scripts/initialize-map-storage.php` preserves existing data and never seeds an
 example or recreates retired storage. The original Walking Tour loads its additional
