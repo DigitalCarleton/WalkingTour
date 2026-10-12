@@ -7,7 +7,10 @@
         data-api-base="<?php echo html_escape(url('walking-tour/index/')); ?>">
         <div class="dual-map-toolbar">
             <p>Explore the same places across two maps.</p>
-            <button type="button" id="map-list-toggle" aria-controls="historical-map-catalog" aria-expanded="true">Hide map list</button>
+            <div class="dual-map-actions">
+                <button type="button" id="dual-map-fit" disabled>Fit the map</button>
+                <button type="button" id="map-list-toggle" aria-controls="historical-map-catalog" aria-expanded="true">Hide map list</button>
+            </div>
         </div>
         <div class="dual-map-layout">
             <section class="dual-map-pane" aria-labelledby="historical-map-heading">

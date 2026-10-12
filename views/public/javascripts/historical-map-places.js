@@ -40,7 +40,7 @@
         function setBusy(value) {
             busy = value; picker.disabled = value;
             if (draftMarker && draftMarker.dragging) { if (value) { draftMarker.dragging.disable(); } else { draftMarker.dragging.enable(); } }
-            root.querySelectorAll('#historical-place-editor button, #historical-place-editor input, #historical-place-editor textarea, #historical-place-editor select, #historical-show-hidden, #historical-map-list button').forEach(function (button) { button.disabled = value; });
+            root.querySelectorAll('#historical-place-editor button, #historical-place-editor input, #historical-place-editor textarea, #historical-place-editor select, #historical-show-hidden, #historical-map-list button, #dual-map-fit').forEach(function (button) { button.disabled = value; });
             if (!value) { el('historical-position-reset').disabled = !decision(selected).pixel; }
         }
         function save(operation, value) {
@@ -175,7 +175,7 @@
                 var p = position(pair);
                 if (p) {
                     historicalLayer.addLayer(pair.historical);
-                    historical.setView([-p[1],p[0]], historical.getMaxZoom(), {animate: false});
+                    historical.panTo([-p[1],p[0]], {animate: false});
                     pair.historical.openPopup();
                 }
             }
@@ -256,6 +256,6 @@
             cancelDraft(); canEdit = false; pairs = {}; selected = null; panel.hidden = true;
             modern.removeLayer(modernLayer); historical.removeLayer(historicalLayer);
         }
-        return {load: load, clear: clear};
+        return {load: load, clear: clear, clearSelection: clearSelection};
     };
 }(window, jQuery));

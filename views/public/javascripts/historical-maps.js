@@ -106,6 +106,13 @@
                     modernMap.fitBounds(geographicBounds, {padding: [40, 40], maxZoom: modernMap.getMaxZoom()});
                 }
             });
+            $('#dual-map-fit').on('click', function () {
+                if (!imageBounds || !geographicBounds || !geographicBounds.isValid()) { return; }
+                places.clearSelection();
+                resize();
+                historicalMap.fitBounds(imageBounds, {padding: [20, 20], animate: false});
+                modernMap.fitBounds(geographicBounds, {padding: [40, 40], maxZoom: modernMap.getMaxZoom(), animate: false});
+            });
 
             function sourceLink(container, label, url) {
                 // Catalog data is text. Only expose HTTP(S) or local file links, never raw HTML.
@@ -161,6 +168,7 @@
                 updateGeographicBounds(record);
                 document.getElementById('historical-map-fit').disabled = false;
                 document.getElementById('map-area-fit').disabled = !geographicBounds.isValid();
+                document.getElementById('dual-map-fit').disabled = !geographicBounds.isValid();
                 document.getElementById('historical-map-heading').title = record.title;
                 var sources = document.getElementById('historical-map-sources');
                 sources.textContent = '';

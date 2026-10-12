@@ -24,6 +24,12 @@ clearing the selector or switching maps removes it. Draft cancellation, position
 save/reset and visibility hide/restore preserved this behavior. No console errors
 were captured, and both local test maps and their decisions were removed afterward.
 
+Historical selection now preserves the image's current zoom. Browser checks compared
+the tile scale before and after selection, and again after a manual zoom followed by
+switching Items; both remained unchanged. **Fit the map** was tested after selecting
+an Item and zooming both panes: it cleared selection/pins/balloons and restored the
+full image and geographic mask inside their respective viewports, without console errors.
+
 ## Passed checks
 
 - 35 populated/fresh storage checks: exactly two fresh Historical Maps tables; verbatim
