@@ -102,6 +102,14 @@ that failure without publishing. Saved-fixture validation does not establish liv
 availability. Repeat the connectivity check on the deployment server before relying on
 that source; this change has not itself been deployed or checked from that server.
 
+An import failure now identifies the exact IIIF information or image-preview URL and
+retains the provider's HTTP status. The annotation may preview successfully while its
+separate image provider refuses server access. HTTP 403 does not mean the Allmaps URL
+is invalid. The review page offers **Open IIIF image information** for diagnosis;
+browser access alone does not prove the Omeka server can reach it. Resolve access with
+the image provider or use another accessible IIIF source, then retry. Failed checks
+keep the reviewed selection and publish no maps.
+
 ## Public interfaces
 
 Paths are relative to the Omeka site root:

@@ -15,6 +15,7 @@
     <h2>Choose maps to import</h2>
     <p>Source: <?php echo html_escape($values['annotation_url']); ?></p>
     <p><?php echo count($images); ?> map(s) found. Select the maps you want; each map becomes a separate catalog record. Images are checked before any selected map is published.</p>
+    <p>The annotation contains calibration and an image reference, not the image itself. The image provider must allow this site to read its IIIF information and a small image preview.</p>
     <form method="post" action="<?php echo html_escape(url('historical-maps/import')); ?>">
         <?php echo $csrf; ?><input name="step" type="hidden" value="import">
         <input name="preview_token" type="hidden" value="<?php echo html_escape($values['preview_token']); ?>">
@@ -27,6 +28,7 @@
             <p><?php echo $image['image_width']; ?> × <?php echo $image['image_height']; ?> pixels · <?php echo html_escape($image['transformation']); ?></p>
             <p><?php echo html_escape($snapshot['annotation']['id']); ?></p>
             <p><?php echo html_escape($image['image_service']); ?></p>
+            <p><a href="<?php echo html_escape($image['image_service'] . '/info.json'); ?>" target="_blank" rel="noopener noreferrer">Open IIIF image information</a></p>
         </fieldset>
         <?php endforeach; ?>
         <input class="submit big green button" type="submit" value="Import selected maps">
