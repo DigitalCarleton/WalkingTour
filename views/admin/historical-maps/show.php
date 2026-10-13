@@ -6,6 +6,7 @@
         <?php if ($map['source_kind'] === 'allmaps'): ?><a class="button green" href="<?php echo html_escape(public_url('historical-maps') . '?map_id=' . $map['id']); ?>">View maps</a><?php endif; ?></p>
     <?php if ($map['source_kind'] === 'allmaps'): ?>
         <p><a class="button" href="<?php echo html_escape(url('historical-maps/refresh/' . $map['id'])); ?>">Refresh from Allmaps</a></p>
+        <p><a class="button" href="<?php echo html_escape(url('historical-maps/positions/' . $map['id'])); ?>">Adjust historical positions</a></p>
         <p>Calibration is imported from Allmaps and is read-only on this website. The saved snapshot stays fixed until an explicit refresh.</p>
     <?php else: ?>
         <p>This record is pending migration or archived and is not in the public library. Ask the server operator to export/review it with migrate-historical-maps.php. Existing uploaded images remain stored; calibration and unmatched free points belong in the private recovery export.</p>

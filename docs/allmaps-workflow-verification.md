@@ -97,3 +97,20 @@ See [migration commands, plan format and recovery](historical-map-migration.md) 
 operator steps and interrupted-cleanup handling, and [the usage guide](map-editor.md) for
 import, refresh and Item decisions. Source URLs, map IDs and reviewed hashes must come
 from the site's actual exports and previews, not example placeholders.
+
+### Public popup and admin editing separation (2026-10-13)
+
+Public HTML omits Selected place and position-editing controls even for a signed-in
+SuperUser. Historical balloons contain only linked titles and available thumbnails;
+width and height follow the pane, and Leaflet keeps the balloon in view after image
+loading. Selecting a place gently zooms from the overview without cumulative zoom.
+Fit the map restores overview scale while retaining the selected Item and pin.
+
+Local Omeka browser checks verified the BnF image and masks, title/thumbnail balloon,
+no modern balloon, and a full-image mask width of 300 pixels before selection and
+again after Fit the map, with the selected Item and historical pin retained. Admin
+Historical Maps → map record → Adjust historical positions loads the shared viewer
+using public plugin asset paths. Saving a fixture position and resetting its estimate
+both succeeded through the existing authenticated, revision-checked write API.
+Anonymous access to the admin editor was denied. PHP/JavaScript syntax and diff
+whitespace checks passed; these checks do not constitute remote deployment.

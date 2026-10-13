@@ -108,9 +108,9 @@
             });
             $('#dual-map-fit').on('click', function () {
                 if (!imageBounds || !geographicBounds || !geographicBounds.isValid()) { return; }
-                places.clearSelection();
                 resize();
                 historicalMap.fitBounds(imageBounds, {padding: [20, 20], animate: false});
+                root.dataset.overviewZoom = historicalMap.getZoom();
                 modernMap.fitBounds(geographicBounds, {padding: [40, 40], maxZoom: modernMap.getMaxZoom(), animate: false});
             });
 
@@ -138,6 +138,7 @@
                 historicalMap.setMinZoom(minimumZoom);
                 historicalMap.setMaxBounds(imageBounds.pad(.2));
                 historicalMap.fitBounds(imageBounds, {padding: [20, 20]});
+                root.dataset.overviewZoom = historicalMap.getZoom();
                 // Cluster grids must be initialized after this image's minimum zoom.
                 places.load(record);
                 setStatus('Loading the original historical image…', false);
@@ -207,7 +208,7 @@
                             button.addEventListener('click', function () { showMap(record); });
                             list.appendChild(button);
                         });
-                        var requestedMap = new URLSearchParams(window.location.search).get('map_id');
+                        var requestedMap = root.dataset.mapId || new URLSearchParams(window.location.search).get('map_id');
                         var selectedMap = response.maps.filter(function (record) { return String(record.id) === requestedMap; })[0];
                         if (requestedMap && !selectedMap) {
                             setStatus('This map is unavailable or pending Allmaps migration. Choose an imported map from the library.', false);

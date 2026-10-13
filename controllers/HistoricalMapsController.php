@@ -17,7 +17,7 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
         if (!is_admin_theme() || !current_user() || !is_allowed('WalkingTourBuilder_Tours', 'edit')) {
             throw new Omeka_Controller_Exception_403;
         }
-        if (!in_array($this->getRequest()->getActionName(), array('browse', 'show', 'import', 'add', 'upload', 'edit', 'delete', 'refresh'), true)) { throw new Omeka_Controller_Exception_404; }
+        if (!in_array($this->getRequest()->getActionName(), array('browse', 'show', 'import', 'add', 'upload', 'edit', 'delete', 'refresh', 'positions'), true)) { throw new Omeka_Controller_Exception_404; }
         $this->getResponse()->setHeader('Cache-Control', 'private, no-store', true);
     }
 
@@ -30,6 +30,23 @@ class WalkingTour_HistoricalMapsController extends Omeka_Controller_AbstractActi
     {
         $map = $this->findMap();
         $this->view->map = $map;
+    }
+
+    public function positionsAction()
+    {
+        $this->view->map = $this->findMap();
+        if ($this->view->map['source_kind'] !== 'allmaps') { throw new Omeka_Controller_Exception_404; }
+        $this->view->addAssetPath(WALKINGTOUR_PLUGIN_DIR . '/views/public', public_url('plugins/WalkingTour/views/public'));
+        $scripts = array('allmaps-transform', 'historical-map-cluster', 'map-place-search', 'historical-map-places', 'historical-maps', 'historical-map-page');
+        $styles = array('historical-map-cluster', 'historical-maps');
+        $files = array();
+        foreach ($scripts as $name) { $files[] = WALKINGTOUR_PLUGIN_DIR . '/views/public/javascripts/' . $name . '.js'; }
+        foreach ($styles as $name) { $files[] = WALKINGTOUR_PLUGIN_DIR . '/views/public/css/' . $name . '.css'; }
+        $version = get_plugin_ini('WalkingTour', 'version') . '-' . max(array_map('filemtime', $files));
+        $this->view->headScript()->appendFile('//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js')->appendFile(src('leaflet/leaflet', 'javascripts', 'js'));
+        foreach ($scripts as $name) { $this->view->headScript()->appendFile(src($name, 'javascripts', 'js', $version)); }
+        $this->view->headLink()->appendStylesheet(src('leaflet/leaflet', 'javascripts', 'css'));
+        foreach ($styles as $name) { $this->view->headLink()->appendStylesheet(src($name, 'css', 'css', $version)); }
     }
 
     private function findMap()

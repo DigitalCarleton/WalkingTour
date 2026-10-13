@@ -169,12 +169,14 @@ the image and its mask, with no place pins or clusters. Click a modern place mar
 use Find a place, or choose Locate on both maps to reveal the selected counterpart.
 Only that Item's pin and detail balloon appear on the historical image; modern pins
 do not display detail balloons. Selecting another Item replaces the historical pin.
-Locating pans the historical image without changing its current zoom, so selecting
-a place never forces the image to maximum magnification. Manual zoom remains available.
+The historical balloon shows only the linked Item title and image, with width and
+height constrained to its pane. Selecting a place gently zooms to 0.75 levels above
+the full-image overview when needed; repeated selections do not accumulate zoom.
+Manual zoom remains available.
 Choosing the empty selector entry or switching maps clears the selection.
-The toolbar's **Fit the map** button clears the selected pin and balloon, then fits
-both panes to the full historical image and its geographic coverage. It does not
-change saved positions, visibility or notes.
+The toolbar's **Fit the map** button restores the full-image overview scale and
+geographic coverage while retaining the selected Item, historical pin and balloon.
+It does not change saved positions, visibility or notes.
 Thirty-place batches yield between conversion passes; old groups are detached
 when the map changes, so obsolete asynchronous work cannot repaint the viewer.
 Click a modern cluster to expand or spiderfy coincident places. Locating uses the
@@ -183,7 +185,9 @@ Original Walking Tour assets and layers remain separate.
 
 ### Item position overrides and notes
 
-Authorized map editors select a public Item in Historical Maps, then use Adjust
+The public viewer never renders the Selected place sidebar or editing controls,
+even for signed-in editors. Authorized editors open **Admin → Historical Maps →
+map record → Adjust historical positions**, select an Item, then use Adjust
 historical position. Click/drag in the historical pane or enter original-image
 pixels; Save position persists the correction. Cancel, switching Items, and
 switching maps discard the position draft. Failed writes keep it. Reset to
