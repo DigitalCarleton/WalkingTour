@@ -33,7 +33,7 @@
                     <a href="#" id="locate-button" aria-label="Show my location"><span class="screen-reader-text">Show my location</span></a>
                 </div>
                 <p id="omeka-locations-status" class="dual-map-feedback" role="status" hidden>Loading Omeka locations…</p>
-                <p id="modern-map-status" class="dual-map-feedback" role="status">Explore the area beside the historical image.</p>
+                <p id="modern-map-status" class="dual-map-feedback" role="status"></p>
             </section>
             <aside id="historical-map-catalog" aria-labelledby="map-catalog-heading">
                 <h2 id="map-catalog-heading">Map library</h2>

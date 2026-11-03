@@ -162,7 +162,7 @@
                 imageLayer.on('tileload tileunload', function (event) { failedTiles.delete(event.tile); });
                 imageLayer.on('load', function () {
                     if (generation !== loadGeneration || failedTiles.size) { return; }
-                    setStatus('Original image · Calibrated in Allmaps · Pink outline: map coverage', false);
+                    setStatus('', false);
                 });
                 imageLayer.addTo(historicalMap);
 

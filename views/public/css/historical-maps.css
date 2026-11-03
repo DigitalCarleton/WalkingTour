@@ -16,10 +16,12 @@
 #dual-map h2 { font-size: 18px; line-height: 1.3; margin: 0; }
 .dual-map-heading { min-height: 70px; background: #fff; }
 .dual-map-heading button { font-size: 13px !important; flex-shrink: 0; }
-#dual-map #historical-map, #dual-map #map { width: 100%; height: clamp(360px, 65vh, 760px) !important; min-height: 0; position: relative; z-index: 0; }
+#dual-map #historical-map, #dual-map #map { width: 100%; height: clamp(360px, 65vh, 760px) !important; min-height: 0 !important; max-height: none !important; position: relative; z-index: 0; }
 #historical-map { background: #f0ebe1; }
 #dual-map .leaflet-container img { margin: 0; max-width: none !important; max-height: none !important; }
-#dual-map .dual-map-feedback { padding: 10px 16px; font-size: 13px; line-height: 1.5; min-height: 44px; }
+#dual-map .dual-map-feedback { padding: 0; font-size: 13px; line-height: 1.5; }
+#dual-map .dual-map-feedback p:empty { display: none; }
+#dual-map .dual-map-feedback p:not(:empty) { padding: 10px 16px; }
 #historical-map-status.is-error { color: #8c2929; }
 #historical-map-retry { margin-top: 8px !important; }
 #historical-map-catalog { padding: 20px 16px; font-size: 14px; line-height: 1.5; }
@@ -38,7 +40,7 @@
     .dual-map-toolbar { align-items: start; }
     .dual-map-toolbar p { max-width: 55%; }
     .dual-map-heading { padding: 8px 12px; }
-    #dual-map #historical-map, #dual-map #map { height: 52vh !important; min-height: 300px; max-height: 520px; }
+    #dual-map #historical-map, #dual-map #map { height: 52vh !important; min-height: 300px !important; max-height: 520px !important; }
     .dual-map-pane { border-right: 0; border-bottom: 1px solid #d8e1e3; }
 }
 

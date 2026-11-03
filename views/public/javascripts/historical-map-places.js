@@ -122,7 +122,7 @@
         function refreshStats() {
             var shown = 0, paired = 0, hidden = 0;
             Object.keys(pairs).forEach(function (key) { if (!visible(key)) { hidden++; } else { shown++; if (position(pairs[key])) { paired++; } } });
-            status.textContent = shown + ' places within map coverage · ' + paired + ' historical positions · ' + hidden + ' hidden · ' + excluded + ' outside coverage or without a reliable estimate.';
+            status.textContent = editorMode ? shown + ' places within map coverage · ' + paired + ' historical positions · ' + hidden + ' hidden · ' + excluded + ' outside coverage or without a reliable estimate.' : '';
         }
         function cluster(map) {
             return L.markerClusterGroup({animate: false, showCoverageOnHover: false, chunkedLoading: true, chunkInterval: 40, chunkDelay: 10,
