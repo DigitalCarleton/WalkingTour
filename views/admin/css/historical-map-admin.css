@@ -6,3 +6,15 @@
 .historical-maps .map-data-table td { overflow-wrap: anywhere; }
 .historical-maps .map-data-table:focus-visible { outline: 2px solid #2469a1; }
 .historical-maps input[type="url"], .historical-maps input[type="text"] { box-sizing: border-box; max-width: 100%; width: 100%; }
+
+/* Contain Omeka's floating form columns so later sections cannot drift right. */
+.historical-maps .map-information-form .field { display: grid; grid-template-columns: minmax(150px, 2fr) minmax(0, 5fr); gap: 8px 20px; margin-bottom: 20px; }
+.historical-maps .map-information-form .field > div { float: none; width: auto; min-width: 0; margin: 0; padding: 0; }
+.historical-maps .map-information-form .field label { float: none; display: block; width: auto; margin: 0; }
+.historical-maps .map-information-form input:not([type="hidden"]):not([type="submit"]) { box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; }
+.historical-maps .map-information-form fieldset { clear: both; width: 100%; min-width: 0; margin: 24px 0; }
+.historical-maps .map-information-form legend { width: 100%; margin-bottom: 16px; }
+.historical-maps .map-information-form .explanation { overflow-wrap: anywhere; }
+@media (max-width: 767px) {
+    .historical-maps .map-information-form .field { grid-template-columns: minmax(0, 1fr); }
+}
