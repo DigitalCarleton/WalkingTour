@@ -114,3 +114,21 @@ using public plugin asset paths. Saving a fixture position and resetting its est
 both succeeded through the existing authenticated, revision-checked write API.
 Anonymous access to the admin editor was denied. PHP/JavaScript syntax and diff
 whitespace checks passed; these checks do not constitute remote deployment.
+
+### Compact admin adjustment mode (2026-11-02)
+
+The old Adjust handler forced historical zoom to -1, abruptly enlarging the image.
+A regression harness reproduced that change before the fix and verified that the
+new handler starts a draft and pans without changing zoom. The admin now supports
+enabling adjustment mode before selecting a modern marker or using Find a place.
+A click on the historical image updates the orange draft marker; Save position
+uses the existing authenticated endpoint. Cancel exits without writing, and
+switching Items replaces the unsaved draft.
+
+Local Omeka browser checks used the existing isolated BnF map fixture: selecting
+in adjustment mode, clicking the historical image, saving, resetting the estimate,
+switching via a modern marker, and cancelling all passed. Sidebar height measured
+558px beside a 468px map, with independent scrolling. Coordinates, notes and map
+sources start collapsed. Description excerpts are capped at 220 Unicode characters
+plus an ellipsis; full text remains accessible through View Item. PHP/JavaScript
+syntax and whitespace checks passed. No database schema or plugin version change.

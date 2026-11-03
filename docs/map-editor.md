@@ -187,9 +187,14 @@ Original Walking Tour assets and layers remain separate.
 
 The public viewer never renders the Selected place sidebar or editing controls,
 even for signed-in editors. Authorized editors open **Admin → Historical Maps →
-map record → Adjust historical positions**, select an Item, then use Adjust
-historical position. Click/drag in the historical pane or enter original-image
-pixels; Save position persists the correction. Cancel, switching Items, and
+map record → Adjust historical positions**. Enable **Adjust historical position**,
+then select an Item marker on the modern map or use **Find a place**. Click the
+historical map or drag its orange draft marker; **Save position** persists the
+correction. Adjustment preserves the current historical zoom. Coordinates are
+available in a collapsed **Image coordinates** section. The sidebar uses a
+220-character description excerpt and scrolls independently at approximately
+map height plus 90 pixels. Display controls stay visible; notes and map sources
+are collapsed by default. Cancel, switching Items, and
 switching maps discard the position draft. Failed writes keep it. Reset to
 estimated position clears only the override; notes and display decisions remain.
 Coordinates can be zero and can fall outside the Allmaps resource mask when

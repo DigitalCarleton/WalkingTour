@@ -36,39 +36,46 @@
                 <p id="modern-map-status" class="dual-map-feedback" role="status"></p>
             </section>
             <aside id="historical-map-catalog" aria-labelledby="map-catalog-heading">
-                <h2 id="map-catalog-heading">Map library</h2>
-                <div id="historical-map-list"></div>
+                <h2 id="map-catalog-heading"><?php echo $editorMode ? 'Place editor' : 'Map library'; ?></h2>
+                <?php if (!$editorMode): ?><div id="historical-map-list"></div><?php endif; ?>
+                <label for="historical-place-select">Find a place</label>
+                <select id="historical-place-select"><option value="">Choose a place</option></select>
                 <?php if ($editorMode): ?>
+                <button type="button" id="historical-place-adjust" aria-pressed="false" disabled>Adjust historical position</button>
+                <p id="historical-decision-status" role="status" aria-live="polite"></p>
                 <section id="historical-place-details" aria-label="Selected place" hidden>
                     <h3 id="historical-place-title"></h3><p id="historical-place-description"></p>
                     <p id="historical-place-status" role="status"></p>
                     <a id="historical-place-link">View Item</a>
-                    <button type="button" id="historical-place-locate">Locate on both maps</button>
+
                     <div id="historical-place-editor" hidden>
-                        <p>Adjust this Item on this historical image. Allmaps calibration and modern coordinates stay fixed.</p>
-                        <button type="button" id="historical-place-adjust">Adjust historical position</button>
                         <div id="historical-position-draft" hidden>
-                            <p>Click the historical image, drag the draft marker, or enter original-image pixels. Placement outside the mask is an explicit editorial override.</p>
+                            <p>Click the historical map or drag the orange marker.</p>
+                            <details class="historical-advanced"><summary>Image coordinates</summary>
                             <label for="historical-pixel-x">Image X</label><input id="historical-pixel-x" type="number" step="any" min="0">
                             <label for="historical-pixel-y">Image Y</label><input id="historical-pixel-y" type="number" step="any" min="0">
+                            </details>
+                            <div class="historical-editor-actions">
                             <button type="button" id="historical-position-save">Save position</button>
-                            <button type="button" id="historical-position-cancel">Cancel adjustment</button>
+                            <button type="button" id="historical-position-cancel">Cancel</button>
+                            </div>
                         </div>
-                        <button type="button" id="historical-position-reset">Reset to estimated position</button>
-                        <label for="historical-place-visibility">Display on this map</label>
+                        <button type="button" id="historical-position-reset">Reset position</button>
+                        <label for="historical-place-visibility">Display</label>
                         <select id="historical-place-visibility"><option value="default">Default</option><option value="show">Show</option><option value="hide">Hide</option></select>
                         <button type="button" id="historical-visibility-save">Save display choice</button>
+                        <details class="historical-advanced"><summary>Editorial note</summary>
                         <label for="historical-place-note">Editorial note</label><textarea id="historical-place-note" maxlength="2000"></textarea>
                         <button type="button" id="historical-note-save">Save note</button>
-                        <p id="historical-decision-status" role="status" aria-live="polite"></p>
+                        </details>
                         <button type="button" id="historical-decision-reload" hidden>Reload latest decisions (discard draft)</button>
                     </div>
                 </section>
                 <label id="historical-hidden-label" hidden><input id="historical-show-hidden" type="checkbox"> Include hidden places (editor)</label>
                 <?php endif; ?>
-                <label for="historical-place-select">Find a place</label>
-                <select id="historical-place-select"><option value="">Choose a place</option></select>
+                <?php if ($editorMode): ?><details class="historical-advanced"><summary>Maps and sources</summary><div id="historical-map-list"></div><?php endif; ?>
                 <div id="historical-map-sources"></div>
+                <?php if ($editorMode): ?></details><?php endif; ?>
             </aside>
         </div>
     </section>

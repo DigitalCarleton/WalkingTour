@@ -85,3 +85,35 @@
 #historical-place-visibility {width: 100%;}
 #historical-hidden-label {display: block; margin: 1em 0;}
 #historical-hidden-label[hidden] {display: none;}
+
+/* The admin editor scrolls independently, keeping both maps within reach. */
+#dual-map[data-editor-mode="true"] .dual-map-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 290px; }
+#dual-map[data-editor-mode="true"].catalog-collapsed .dual-map-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+#dual-map[data-editor-mode="true"] #historical-map-catalog { max-height: calc(clamp(360px, 65vh, 760px) + 90px); overflow-y: auto; overscroll-behavior: contain; padding: 14px; font: 14px/1.45 sans-serif; }
+#dual-map[data-editor-mode="true"] #historical-map-catalog h2 { margin-bottom: 12px; }
+#dual-map[data-editor-mode="true"] #historical-map-catalog h3 { margin: 0 0 6px; font: 600 15px/1.4 sans-serif; overflow-wrap: anywhere; }
+#dual-map[data-editor-mode="true"] #historical-map-catalog p { margin: 8px 0; }
+#dual-map[data-editor-mode="true"] #historical-map-catalog label { display: block; margin-top: 8px; font-weight: normal; }
+#dual-map[data-editor-mode="true"] #historical-map-catalog button { font: 13px/1.3 sans-serif; min-height: 36px; padding: 7px 9px; width: 100%; margin: 5px 0; }
+#dual-map[data-editor-mode="true"] #historical-map-catalog input,
+#dual-map[data-editor-mode="true"] #historical-map-catalog select,
+#dual-map[data-editor-mode="true"] #historical-map-catalog textarea { font: 14px/1.4 sans-serif; width: 100%; min-height: 36px; margin: 4px 0; padding: 6px; }
+#dual-map[data-editor-mode="true"] #historical-map-catalog input[type="checkbox"] { width: auto; min-height: 0; }
+#dual-map[data-editor-mode="true"] #historical-place-details { margin: 10px 0; padding: 10px; }
+#dual-map[data-editor-mode="true"] #historical-place-details p { margin: 6px 0 !important; }
+#dual-map[data-editor-mode="true"] #historical-place-editor { margin-top: 8px; padding-top: 8px; }
+#dual-map[data-editor-mode="true"] #historical-decision-status:empty { display: none; }
+#dual-map[data-editor-mode="true"] .historical-advanced { margin-top: 10px; }
+#dual-map[data-editor-mode="true"] .historical-advanced summary { cursor: pointer; font-size: 13px; }
+#dual-map[data-editor-mode="true"] .historical-editor-actions { display: flex; gap: 6px; }
+#dual-map.is-adjusting-position #historical-map { cursor: crosshair; }
+#dual-map.is-adjusting-position #historical-place-adjust { background: #fff0df; border-color: #b34810; }
+@media (max-width: 1000px) {
+    #dual-map[data-editor-mode="true"] .dual-map-layout { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    #dual-map[data-editor-mode="true"] #historical-map-catalog { max-height: 420px; }
+}
+@media (max-width: 640px) {
+    #dual-map[data-editor-mode="true"] .dual-map-layout,
+    #dual-map[data-editor-mode="true"].catalog-collapsed .dual-map-layout { grid-template-columns: minmax(0, 1fr); }
+}
+#dual-map[data-editor-mode="true"] #historical-place-title { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
