@@ -10,12 +10,9 @@ See [WalkingTour architecture and next steps](docs/architecture/README.md) for t
 
 Import a georeference Annotation or AnnotationPage URL exported from Allmaps through
 **Omeka admin → Historical Maps → Import from Allmaps**. Review and select the maps,
-then browse one original historical image on the public page. Choose a place to
-filter the map library to its coverage and keep that place selected across maps.
-The admin position editor retains its historical-image/modern-map pair, adjustment,
-visibility and note controls. Imported calibration stays in a provenance snapshot;
-this site no longer displays or edits control points. The original Walking Tour
-remains a separate page.
+then browse the original IIIF image beside the modern map. Imported calibration stays
+in a provenance snapshot; this site no longer displays or edits control points.
+The original Walking Tour remains a separate page.
 
 The plugin version remains **0.2.3**. Fresh Historical Maps storage has two tables: maps with
 Allmaps provenance/snapshots, and Item-specific local decisions. Install/upgrade or

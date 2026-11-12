@@ -173,9 +173,7 @@
                 link.appendChild(image); thumbnail.appendChild(link); content.appendChild(thumbnail);
             }
             var popupWidth = Math.max(120, Math.min(280, historical.getSize().x - 64));
-            // Pan once when opening. Continuous keepInView can recurse against
-            // image maxBounds when an edit interrupts Leaflet 1.6's pan animation.
-            m.bindPopup(content, {className: 'historical-place-popup', maxWidth: popupWidth, minWidth: Math.min(160, popupWidth), maxHeight: Math.max(100, historical.getSize().y - 80), autoPanPadding: [16,16]});
+            m.bindPopup(content, {className: 'historical-place-popup', maxWidth: popupWidth, minWidth: Math.min(160, popupWidth), maxHeight: Math.max(100, historical.getSize().y - 80), autoPanPadding: [16,16], keepInView: true});
             return m;
         }
         historical.on('resize', function () {
