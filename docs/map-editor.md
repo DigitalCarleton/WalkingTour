@@ -1,8 +1,9 @@
 # Historical Maps: Allmaps import and browsing
 
 Historical Maps now uses calibration completed in [Allmaps Editor](https://editor.allmaps.org/).
-The public `historical-maps` page displays the original unwarped image beside a modern
-map. Both panes support independent pan and zoom. Control points, calibration tools,
+The public `historical-maps` page displays one original, unwarped historical image,
+place details and a place-aware map library. The admin position editor still displays
+the historical image beside a modern map with independent pan and zoom. Control points, calibration tools,
 mask drawing, counters, and calibration undo are retired on this site. The separate
 `walking-tour` page retains its existing tour map, filters, stops, and details.
 
@@ -117,17 +118,80 @@ Paths are relative to the Omeka site root:
 - `admin/historical-maps/import` implements authorized, CSRF-protected preview and import.
   Admin routes are unavailable through the public page.
 
-Place search remains on the modern map. It uses the configured Photon-compatible endpoint
+The admin editor's geographic search remains on the modern map. It uses the configured Photon-compatible endpoint
 (default `https://photon.komoot.io/api/`) and does not save locations or change calibration.
 Live Geolocation Item markers, historical estimates, clustering, local overrides,
 periods, visibility, manual refresh and reviewed migration/cleanup are available. Both
 public pages read current Geolocation places; neither uses bundled location exports.
 
-## Live places (ticket 02)
+## Public place browsing
+
+The public browser has its own template, stylesheet and two scripts; it does not load
+the admin dual-map startup or position-editing scripts. The admin asset list and its
+editor behavior remain unchanged. Neither public browsing nor filtering writes data.
+
+Find a place lists live public Geolocation Items independently of the active map.
+Click a historical marker or choose an Item to see its title, first available thumbnail,
+plain-text description excerpt (up to 1,000 characters), and full Item link. The map
+library then shows maps covering that place, respecting each map's Hide decision.
+Changing maps keeps the Item selected and centers on its historical counterpart.
+Clear place selection restores the complete public map library. Without a selection,
+the historical image shows clustered, eligible place pins; the selected pin is separate
+from clusters so its actual position remains visible. Dates are not shown in this version.
+
+Coverage and position estimates are separate. A checked inverse proves an in-mask
+position; otherwise the sampled transformed mask is used to determine coverage, never
+its bounding box. A covered map with an unavailable inverse stays in the library with
+Position needs review and no invented pin. An unavailable footprint or failed decision
+read stays explicitly marked for review/retry rather than being classified as outside.
+Saved, current position overrides are used for covered places; they cannot bring an
+outside place into the map. No-match selections retain their details and clear the image
+and markers. This numerical coverage test is based on the saved georeference, not an
+independent claim of historical accuracy.
+
+Loading the page or choosing Reload maps and places reads the latest public Items,
+locations, catalog revisions and decisions. Results and map transforms are cached only
+for that browsing session and discarded on reload. Map decision reads must match the
+catalog revision; a mismatch asks the visitor to reload. The map library checks only
+the selected place against other maps, while image markers are calculated for the
+active map in yielding batches. This avoids a full Items-by-maps rebuild on every edit.
+There is no background synchronization with other open pages or with Allmaps; Allmaps
+changes still require the existing reviewed refresh. Tour Item pages are not changed.
+
+### Verifying the public browser
+
+The browser change adds no database fields. It uses the existing catalog, live places
+and decision read interfaces. Keep the admin dual-map assets when deploying the plugin.
+
+Run the relationship tests from the plugin directory:
+
+```sh
+node --test tests/historical-map-browser-data.test.cjs
+```
+
+The isolated browser regression uses real PHP templates (PHP 8.2 in WebAssembly),
+Leaflet and Allmaps, with a local HTTP fixture instead of an Omeka database. With
+Node 22, install its optional test dependencies outside the plugin and run:
+
+```sh
+npm install --prefix /tmp/walkingtour-browser-tools playwright @php-wasm/node@3.1.64 jquery@1.9.1
+NODE_PATH=/tmp/walkingtour-browser-tools/node_modules node tests/historical-map-browser.browser.cjs
+```
+
+On macOS the test uses installed Google Chrome. Elsewhere install Playwright's Chromium,
+or set `WT_TEST_CHROME` to the browser executable. Screenshots are written under
+`.scratch/historical-map-browser`. The regression checks map filtering, stable selection,
+reloads, unavailable estimates, image retry, mobile layout and admin position/visibility
+saves. It also covers the Leaflet popup pan loop reproduced on the old admin viewer:
+opening still pans the popup into view, but continuous `keepInView` is disabled so it
+cannot fight image bounds during editing. Fixture checks do not replace a deployment
+check against the site's Omeka permissions, database and external IIIF providers.
+
+## Live places and the admin dual-map editor
 
 Historical Maps reads published Items directly from Geolocation in pages of 500. It never
 requires tour membership or the old location export. Reloading reads current locations.
-Only Items with a reliable automatic historical position inside the imported mask are
+In the admin editor, only Items with a reliable automatic historical position inside the imported mask are
 included in either pane or the place selector. Out-of-coverage, invalid and ambiguous
 positions are omitted from both panes. Ground control points are never drawn.
 Select a blue Leaflet pin or **Find a place** to see a Geolocation-style balloon with
@@ -160,7 +224,7 @@ PHP hosts need neither npm nor a Node service. Dependency notices are included i
 The dedicated `GET walking-tour/index/historical-map-places?after=<Item ID>` interface
 returns public Item positions and plain-text excerpts with no shared response cache.
 
-### Clustered place browsing
+### Admin clustered place browsing
 
 Historical Maps uses the existing Leaflet 1.6 instance and locally bundled
 Leaflet.markercluster 1.5.3 (rebuilt by the same asset command). The modern pane
@@ -185,7 +249,7 @@ Original Walking Tour assets and layers remain separate.
 
 ### Item position overrides and notes
 
-The public viewer never renders the Selected place sidebar or editing controls,
+The public viewer renders read-only place details and never renders editing controls,
 even for signed-in editors. Authorized editors open **Admin → Historical Maps →
 map record → Adjust historical positions**. Enable **Adjust historical position**,
 then select an Item marker on the modern map or use **Find a place**. Click the
@@ -223,15 +287,17 @@ latest decisions; that explicit page reload discards the draft for review.
 Edit map information in the Omeka admin to set an optional period label and start
 or end year. Negative years mean BCE, positive years mean CE; year zero, fractional
 years, reversed intervals and values outside -9999…9999 are rejected. Unknown years
-stay blank. The library shows the label and available years. No timeline or Dublin
+stay blank. The admin map record shows the saved period; the public browser defers
+period display. No timeline or Dublin
 Core date inference is performed.
 
-The default display rule shows current public Geolocation Items only when the imported
+In the admin editor, the default display rule shows current public Geolocation Items only when the imported
 calibration yields a reliable position inside the mask. Both panes share this coverage
 rule. Reviewed overrides replace historical positions after this filter. An explicit Show
 uses the same coverage rule; it records
 the editorial intention without bypassing publication or inventing positions. Hide
-removes that Item from both panes and the visitor picker. Editors can check Include
+removes that Item from both editor panes and its public map matches. The public place
+picker still lists the public Item independently of individual maps. Editors can check Include
 hidden places to find a hidden Item and restore Default or Show. Saving Hide keeps
 the selected Item available in that editor picker. Visibility is scoped to the map
 and shares its annotation row with position and note; reset/delete never touches the

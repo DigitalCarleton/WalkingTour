@@ -1,3 +1,4 @@
+<?php if (!$editorMode) { include __DIR__ . '/historical-map-browser.php'; return; } ?>
 <div role="main">
     <section id="dual-map" aria-label="Historical and modern maps"
         data-editor-mode="<?php echo $editorMode ? 'true' : 'false'; ?>"

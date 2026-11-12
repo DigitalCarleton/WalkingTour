@@ -3,7 +3,9 @@
 
 # Local preview, tests, and implementation notes (kept on this machine).
 /dev/
-/tests/
+/tests/*
+!/tests/historical-map-browser-data.test.cjs
+!/tests/historical-map-browser.browser.cjs
 /.scratch/
 /docs/development.md
 /docs/dual-map-annotation-spec.md
