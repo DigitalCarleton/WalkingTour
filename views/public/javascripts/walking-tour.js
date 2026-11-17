@@ -698,6 +698,15 @@ function walkingTourJs() {
         infoContent += '<div class = "content-container"> <div class ="article">' + rightContent + '</div></div>';
 
         content.append('<div class = "info-content">' + infoContent + '</div>')
+        if (typeof response.historicalMapsUrl === 'string' && /^(?:https?:\/\/|\/(?!\/))/i.test(response.historicalMapsUrl)) {
+            $('<a>', {
+                href: response.historicalMapsUrl,
+                'class': 'button historical-maps-jump',
+                text: 'Jump to Historical Maps',
+                target: '_blank',
+                rel: 'noopener'
+            }).insertAfter(content.find('.popupButton > a').first());
+        }
     }
 
     function getMarkerHTML(color) {

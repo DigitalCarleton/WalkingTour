@@ -64,6 +64,8 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
     {
         $_tourTypes = $this->publicTours();
         $this->view->tour_types = $_tourTypes;
+        $assetVersion = max(filemtime(WALKINGTOUR_PLUGIN_DIR . '/views/public/javascripts/walking-tour.js'),
+            filemtime(WALKINGTOUR_PLUGIN_DIR . '/views/public/css/walking-tour.css'));
 
         // Set the JS and CSS files.
         $this->view->headScript()
@@ -74,12 +76,12 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
             ->appendFile(src('modernizr.custom.63332', 'javascripts', 'js'))
             ->appendFile(src('Polyline.encoded', 'javascripts', 'js'))
             ->appendFile('//cdn.jsdelivr.net/npm/@allmaps/leaflet/dist/bundled/allmaps-leaflet-1.9.umd.js')
-            ->appendFile(src('walking-tour', 'javascripts', 'js'));
+            ->appendFile(src('walking-tour', 'javascripts', 'js', $assetVersion));
         $this->view->headLink()
             ->appendStylesheet('//code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css', 'all')
             // ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.css', 'all')
             // ->appendStylesheet('//cdn.leafletjs.com/leaflet-0.7/leaflet.ie.css', 'all', 'lte IE 8')
-            ->appendStylesheet(src('walking-tour', 'css', 'css'));
+            ->appendStylesheet(src('walking-tour', 'css', 'css', $assetVersion));
             // ->appendStylesheet(src('/../../../themes/mall-theme', 'css', 'css'));
     }
 
@@ -202,20 +204,29 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
         if (!$this->_request->isXmlHttpRequest()) {
             throw new Omeka_Controller_Exception_403;
         }
-        $item_id = $this->_request->getParam('id');
-        $tour_id = $this->_request->getParam('tour');
+        $item_id = filter_var($this->_request->getParam('id'), FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
+        $tour_id = filter_var($this->_request->getParam('tour'), FILTER_VALIDATE_INT, array('options' => array('min_range' => 1)));
+        if ($item_id === false || $tour_id === false) {
+            $this->getResponse()->setHttpResponseCode(422);
+            $this->_helper->json(array('error' => 'Choose a valid tour and Item.')); return;
+        }
 
         $db = $this->_helper->db->getDb();
         $tourItemTable = $db->getTable('TourItem');
         $prefix = $db->prefix;
 
 
-        $tourItem = $tourItemTable->fetchObjects("SELECT * FROM " . $prefix . "tour_items 
-                                                            WHERE tour_id = $tour_id AND item_id = $item_id");
+        $tourItem = $tourItemTable->fetchObjects("SELECT * FROM " . $prefix . "tour_items
+            WHERE tour_id = ? AND item_id = ?", array($tour_id, $item_id));
+
+        $item = get_record_by_id('item', $item_id);
+        if (!$tourItem || !$item) {
+            $this->getResponse()->setHttpResponseCode(404);
+            $this->_helper->json(array('error' => 'This Item is not available in the selected tour.')); return;
+        }
 
         $exhibit_id = $tourItem[0]["exhibit_id"];
 
-        $item = get_record_by_id('item', $item_id);
         $data = array(
             'id' => $item->id,
             'title' => metadata($item, array('Dublin Core', 'Title')),
@@ -233,8 +244,17 @@ class WalkingTour_IndexController extends Omeka_Controller_AbstractActionControl
                 ),
                 'id'
             ),
-            "exhibitUrl" => ""
+            "exhibitUrl" => "",
+            'historicalMapsUrl' => null
         );
+        if (plugin_is_active('HistoricalMaps') && $item->public) {
+            $tour = $db->getTable('Tour')->find($tour_id);
+            if ($tour && $tour->public) {
+                $data['historicalMapsUrl'] = public_url('historical-maps') . '?' . http_build_query(array(
+                    'tour_id' => $tour_id, 'item_id' => $item_id
+                ));
+            }
+        }
         if (plugin_is_active('DublinCoreExtended')) {
             $data['abstract'] = metadata($item, array('Dublin Core', 'Abstract'), array('no-escape' => true));
         }

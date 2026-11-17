@@ -21,6 +21,22 @@ With the [Geolocation plugin](https://omeka.org/classic/plugins/Geolocation/) in
 
 3. Use the plugin Configuration Settings to set the help text and map default options. If you want the center of the map to be automatically calculated based off all geolocated items that have been added to walking tours, check the Auto-fit to Locations checkbox.
 
+## Optional Historical Maps link
+
+When the separate Historical Maps plugin is installed and active, a public tour
+stop's **View More Info** panel includes **Jump to Historical Maps** beside **Full
+Details**. The link opens that tour and Item in a new tab. Previous/Next navigation
+updates the link; an Item shared by multiple tours uses the tour currently being
+viewed. The link is omitted for private tours or Items and when Historical Maps is
+inactive or absent. Existing Full Details and ExhibitBuilder actions remain available.
+
+The destination keeps the tour selected while visitors switch historical maps.
+Only stops allowed by the current map's coverage and visibility settings appear;
+route legs touching unavailable stops are omitted. Route and stop visibility can
+be toggled independently. **Clear tour** restores ordinary historical-map browsing
+on the same map. This integration requires the Historical Maps version supporting
+`tour_id` and `item_id` entry links and needs no database migration.
+
 # Use Instructions
 
 ### 1. Create a Walking Tour:
